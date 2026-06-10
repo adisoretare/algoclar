@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import { CURRICULUM } from '@/data/curriculum'
 import { LessonFrontmatterSchema } from './types'
 import type { LessonMeta, LessonWithContent } from './types'
 
@@ -74,7 +75,14 @@ export async function getLessonsByGrade(grade: number): Promise<LessonMeta[]> {
 
 export async function getChaptersByGrade(grade: number): Promise<string[]> {
   const lessons = await getLessonsByGrade(grade)
-  const seen = new Set<string>()
-  for (const l of lessons) seen.add(l.chapter)
-  return [...seen].sort()
+  const lessonChapters = new Set(lessons.map((l) => l.chapter))
+
+  const gradeData = CURRICULUM.find((g) => g.grade === grade)
+  if (gradeData) {
+    return gradeData.chapters
+      .filter((c) => lessonChapters.has(c.id))
+      .map((c) => c.id)
+  }
+
+  return [...lessonChapters].sort()
 }

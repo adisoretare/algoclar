@@ -144,4 +144,16 @@ describe('getChaptersByGrade()', () => {
     const unique = [...new Set(chapters)]
     expect(chapters).toEqual(unique)
   })
+
+  it('returns chapters in curriculum order for grade 7', async () => {
+    const chapters = await getChaptersByGrade(7)
+    // grade-7 has only recursivitate/factorial.mdx → first chapter is 'recursivitate'
+    expect(chapters[0]).toBe('recursivitate')
+  })
+
+  it('returns chapters in curriculum order for grade 9', async () => {
+    const chapters = await getChaptersByGrade(9)
+    // grade-9 has only sortare/bubble-sort.mdx → first chapter is 'sortare'
+    expect(chapters[0]).toBe('sortare')
+  })
 })
