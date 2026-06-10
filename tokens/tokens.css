@@ -1,0 +1,73 @@
+/* ============================================================
+   AlgoClar — Design Tokens
+   shadcn/ui compatible · HSL channels (no hsl() wrapper)
+   Use as: hsl(var(--primary)) / hsl(var(--primary) / 0.5)
+   ============================================================ */
+
+:root {
+  /* --- surfaces & text --- */
+  --background: 45 33% 98%;            /* #FBFAF7 warm white */
+  --foreground: 224 33% 11%;           /* #131826 blue-black */
+  --card: 0 0% 100%;                   /* #FFFFFF */
+  --card-foreground: 224 33% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 33% 11%;
+
+  /* --- brand & semantic --- */
+  --primary: 222 100% 59%;             /* #2D6BFF electric blue */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 252 92% 66%;            /* #7A5AF8 violet */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 223 100% 96%;              /* #EAF0FF blue tint (hover/soft bg) */
+  --accent-foreground: 222 100% 59%;
+  --muted: 220 12% 95%;                /* #F1F2F4 */
+  --muted-foreground: 220 11% 47%;     /* #6B7486 */
+  --destructive: 0 67% 58%;            /* #DB4B4B discreet red */
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;              /* #16A34A */
+  --success-foreground: 0 0% 100%;
+  --warning: 38 90% 48%;               /* #EA9A0C */
+  --warning-foreground: 224 33% 11%;
+
+  /* --- lines & focus --- */
+  --border: 43 13% 89%;                /* #E7E5E0 */
+  --input: 43 13% 89%;
+  --ring: 222 100% 59%;                /* #2D6BFF */
+
+  /* --- code blocks --- */
+  --code: 222 43% 10%;                 /* #0F1626 dark code bg */
+  --code-foreground: 219 40% 85%;      /* #C9D4E8 */
+
+  --radius: 0.625rem;                  /* 10px base (buttons) */
+}
+
+.dark {
+  --background: 223 39% 9%;            /* #0E1320 */
+  --foreground: 218 35% 94%;           /* #EAEEF5 */
+  --card: 221 27% 12%;                 /* #161B26 */
+  --card-foreground: 218 35% 94%;
+  --popover: 221 27% 12%;
+  --popover-foreground: 218 35% 94%;
+
+  --primary: 224 100% 68%;             /* #5B86FF */
+  --primary-foreground: 224 41% 7%;    /* #0B0F1A */
+  --secondary: 250 100% 76%;           /* #9B86FF */
+  --secondary-foreground: 224 41% 7%;
+  --accent: 224 41% 18%;               /* #1B2540 */
+  --accent-foreground: 229 100% 81%;   /* #9FB1FF */
+  --muted: 222 26% 15%;                /* #1C2230 */
+  --muted-foreground: 215 13% 65%;     /* #9AA4B2 */
+  --destructive: 0 84% 68%;            /* #F26B6B */
+  --destructive-foreground: 0 41% 7%;
+  --success: 149 59% 49%;              /* #34C77B */
+  --success-foreground: 148 41% 7%;
+  --warning: 40 89% 60%;               /* #F4B740 */
+  --warning-foreground: 224 41% 7%;
+
+  --border: 218 22% 19%;               /* #262E3C */
+  --input: 218 22% 19%;
+  --ring: 224 100% 68%;                /* #5B86FF */
+
+  --code: 223 41% 7%;                  /* #0A0E18 */
+  --code-foreground: 219 40% 85%;
+}
