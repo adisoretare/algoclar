@@ -76,5 +76,5 @@ export async function getChaptersByGrade(grade: number): Promise<string[]> {
   const lessons = await getLessonsByGrade(grade)
   const seen = new Set<string>()
   for (const l of lessons) seen.add(l.chapter)
-  return [...seen]
+  return [...seen].sort()
 }

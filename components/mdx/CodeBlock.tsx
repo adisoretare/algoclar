@@ -12,8 +12,10 @@ export async function CodeBlock({
 }: CodeBlockProps) {
   const code = children.trim()
   const highlighter = await getHighlighter()
+  const SUPPORTED = ['cpp', 'c', 'python', 'javascript', 'typescript', 'bash', 'text']
+  const lang = SUPPORTED.includes(language) ? language : 'text'
   const html = highlighter.codeToHtml(code, {
-    lang: language,
+    lang,
     theme: 'github-dark',
   })
 
