@@ -50,12 +50,13 @@ export function PlayerControls({
         aria-valuemin={0}
         aria-valuemax={frameCount - 1}
         aria-valuenow={index}
+        aria-valuetext={`Pasul ${index + 1} din ${frameCount}`}
         tabIndex={0}
         className="group relative h-2 w-full cursor-pointer rounded-full bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         onClick={handleProgressClick}
         onKeyDown={e => {
-          if (e.key === 'ArrowRight') { e.preventDefault(); onNext() }
-          if (e.key === 'ArrowLeft') { e.preventDefault(); onPrev() }
+          if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); onNext() }
+          if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); onPrev() }
         }}
       >
         <div

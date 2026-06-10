@@ -40,6 +40,8 @@ export function VisualizerShell<T>({
 
   return (
     <div
+      role="region"
+      aria-label={title}
       tabIndex={0}
       onKeyDown={handleKeyDown}
       className="my-6 flex flex-col gap-4 rounded-[16px] border border-border bg-card p-4 shadow-[0_1px_2px_rgba(19,24,38,0.04)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-6"
@@ -60,6 +62,7 @@ export function VisualizerShell<T>({
       {/* Explanation */}
       <div
         key={player.index}
+        aria-live="polite"
         className="animate-in fade-in rounded-[8px] bg-muted/50 px-4 py-3 font-mono text-sm text-foreground duration-200"
       >
         {player.currentFrame.explanation}
