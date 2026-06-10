@@ -1,0 +1,89 @@
+---
+title: "Ce este un algoritm?"
+slug: ce-este-un-algoritm
+grade: 5
+chapter: introducere
+difficulty: baza
+estimatedTime: 10
+free: true
+tags: ["algoritm", "introducere", "notiuni-de-baza"]
+visualizers: []
+relatedProblems: []
+---
+
+<LessonHook>
+Dimineața, când faci un sandviș, urmezi pași în ordine: iei pâinea, tai, pui unt, adaugi ce vrei. Dacă sari un pas sau îi schimbi ordinea, rezultatul e greșit. Un algoritm funcționează exact așa — o listă de instrucțiuni precise, în ordine, care rezolvă o problemă.
+</LessonHook>
+
+## Definiție
+
+Un **algoritm** este o secvență finită de pași bine definiți care rezolvă o problemă sau realizează o sarcină.
+
+Trei proprietăți obligatorii:
+
+1. **Finit** — se termină după un număr limitat de pași
+2. **Precis** — fiecare pas e clar, fără ambiguitate
+3. **Corect** — produce rezultatul așteptat pentru orice date de intrare valide
+
+<ObservationBox>
+„Adaugă puțină sare" NU este un pas algoritmic — „puțin" e ambiguu. „Adaugă 3 grame de sare" este precis.
+</ObservationBox>
+
+## Primul tău algoritm: găsește maximul
+
+**Problemă:** Ai trei numere. Găsește-l pe cel mai mare.
+
+**Algoritm în cuvinte:**
+1. Citește numerele `a`, `b`, `c`
+2. Presupune că maximul este `a`
+3. Dacă `b > maxim`, atunci maximul devine `b`
+4. Dacă `c > maxim`, atunci maximul devine `c`
+5. Afișează maximul
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a, b, c;
+    cin >> a >> b >> c;
+
+    int maxim = a;
+    if (b > maxim) maxim = b;
+    if (c > maxim) maxim = c;
+
+    cout << maxim << endl;
+    return 0;
+}
+```
+
+<HintBox>
+Testează cu `a=5, b=5, c=5`. Algoritmul returnează `5` — corect. Testează și cu numere negative: `a=-3, b=-1, c=-7` → returnează `-1`. Un algoritm bun funcționează pentru **toate** cazurile valide, nu doar pentru cele ușoare.
+</HintBox>
+
+## De ce contează ordinea pașilor?
+
+Dacă ai scrie:
+
+```cpp
+int maxim = a;
+if (c > maxim) maxim = c;  // am schimbat ordinea
+if (b > maxim) maxim = b;
+```
+
+Rezultatul este același — ordinea `b`/`c` nu contează aici. Dar în alți algoritmi ordinea este critică. Exemplu: la sortare, dacă schimbi ordinea comparațiilor obții un șir nesortrat.
+
+<MistakeBox>
+Greșeală frecventă: inițializezi maximul cu `0` în loc de `a`. Funcționează dacă numerele sunt pozitive, dar pentru `a=-5, b=-3, c=-8` returnează `0` — greșit. Inițializează mereu cu primul element din șir, nu cu o valoare fixă.
+</MistakeBox>
+
+## Algoritmi în viața de zi cu zi
+
+| Situație | Algoritm |
+|----------|----------|
+| Rețetă de prăjitură | Pași în ordine, ingrediente precise |
+| GPS — ruta cea mai scurtă | Algoritm Dijkstra |
+| Căutare pe Google | Algoritmi de indexare + ranking |
+| Recunoaștere față (Face ID) | Algoritmi de machine learning |
+
+Toți pornesc de la același principiu: pași precisi, în ordine, care transformă o intrare într-o ieșire corectă.
