@@ -4,6 +4,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Frame, StepPlayerControls } from './types'
 
 export function useStepPlayer<T>(frames: Frame<T>[]): StepPlayerControls<T> {
+  if (frames.length === 0) {
+    throw new Error('useStepPlayer requires at least one frame')
+  }
   const total = frames.length
   const [index, setIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -18,18 +21,19 @@ export function useStepPlayer<T>(frames: Frame<T>[]): StepPlayerControls<T> {
   }, [])
 
   useEffect(() => {
-    if (isPlaying && index >= total - 1) {
-      setIsPlaying(false)
-    }
-  }, [index, isPlaying, total])
-
-  useEffect(() => {
     if (!isPlaying) {
       clearTimer()
       return
     }
     intervalRef.current = setInterval(() => {
-      setIndex(prev => (prev >= total - 1 ? prev : prev + 1))
+      setIndex(prev => {
+        const next = prev + 1
+        if (next >= total - 1) {
+          setIsPlaying(false)
+          return Math.min(next, total - 1)
+        }
+        return next
+      })
     }, 1000 / speed)
     return clearTimer
   }, [isPlaying, speed, total, clearTimer])
