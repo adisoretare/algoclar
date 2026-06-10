@@ -3,15 +3,7 @@ import Link from 'next/link'
 import { BookOpen, Play, Archive, TrendingUp, Check } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import dynamic from 'next/dynamic'
-
-const BinarySearchVisualizer = dynamic<{ ambient?: boolean }>(
-  () =>
-    import('@/components/visualizers/BinarySearchVisualizer').then(m => ({
-      default: m.BinarySearchVisualizer,
-    })),
-  { ssr: false },
-)
+import { HeroBinarySearch } from '@/components/home/HeroBinarySearch'
 import { ProblemCard } from '@/components/problem/ProblemCard'
 
 export const metadata: Metadata = {
@@ -156,7 +148,7 @@ export default function HomePage() {
           </div>
           {/* Right: live binary search demo */}
           <div className="w-full lg:flex-1">
-            <BinarySearchVisualizer ambient />
+            <HeroBinarySearch />
           </div>
         </div>
       </section>
