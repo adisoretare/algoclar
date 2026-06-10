@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getVisualizer } from '@/components/visualizers/registry'
 import { VISUALIZER_CATALOG } from '@/lib/visualizers/catalog'
+import { VisualizerRenderer } from '@/components/visualizers/VisualizerRenderer'
 
 export function generateStaticParams() {
   return VISUALIZER_CATALOG.map(v => ({ slug: v.slug }))
@@ -26,9 +26,8 @@ export default async function VisualizarePage({
 }) {
   const { slug } = await params
   const viz = VISUALIZER_CATALOG.find(v => v.slug === slug)
-  const Viz = getVisualizer(slug)
 
-  if (!viz || !Viz) notFound()
+  if (!viz) notFound()
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
@@ -41,7 +40,7 @@ export default async function VisualizarePage({
       <h1 className="mt-6 font-heading text-2xl font-bold">{viz.title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{viz.description}</p>
       <div className="mt-8">
-        <Viz />
+        <VisualizerRenderer slug={slug} />
       </div>
     </main>
   )
