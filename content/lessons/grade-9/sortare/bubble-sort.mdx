@@ -1,0 +1,105 @@
+---
+title: "Bubble Sort — cum și de ce"
+slug: bubble-sort
+grade: 9
+chapter: sortare
+difficulty: baza
+estimatedTime: 15
+free: true
+tags: ["sortare", "comparație", "swap"]
+visualizers: ["bubble-sort"]
+relatedProblems: []
+---
+
+<LessonHook>
+Ai o grămadă de fișe dezordonate pe birou. Cel mai simplu mod de a le sorta?
+Treci de mai multe ori prin ele și schimbi oricare două fișe vecine care sunt în
+ordine greșită. Exact asta face Bubble Sort.
+</LessonHook>
+
+## Ce este Bubble Sort?
+
+Bubble Sort este cel mai simplu algoritm de sortare prin comparație. La fiecare
+**trecere** prin șir, elementele mai mari "plutesc" (bubble) spre dreapta, la
+fel cum bulele de aer urcă în apă.
+
+## Algoritmul pas cu pas
+
+Fie șirul `[5, 3, 8, 1, 9, 2]`. O trecere completă arată așa:
+
+- Comparăm 5 și 3 → swap → `[3, 5, 8, 1, 9, 2]`
+- Comparăm 5 și 8 → ok
+- Comparăm 8 și 1 → swap → `[3, 5, 1, 8, 9, 2]`
+- Comparăm 8 și 9 → ok
+- Comparăm 9 și 2 → swap → `[3, 5, 1, 8, 2, 9]`
+
+După prima trecere, `9` (maximul) este pe poziția corectă. Repetăm pentru `n-1` treceri.
+
+<ObservationBox>
+După trecerea `k`, ultimele `k` elemente sunt deja sortate și nu mai trebuie
+comparate. Optimizat, facem `n-1 + n-2 + ... + 1 = n(n-1)/2` comparații.
+</ObservationBox>
+
+## Implementare C++
+
+<CodeBlock language="cpp">{`#include <iostream>
+using namespace std;
+
+void bubbleSort(int a[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (a[j] > a[j + 1]) {
+                swap(a[j], a[j + 1]);
+            }
+        }
+    }
+}
+
+int main() {
+    int a[] = {5, 3, 8, 1, 9, 2};
+    int n = 6;
+    bubbleSort(a, n);
+    for (int i = 0; i < n; i++) {
+        cout << a[i] << " ";
+    }
+    return 0;
+}`}</CodeBlock>
+
+## Versiunea optimizată
+
+Dacă o trecere nu produce niciun swap, șirul e deja sortat. Ieșim devreme:
+
+<CodeBlock language="cpp">{`void bubbleSortOpt(int a[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        bool swapped = false;
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (a[j] > a[j + 1]) {
+                swap(a[j], a[j + 1]);
+                swapped = true;
+            }
+        }
+        if (!swapped) break;
+    }
+}`}</CodeBlock>
+
+<HintBox>
+Pe un șir deja sortat, versiunea optimizată face doar **O(n)** comparații
+(o singură trecere fără niciun swap). Fără optimizare: mereu O(n²).
+</HintBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Cel mai bun (șir sortat, cu opt.) | O(n) | O(1) |
+| Mediu | O(n²) | O(1) |
+| Cel mai rău | O(n²) | O(1) |
+
+<MistakeBox>
+Nu folosi Bubble Sort pentru n > 10.000 în concursuri — O(n²) e prea lent.
+Pentru n mare folosește `std::sort` (O(n log n)) sau Merge Sort.
+</MistakeBox>
+
+## Vizualizare
+
+<Visualizer name="bubble-sort" />
