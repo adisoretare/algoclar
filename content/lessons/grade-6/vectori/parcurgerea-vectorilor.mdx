@@ -1,0 +1,79 @@
+---
+title: "Parcurgerea vectorilor — maxim și sumă"
+slug: parcurgerea-vectorilor
+grade: 6
+chapter: vectori
+difficulty: baza
+estimatedTime: 10
+free: true
+tags: ["vectori", "parcurgere", "maxim", "sumă"]
+visualizers: ["array-traversal"]
+relatedProblems: []
+---
+
+<LessonHook>
+Ai o listă de note și vrei să știi care e cea mai mare și cât e suma lor totală. Cum faci asta fără să ordonezi nimic? Parcurgi lista o singură dată, de la stânga la dreapta.
+</LessonHook>
+
+## Ce este parcurgerea unui vector?
+
+Un **vector** este o colecție de valori numerotate, accesate prin index (de la `0` la `n-1`).
+
+**Parcurgerea** înseamnă să vizităm fiecare element exact o dată, în ordine, acumulând informații pe parcurs — suma și maximul, de exemplu.
+
+## Algoritmul
+
+```
+maxim ← v[0]
+sumă  ← 0
+
+pentru i de la 0 la n-1:
+    sumă ← sumă + v[i]
+    dacă v[i] > maxim:
+        maxim ← v[i]
+```
+
+**De ce inițializăm `maxim` cu `v[0]`?**
+Maximul unui vector este neapărat unul dintre elementele lui, deci `v[0]` e o alegere sigură. Alternativa `−∞` funcționează și ea, dar e mai puțin intuitivă.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[100];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    int maxim = v[0], suma = 0;
+    for (int i = 0; i < n; i++) {
+        suma += v[i];
+        if (v[i] > maxim) maxim = v[i];
+    }
+
+    cout << "Maxim: " << maxim << "\n";
+    cout << "Suma: "  << suma  << "\n";
+    return 0;
+}
+```
+
+<ObservationBox>
+Complexitate: **O(n)** timp, **O(1)** spațiu suplimentar. Parcurgem vectorul o singură dată.
+</ObservationBox>
+
+## Vizualizare
+
+Urmărește cum se actualizează maximul și suma la fiecare pas:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+<MistakeBox>
+Nu inițializa `maxim` cu `0` dacă vectorul poate conține numere negative — vei obține un rezultat greșit. Inițializează întotdeauna cu `v[0]`.
+</MistakeBox>
