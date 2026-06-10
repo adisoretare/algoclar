@@ -1,7 +1,7 @@
 import { HintBox } from '@/components/lesson/HintBox'
 import { ObservationBox } from '@/components/lesson/ObservationBox'
 import { MistakeBox } from '@/components/lesson/MistakeBox'
-import { CodeBlock } from './CodeBlock'
+import { CodeBlock, MdxPre } from './CodeBlock'
 import { LessonHook } from './LessonHook'
 import { Visualizer } from './Visualizer'
 
@@ -10,6 +10,7 @@ export const MDX_COMPONENTS = {
   ObservationBox,
   MistakeBox,
   CodeBlock,
+  pre: MdxPre,
   LessonHook,
   Visualizer,
 }

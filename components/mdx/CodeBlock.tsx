@@ -2,26 +2,20 @@ import React from 'react'
 import { getHighlighter } from '@/lib/highlighter'
 import { CopyButton } from './CopyButton'
 
+const SUPPORTED = [
+  'cpp', 'c', 'python', 'javascript', 'typescript', 'bash', 'text',
+]
+
 interface CodeBlockProps {
   language?: string
-  children?: React.ReactNode
+  code: string
 }
 
-export async function CodeBlock({
-  language = 'cpp',
-  children,
-}: CodeBlockProps) {
-  const raw =
-    typeof children === 'string'
-      ? children
-      : Array.isArray(children) && typeof children[0] === 'string'
-        ? children[0]
-        : ''
-  const code = raw.trim()
+export async function CodeBlock({ language = 'cpp', code }: CodeBlockProps) {
+  const trimmed = code.trim()
   const highlighter = await getHighlighter()
-  const SUPPORTED = ['cpp', 'c', 'python', 'javascript', 'typescript', 'bash', 'text']
   const lang = SUPPORTED.includes(language) ? language : 'text'
-  const html = highlighter.codeToHtml(code, {
+  const html = highlighter.codeToHtml(trimmed, {
     lang,
     theme: 'github-dark',
   })
@@ -32,7 +26,31 @@ export async function CodeBlock({
         className="overflow-x-auto text-[13.5px] leading-[1.6] [&>pre]:p-5"
         dangerouslySetInnerHTML={{ __html: html }}
       />
-      <CopyButton code={code} />
+      <CopyButton code={trimmed} />
     </div>
   )
+}
+
+// MdxPre is used as the `pre` component override for MDX fenced code blocks.
+// It extracts the code string and language from the standard <code> child
+// that MDX generates, then delegates to CodeBlock for highlighting.
+export async function MdxPre({
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLPreElement>) {
+  // MDX renders: <pre {...rest}><code className="language-cpp">...code...</code></pre>
+  const codeEl = React.Children.only(children) as React.ReactElement<{
+    className?: string
+    children?: string
+  }>
+
+  const rawCode =
+    typeof codeEl?.props?.children === 'string'
+      ? codeEl.props.children
+      : ''
+
+  const className = codeEl?.props?.className ?? ''
+  const language = className.replace('language-', '') || 'text'
+
+  return <CodeBlock language={language} code={rawCode} />
 }

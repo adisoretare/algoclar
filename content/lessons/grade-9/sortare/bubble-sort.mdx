@@ -42,7 +42,8 @@ comparate. Optimizat, facem `n-1 + n-2 + ... + 1 = n(n-1)/2` comparații.
 
 ## Implementare C++
 
-<CodeBlock language="cpp">{`#include <iostream>
+```cpp
+#include <iostream>
 using namespace std;
 
 void bubbleSort(int a[], int n) {
@@ -63,13 +64,15 @@ int main() {
         cout << a[i] << " ";
     }
     return 0;
-}`}</CodeBlock>
+}
+```
 
 ## Versiunea optimizată
 
 Dacă o trecere nu produce niciun swap, șirul e deja sortat. Ieșim devreme:
 
-<CodeBlock language="cpp">{`void bubbleSortOpt(int a[], int n) {
+```cpp
+void bubbleSortOpt(int a[], int n) {
     for (int i = 0; i < n - 1; i++) {
         bool swapped = false;
         for (int j = 0; j < n - 1 - i; j++) {
@@ -80,7 +83,8 @@ Dacă o trecere nu produce niciun swap, șirul e deja sortat. Ieșim devreme:
         }
         if (!swapped) break;
     }
-}`}</CodeBlock>
+}
+```
 
 <HintBox>
 Pe un șir deja sortat, versiunea optimizată face doar **O(n)** comparații

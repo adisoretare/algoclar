@@ -42,7 +42,8 @@ până la stack overflow.
 
 ## Implementare recursivă C++
 
-<CodeBlock language="cpp">{`#include <iostream>
+```cpp
+#include <iostream>
 using namespace std;
 
 long long factorial(int n) {
@@ -54,7 +55,8 @@ int main() {
     cout << factorial(5) << endl;  // 120
     cout << factorial(10) << endl; // 3628800
     return 0;
-}`}</CodeBlock>
+}
+```
 
 ## Stiva de apeluri
 
@@ -78,13 +80,15 @@ Vizualizează recursivitatea ca o stivă de scrisori: pui câte una pe stivă
 
 ## Implementare iterativă (comparație)
 
-<CodeBlock language="cpp">{`long long factorialIterativ(int n) {
+```cpp
+long long factorialIterativ(int n) {
     long long rezultat = 1;
     for (int i = 2; i <= n; i++) {
         rezultat *= i;
     }
     return rezultat;
-}`}</CodeBlock>
+}
+```
 
 <MistakeBox>
 `int` depășește la 13! (2.147.483.647 < 6.227.020.800). Folosește `long long`
