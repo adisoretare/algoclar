@@ -3,11 +3,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Frame, StepPlayerControls } from './types'
 
-export function useStepPlayer<T>(frames: Frame<T>[]): StepPlayerControls<T> {
+export function useStepPlayer<T>(
+  frames: Frame<T>[],
+  opts?: { loop?: boolean },
+): StepPlayerControls<T> {
   if (frames.length === 0) {
     throw new Error('useStepPlayer requires at least one frame')
   }
   const total = frames.length
+  const loop = opts?.loop ?? false
   const [index, setIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeedState] = useState(1)
@@ -28,15 +32,16 @@ export function useStepPlayer<T>(frames: Frame<T>[]): StepPlayerControls<T> {
     intervalRef.current = setInterval(() => {
       setIndex(prev => {
         const next = prev + 1
-        if (next >= total - 1) {
+        if (next >= total) {
+          if (loop) return 0
           setIsPlaying(false)
-          return Math.min(next, total - 1)
+          return total - 1
         }
         return next
       })
     }, 1000 / speed)
     return clearTimer
-  }, [isPlaying, speed, total, clearTimer])
+  }, [isPlaying, speed, total, clearTimer, loop])
 
   const next = useCallback(() => {
     setIndex(i => Math.min(i + 1, total - 1))

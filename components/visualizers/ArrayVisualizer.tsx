@@ -1,40 +1,67 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useStepPlayer } from '@/lib/visualizers/useStepPlayer'
 import { VisualizerShell } from './VisualizerShell'
 import { generateArrayTraversal } from '@/lib/visualizers/generators/array-traversal'
+import { LabInput, parseIntegers } from './LabInput'
+import type { LabField } from './LabInput'
 
 const DEFAULT_ARRAY = [3, 7, 2, 9, 1, 5, 8, 4]
 
+const LAB_FIELDS: LabField[] = [
+  {
+    id: 'array',
+    label: 'Vectorul tău',
+    placeholder: 'ex: 3 7 1 9 4',
+    validate: raw => {
+      const nums = parseIntegers(raw)
+      if (!nums) return 'Introdu numere întregi separate prin spațiu.'
+      if (nums.length < 2) return 'Introdu cel puțin 2 valori.'
+      if (nums.length > 15) return 'Maximum 15 valori.'
+      if (nums.some(n => n < -999 || n > 9999))
+        return 'Valorile trebuie să fie între -999 și 9999.'
+      return null
+    },
+  },
+]
+
 export function ArrayVisualizer() {
-  // Frames are pure data — stable reference, computed once
-  const frames = useMemo(
-    () => generateArrayTraversal({ array: DEFAULT_ARRAY }),
-    [],
-  )
+  const [array, setArray] = useState(DEFAULT_ARRAY)
+  const frames = useMemo(() => generateArrayTraversal({ array }), [array])
   const player = useStepPlayer(frames)
-  const { array, currentIndex, maxValue, maxIndex, sum, done } =
+  const { reset } = player
+
+  useEffect(() => {
+    reset()
+  }, [array, reset])
+
+  const { currentIndex, maxValue, maxIndex, sum, done } =
     player.currentFrame.state
+  const currentArray = player.currentFrame.state.array
+
+  function handleLabSubmit(values: Record<string, string>) {
+    const nums = parseIntegers(values.array ?? '')
+    if (nums) setArray(nums)
+  }
 
   return (
     <VisualizerShell
       title="Parcurgerea unui vector — max și sumă"
       player={player}
       frameCount={frames.length}
+      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
     >
       <div className="flex flex-col items-center gap-6 py-2">
-        {/* ── Array cells ─────────────────────────────────────────── */}
+        {/* Array cells */}
         <div
           className="flex flex-wrap justify-center gap-2"
           role="list"
           aria-label="Vectorul v"
         >
-          {array.map((value, i) => {
-            // currentIndex is -1 when done → isCurrent is always false at end
+          {currentArray.map((value, i) => {
             const isCurrent = i === currentIndex
-            // Max highlight only when cell is not also the current (current takes priority)
             const isMax = !isCurrent && i === maxIndex
 
             return (
@@ -47,16 +74,12 @@ export function ArrayVisualizer() {
                   className={cn(
                     'flex h-12 w-12 items-center justify-center rounded-[10px] border-2 font-mono text-base font-semibold transition-all duration-200',
                     isCurrent
-                      ? // Active cell: primary blue ring + subtle glow
-                        'scale-110 border-primary bg-accent text-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.12)]'
+                      ? 'scale-110 border-primary bg-accent text-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.12)]'
                       : isMax
-                        ? // Current maximum: success green
-                          'border-success bg-success/10 text-success'
+                        ? 'border-success bg-success/10 text-success'
                         : done
-                          ? // Traversal done, non-max cells: muted
-                            'border-border bg-muted/60 text-muted-foreground'
-                          : // Normal unvisited / visited cell
-                            'border-border bg-muted text-foreground',
+                          ? 'border-border bg-muted/60 text-muted-foreground'
+                          : 'border-border bg-muted text-foreground',
                   )}
                   aria-current={isCurrent ? 'true' : undefined}
                   aria-label={`v[${i}] = ${value}${isCurrent ? ', vizitat acum' : ''}${isMax ? ', maxim curent' : ''}`}
@@ -71,29 +94,15 @@ export function ArrayVisualizer() {
           })}
         </div>
 
-        {/* ── Stats panel ──────────────────────────────────────────── */}
+        {/* Stats */}
         <div className="flex gap-3">
-          <StatChip
-            label="max"
-            value={maxValue}
-            variant="success"
-            emphasized={done}
-          />
-          <StatChip
-            label="sumă"
-            value={sum}
-            variant="primary"
-            emphasized={done}
-          />
+          <StatChip label="max" value={maxValue} variant="success" emphasized={done} />
+          <StatChip label="sumă" value={sum} variant="primary" emphasized={done} />
         </div>
       </div>
     </VisualizerShell>
   )
 }
-
-// ── StatChip ──────────────────────────────────────────────────────────────────
-// Small info chip showing a running value. `emphasized` triggers a subtle
-// color wash when the traversal completes, reinforcing the "done" state.
 
 interface StatChipProps {
   label: string

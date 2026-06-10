@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { StepPlayerControls } from '@/lib/visualizers/types'
 import { PlayerControls } from './PlayerControls'
 
@@ -8,6 +11,8 @@ interface VisualizerShellProps<T> {
   player: StepPlayerControls<T>
   frameCount: number
   children: React.ReactNode
+  ambient?: boolean
+  labZone?: React.ReactNode
 }
 
 export function VisualizerShell<T>({
@@ -15,7 +20,15 @@ export function VisualizerShell<T>({
   player,
   frameCount,
   children,
+  ambient = false,
+  labZone,
 }: VisualizerShellProps<T>) {
+  const [labOpen, setLabOpen] = useState(false)
+
+  if (ambient) {
+    return <>{children}</>
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     switch (e.key) {
       case 'ArrowLeft':
@@ -56,7 +69,7 @@ export function VisualizerShell<T>({
         </span>
       </div>
 
-      {/* Canvas area */}
+      {/* Canvas */}
       <div className="min-h-[200px] w-full">{children}</div>
 
       {/* Explanation */}
@@ -83,6 +96,28 @@ export function VisualizerShell<T>({
         onGoTo={player.goTo}
         onSetSpeed={player.setSpeed}
       />
+
+      {/* Lab zone — collapsible */}
+      {labZone && (
+        <div className="border-t border-border pt-4">
+          <button
+            type="button"
+            onClick={() => setLabOpen(o => !o)}
+            className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+            aria-expanded={labOpen}
+          >
+            <ChevronDown
+              className={cn(
+                'h-3 w-3 transition-transform duration-200',
+                labOpen && 'rotate-180',
+              )}
+              aria-hidden
+            />
+            Încearcă cu datele tale
+          </button>
+          {labOpen && <div className="mt-3">{labZone}</div>}
+        </div>
+      )}
     </div>
   )
 }
