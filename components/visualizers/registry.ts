@@ -15,7 +15,23 @@ const registry: Record<string, ComponentType<any>> = {
       })),
     { ssr: false },
   ),
+  // Romanian alias used in MDX lessons
+  'cautare-binara': dynamic(
+    () =>
+      import('./BinarySearchVisualizer').then(m => ({
+        default: m.BinarySearchVisualizer,
+      })),
+    { ssr: false },
+  ),
   sorting: dynamic(
+    () =>
+      import('./SortingVisualizer').then(m => ({
+        default: m.SortingVisualizer,
+      })),
+    { ssr: false },
+  ),
+  // Romanian alias used in MDX lessons
+  'bubble-sort': dynamic(
     () =>
       import('./SortingVisualizer').then(m => ({
         default: m.SortingVisualizer,

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Clock, ChevronLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import { compileMDX } from 'next-mdx-remote/rsc'
+import remarkGfm from 'remark-gfm'
 import { getAllLessons, getLessonBySlug } from '@/lib/content/lessons'
 import { MDX_COMPONENTS } from '@/components/mdx'
 import { DifficultyBadge } from '@/components/shared/DifficultyBadge'
@@ -55,6 +56,7 @@ export default async function LessonPage({
     source: lesson.rawContent,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     components: MDX_COMPONENTS as any,
+    options: { mdxOptions: { remarkPlugins: [remarkGfm] } },
   })
 
   const chapterTitle = getChapterTitle(lesson.grade, lesson.chapter)
