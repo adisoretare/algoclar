@@ -48,7 +48,11 @@ export function LabInput({ fields, onSubmit }: LabInputProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <form
+      onSubmit={handleSubmit}
+      onKeyDown={e => e.stopPropagation()}
+      className="flex flex-col gap-3"
+    >
       {fields.map(field => (
         <div key={field.id} className="flex flex-col gap-1">
           <label
