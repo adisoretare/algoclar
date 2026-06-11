@@ -848,21 +848,9 @@ export const CURRICULUM: Grade[] = [
         ],
       },
       {
-        id: 'arbori-acm',
-        title: 'Arbori și arbori de cost minim',
-        order: 6,
-        lessons: [
-          { id: 'proprietatile-arborilor', title: 'Proprietățile arborilor' },
-          { id: 'arbori-partiali', title: 'Arbori parțiali' },
-          { id: 'kruskal', title: 'Kruskal' },
-          { id: 'prim', title: 'Prim' },
-          { id: 'punte-arbore-n-minus-1', title: 'Lecție-punte: de ce un arbore cu n noduri are n−1 muchii', isBridge: true },
-        ],
-      },
-      {
         id: 'structuri-arborescente',
         title: 'Structuri de date arborescente',
-        order: 7,
+        order: 6,
         lessons: [
           { id: 'arbori-cu-radacina', title: 'Arbori cu rădăcină' },
           { id: 'arbori-binari', title: 'Arbori binari' },
@@ -875,6 +863,18 @@ export const CURRICULUM: Grade[] = [
           { id: 'actualizari', title: 'Actualizări' },
           { id: 'union-find', title: 'Union-Find / Disjoint Set Union' },
           { id: 'punte-structuri-interogari', title: 'Lecție-punte: structuri pentru interogări și actualizări rapide', isBridge: true },
+        ],
+      },
+      {
+        id: 'arbori-acm',
+        title: 'Arbori și arbori de cost minim',
+        order: 7,
+        lessons: [
+          { id: 'proprietatile-arborilor', title: 'Proprietățile arborilor' },
+          { id: 'arbori-partiali', title: 'Arbori parțiali' },
+          { id: 'kruskal', title: 'Kruskal' },
+          { id: 'prim', title: 'Prim' },
+          { id: 'punte-arbore-n-minus-1', title: 'Lecție-punte: de ce un arbore cu n noduri are n−1 muchii', isBridge: true },
         ],
       },
       {
