@@ -37,6 +37,7 @@ export function useStepPlayer<T>(
           setIsPlaying(false)
           return total - 1
         }
+        if (next === total - 1) setIsPlaying(false)
         return next
       })
     }, 1000 / speed)
