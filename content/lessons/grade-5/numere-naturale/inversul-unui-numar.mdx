@@ -1,0 +1,114 @@
+---
+title: "Inversul unui număr"
+slug: inversul-unui-numar
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["cifre", "invers", "reconstructie", "palindrom"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e inversul lui 374?"
+    options:
+      - "743"
+      - "347"
+      - "437"
+      - "473"
+    correctIndex: 3
+    explanation: "Cifrele 3, 7, 4 se inversează în 4, 7, 3 → 473."
+  - question: "Ce formulă construiește inversul pas cu pas?"
+    options:
+      - "invers = invers + cifra"
+      - "invers = invers * 10 + cifra"
+      - "invers = cifra * 10 + invers"
+      - "invers = invers / 10 + cifra"
+    correctIndex: 1
+    explanation: "La fiecare pas 'deplasăm' cifrele deja adăugate cu o poziție la stânga (×10) și adăugăm noua cifră la final."
+  - question: "Inversul lui 300 ca număr întreg este:"
+    options:
+      - "300"
+      - "003"
+      - "3"
+      - "30"
+    correctIndex: 2
+    explanation: "300 → cifrele 0, 0, 3. Inversul ca număr este 3 — zerourile inițiale dispar în reprezentarea numerică."
+---
+
+<LessonHook>
+Privești numărul 374 într-o oglindă și obții 473. Calculatorul nu are oglindă — în schimb construiește noul număr cifră cu cifră: ia ultima cifră a originalului și o pune la dreapta inversului în construcție.
+</LessonHook>
+
+## Cum se construiește inversul?
+
+La fiecare pas extragem ultima cifră a lui `n` și o „lipim" la dreapta inversului curent:
+
+```
+n = 374,  invers = 0
+cifra = 4: invers = 0 * 10 + 4 = 4
+cifra = 7: invers = 4 * 10 + 7 = 47
+cifra = 3: invers = 47 * 10 + 3 = 473
+Rezultat: 473
+```
+
+Formula: `invers = invers * 10 + cifra`
+
+<ObservationBox>
+Multiplicarea cu 10 „mută" cifrele deja colectate cu o poziție la stânga, eliberând locul unităților pentru noua cifră. E ca și cum ai scrie numărul invers, cifră cu cifră.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    int invers = 0;
+    int temp = n;
+
+    while (temp > 0) {
+        int cifra = temp % 10;
+        invers = invers * 10 + cifra;  // adauga cifra la dreapta
+        temp /= 10;
+    }
+
+    cout << invers << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `374` → Output `473`
+
+## Aplicație: verificarea palindromului
+
+Un număr e **palindrom** dacă e egal cu inversul său:
+
+```cpp
+if (n == invers)
+    cout << "palindrom" << endl;
+else
+    cout << "nu e palindrom" << endl;
+```
+
+Exemple: `121`, `3443`, `7` sunt palindroame.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Număr cu d cifre | O(log n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Zerourile finale ale originalului dispar în invers. `1200` inversat e `21`, nu `0021`. Ca număr întreg e corect, dar dacă problema cere să păstrezi zerourile, lucrează cu string-uri.
+
+**Greșeala 2:** Overflow la inversare. `int` ține până la ~2.1 miliarde. Inversând `1.000.000.007` obții `7.000.000.001` care nu încape în `int`. Folosește `long long`.
+
+**Greșeala 3:** Compari `n` cu `invers` dar ai modificat `n` în buclă. Salvează `n` înainte de buclă sau folosește o copie `temp`.
+</MistakeBox>

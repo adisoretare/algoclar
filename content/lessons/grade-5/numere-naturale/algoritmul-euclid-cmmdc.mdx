@@ -1,0 +1,117 @@
+---
+title: "CMMDC — Algoritmul lui Euclid"
+slug: algoritmul-euclid-cmmdc
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["cmmdc", "euclid", "modulo", "recursiv"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "CMMDC(12, 8) = ?"
+    options:
+      - "2"
+      - "4"
+      - "8"
+      - "24"
+    correctIndex: 1
+    explanation: "12 = 4×3, 8 = 4×2. Cel mai mare divizor comun este 4."
+  - question: "Ce proprietate folosește algoritmul lui Euclid?"
+    options:
+      - "CMMDC(a, b) = CMMDC(a+b, b)"
+      - "CMMDC(a, b) = CMMDC(b, a % b)"
+      - "CMMDC(a, b) = a × b / b"
+      - "CMMDC(a, b) = CMMDC(a-b, b)"
+    correctIndex: 1
+    explanation: "Euclid se bazează pe CMMDC(a, b) = CMMDC(b, a mod b). Reducem problema la numere din ce în ce mai mici."
+  - question: "Când se oprește algoritmul lui Euclid?"
+    options:
+      - "Când a = b"
+      - "Când b = 0"
+      - "Când a < b"
+      - "Când a % b = 1"
+    correctIndex: 1
+    explanation: "Algoritmul se oprește când al doilea argument devine 0. CMMDC(a, 0) = a prin definiție."
+---
+
+<LessonHook>
+Vrei să împarți o tablă de 84 cm și una de 36 cm în bucăți egale, cât mai mari, fără risipă. Răspunsul este cel mai mare număr care divide ambele lungimi — CMMDC. Algoritmul lui Euclid îl calculează în câteva scăderi succesive (sau împărțiri) — și e folosit de mai bine de 2300 de ani.
+</LessonHook>
+
+## Ce este CMMDC?
+
+**Cel Mai Mare Divizor Comun** al lui `a` și `b` este cel mai mare număr care divide exact ambele.
+
+**Exemplu:** CMMDC(84, 36) = 12, deoarece 84 = 12×7 și 36 = 12×3.
+
+## Algoritmul lui Euclid
+
+**Proprietate cheie:** `CMMDC(a, b) = CMMDC(b, a % b)`
+
+Aplicăm repetat până când `b` devine 0:
+
+```
+CMMDC(84, 36):
+  84 % 36 = 12 → CMMDC(36, 12)
+  36 % 12 = 0  → CMMDC(12, 0)
+  b = 0 → rezultat: 12
+```
+
+<ObservationBox>
+La fiecare pas, cel mai mic argument se înjumătățește cel puțin o dată. Asta garantează că algoritmul se termină rapid — în O(log(min(a,b))) pași, chiar și pentru numere foarte mari.
+</ObservationBox>
+
+## Implementare C++ — iterativă
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cmmdc(int a, int b) {
+    while (b != 0) {
+        int rest = a % b;
+        a = b;
+        b = rest;
+    }
+    return a;
+}
+
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << "CMMDC(" << a << ", " << b << ") = " << cmmdc(a, b) << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `84 36` → `CMMDC(84, 36) = 12`
+
+## Varianta recursivă
+
+```cpp
+int cmmdc(int a, int b) {
+    if (b == 0) return a;       // caz de baza
+    return cmmdc(b, a % b);     // pas recursiv
+}
+```
+
+Elegantă, dar consumă mai multă memorie (stiva de apeluri).
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Iterativ | O(log(min(a,b))) | O(1) |
+| Recursiv | O(log(min(a,b))) | O(log n) — stivă |
+
+<MistakeBox>
+**Greșeala 1:** Confunzi ordinea la pasul de reducere. `CMMDC(a, b) = CMMDC(b, a % b)` — noul prim argument e `b`, nu `a % b`.
+
+**Greșeala 2:** Aplici algoritmul cu `a = 0`. `CMMDC(0, b) = b` prin definiție. Dacă inputul poate conține 0, verifică separat.
+
+**Greșeala 3:** La varianta iterativă, uiți să salvezi `rest = a % b` înainte de `a = b`. Dacă scrii `a = b; b = a % b`, al doilea `a` e deja suprascris — rezultat greșit.
+</MistakeBox>

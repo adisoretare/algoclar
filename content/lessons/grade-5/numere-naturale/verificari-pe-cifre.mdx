@@ -1,0 +1,141 @@
+---
+title: "Verificări pe cifre"
+slug: verificari-pe-cifre
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["cifre", "verificare", "contor", "proprietati"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum verifici dacă toate cifrele unui număr sunt pare?"
+    options:
+      - "Verifici dacă n este par"
+      - "Parcurgi cifrele; dacă găsești una impară, răspunsul e NU"
+      - "Verifici prima și ultima cifră"
+      - "Sumezi cifrele și verifici dacă suma e pară"
+    correctIndex: 1
+    explanation: "Trebuie să parcurgi toate cifrele. n par nu garantează că toate cifrele sunt pare — de exemplu 12 are cifra 1 care e impară."
+  - question: "Câte cifre pare are numărul 3526?"
+    options:
+      - "2"
+      - "3"
+      - "1"
+      - "4"
+    correctIndex: 0
+    explanation: "Cifrele sunt 3 (impar), 5 (impar), 2 (par), 6 (par). Deci 2 cifre pare."
+  - question: "Ce înseamnă că un număr este palindrom?"
+    options:
+      - "Suma cifrelor e egală cu produsul"
+      - "Inversul e egal cu numărul original"
+      - "Toate cifrele sunt egale"
+      - "Prima cifră e mai mică decât ultima"
+    correctIndex: 1
+    explanation: "Un palindrom se citește la fel de la stânga la dreapta și de la dreapta la stânga: 121, 3443, 7."
+---
+
+<LessonHook>
+Codul PIN 1221 e palindrom. Numărul 2244 are toate cifrele pare. Verificările pe cifrele unui număr sunt tipice la olimpiade: „Câte cifre pare are?", „Toate cifrele sunt distincte?", „E palindrom?". Toate folosesc același mecanism: parcurgerea cifrelor cu o condiție adăugată.
+</LessonHook>
+
+## Pattern general
+
+Orice verificare pe cifre arată la fel:
+
+```cpp
+bool proprietate = true;  // presupunem că e adevărat
+int temp = n;
+while (temp > 0) {
+    int cifra = temp % 10;
+    // verifică condiția pe cifra curentă
+    temp /= 10;
+}
+```
+
+## Exemple frecvente
+
+### Toate cifrele sunt pare?
+
+```cpp
+bool toatePare = true;
+int temp = n;
+while (temp > 0) {
+    if ((temp % 10) % 2 != 0) {
+        toatePare = false;
+        break;  // gasita o cifra impara, ne oprim
+    }
+    temp /= 10;
+}
+```
+
+### Câte cifre pare are?
+
+```cpp
+int contor = 0;
+int temp = n;
+while (temp > 0) {
+    if ((temp % 10) % 2 == 0) contor++;
+    temp /= 10;
+}
+```
+
+### Este palindrom?
+
+```cpp
+int invers = 0, temp = n;
+while (temp > 0) {
+    invers = invers * 10 + temp % 10;
+    temp /= 10;
+}
+bool palindrom = (n == invers);
+```
+
+## Implementare C++ — problemă completă
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    int contor_pare = 0, contor_impare = 0;
+    int temp = n;
+
+    while (temp > 0) {
+        int cifra = temp % 10;
+        if (cifra % 2 == 0) contor_pare++;
+        else contor_impare++;
+        temp /= 10;
+    }
+
+    cout << "Cifre pare: " << contor_pare << endl;
+    cout << "Cifre impare: " << contor_impare << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `3526` → `Cifre pare: 2` / `Cifre impare: 2`
+
+<ObservationBox>
+Poți combina mai multe verificări într-o singură parcurgere. Nu ai nevoie de mai multe bucle — o singură buclă, mai mulți acumulatori sau condiții paralele.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Număr cu d cifre | O(log n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Verifici `n % 2 == 0` pentru „toate cifrele pare". Asta verifică doar ultima cifră (paritatea lui n), nu toate cifrele.
+
+**Greșeala 2:** Nu tratezi `n = 0`. Decide de la început: 0 are o singură cifră (0), care este pară.
+
+**Greșeala 3:** Uiți `break` după ce ai găsit o condiție falsă. Pentru „există o cifră impară?", odată găsită nu mai trebuie să continui — `break` evită iterații inutile.
+</MistakeBox>

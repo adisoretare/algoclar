@@ -1,0 +1,106 @@
+---
+title: "CMMMC — Cel mai mic multiplu comun"
+slug: cmmmc
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["cmmmc", "cmmdc", "multipli", "overflow"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "CMMMC(4, 6) = ?"
+    options:
+      - "2"
+      - "12"
+      - "24"
+      - "6"
+    correctIndex: 1
+    explanation: "Multiplii lui 4: 4, 8, 12... Multiplii lui 6: 6, 12, 18... Primul comun: 12."
+  - question: "Formula CMMMC în funcție de CMMDC este:"
+    options:
+      - "CMMMC(a,b) = a + b - CMMDC(a,b)"
+      - "CMMMC(a,b) = a × b / CMMDC(a,b)"
+      - "CMMMC(a,b) = a × CMMDC(a,b)"
+      - "CMMMC(a,b) = (a + b) / CMMDC(a,b)"
+    correctIndex: 1
+    explanation: "CMMMC = a × b / CMMDC(a,b). Produsul a × b împărțit la CMMDC elimină factorii comuni duplicați."
+  - question: "De ce scriem `(a / cmmdc(a,b)) * b` în loc de `a * b / cmmdc(a,b)`?"
+    options:
+      - "E mai rapid"
+      - "Evităm overflow: împărțim înainte de a înmulți"
+      - "E mai ușor de citit"
+      - "Nu contează ordinea"
+    correctIndex: 1
+    explanation: "a × b poate depăși limita int pentru numere moderate. Împărțind a la CMMDC înainte de înmulțire, lucrăm cu numere mai mici."
+---
+
+<LessonHook>
+Două trenuri pleacă din aceeași gară: unul la fiecare 4 minute, celălalt la fiecare 6 minute. Când se vor întâlni din nou în gară? La minutul 12 — cel mai mic multiplu comun. CMMMC apare ori de câte ori sincronizezi cicluri sau găsești numitorul comun al unor fracții.
+</LessonHook>
+
+## Ce este CMMMC?
+
+**Cel Mai Mic Multiplu Comun** al lui `a` și `b` este cel mai mic număr pozitiv care este multiplu al ambelor.
+
+**Relația fundamentală:**
+
+```
+CMMMC(a, b) = a × b / CMMDC(a, b)
+```
+
+**Exemplu:** CMMMC(4, 6) = 4 × 6 / CMMDC(4, 6) = 24 / 2 = 12
+
+## De ce funcționează formula?
+
+Produsul `a × b` conține toți factorii ambelor numere, dar cei comuni apar de două ori. Împărțind la CMMDC (care este produsul factorilor comuni), eliminăm duplicatele.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cmmdc(int a, int b) {
+    while (b != 0) {
+        int r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+int cmmmc(int a, int b) {
+    return (a / cmmdc(a, b)) * b;  // impartim intai pentru a evita overflow
+}
+
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << "CMMMC(" << a << ", " << b << ") = " << cmmmc(a, b) << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `4 6` → `CMMMC(4, 6) = 12`
+
+<ObservationBox>
+Formula `(a / cmmdc) * b` împarte mai întâi, pentru a reduce riscul de overflow. Varianta `a * b / cmmdc` poate depăși `int` chiar și pentru numere moderate: 100.000 × 100.000 = 10¹⁰, care depășește `int` și chiar limita inferioară a `long long`-ului util.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| CMMMC via CMMDC | O(log(min(a,b))) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Scrii `a * b / cmmdc(a, b)` — produsul `a * b` dă overflow la `int` pentru valori mari. Formula corectă: `(a / cmmdc(a, b)) * b`.
+
+**Greșeala 2:** Confunzi CMMDC cu CMMMC. CMMDC ≤ min(a, b). CMMMC ≥ max(a, b). Dacă rezultatul tău e mai mic decât ambele numere, ai calculat CMMDC în loc de CMMMC.
+
+**Greșeala 3:** CMMMC(a, 0) sau CMMMC(0, b) — CMMMC cu zero e nedefinit sau 0 (depinde de convenție). Verifică că inputul e pozitiv.
+</MistakeBox>

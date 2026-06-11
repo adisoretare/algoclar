@@ -1,0 +1,108 @@
+---
+title: "Numere prime între ele"
+slug: numere-prime-intre-ele
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: false
+tags: ["cmmdc", "coprime", "fractii", "simplificare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Sunt 8 și 15 prime între ele?"
+    options:
+      - "Nu, ambele sunt pare"
+      - "Da, CMMDC(8, 15) = 1"
+      - "Nu, 15 nu e prim"
+      - "Depinde de context"
+    correctIndex: 1
+    explanation: "8 = 2³, 15 = 3×5. Nu au factori comuni, deci CMMDC = 1 — sunt prime între ele."
+  - question: "Sunt 6 și 10 prime între ele?"
+    options:
+      - "Da, ambele sunt pare"
+      - "Nu, CMMDC(6, 10) = 2 ≠ 1"
+      - "Da, niciunul nu e prim"
+      - "Nu se poate determina"
+    correctIndex: 1
+    explanation: "Ambele sunt divizibile cu 2, deci CMMDC(6, 10) = 2 ≠ 1. Nu sunt prime între ele."
+  - question: "Dacă CMMDC(a, b) = 1, fracția a/b este:"
+    options:
+      - "Supraunitară"
+      - "Ireductibilă — nu mai poate fi simplificată"
+      - "Egală cu 1"
+      - "Subunitară"
+    correctIndex: 1
+    explanation: "O fracție e ireductibilă când numărătorul și numitorul sunt prime între ele — CMMDC = 1."
+---
+
+<LessonHook>
+Fracția 8/15 nu poate fi simplificată — 8 și 15 nu au niciun divizor comun în afară de 1. Spunem că sunt „prime între ele". Asta nu înseamnă că fiecare e număr prim. Înseamnă că împreună nu au niciun „secret comun" care ar permite simplificarea fracției.
+</LessonHook>
+
+## Definiție
+
+Două numere `a` și `b` sunt **prime între ele** (sau **coprime**) dacă `CMMDC(a, b) = 1`. Nu au niciun factor comun mai mare decât 1.
+
+**Exemple:**
+
+| a | b | CMMDC | Prime între ele? |
+|---|---|---|---|
+| 8 | 15 | 1 | ✓ |
+| 6 | 10 | 2 | ✗ |
+| 7 | 13 | 1 | ✓ (ambele prime) |
+| 9 | 16 | 1 | ✓ (niciunul nu e prim) |
+
+<ObservationBox>
+Două numere prime distincte sunt întotdeauna prime între ele. Dar pot fi prime între ele și numere care nu sunt prime individual: 8 (= 2³) și 9 (= 3²) nu au factori comuni, deci sunt coprime.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cmmdc(int a, int b) {
+    while (b != 0) {
+        int r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+int main() {
+    int a, b;
+    cin >> a >> b;
+
+    if (cmmdc(a, b) == 1)
+        cout << a << " si " << b << " sunt prime intre ele" << endl;
+    else
+        cout << a << " si " << b << " nu sunt prime intre ele" << endl;
+
+    return 0;
+}
+```
+
+**Exemple:** `8 15` → prime între ele; `6 10` → nu sunt prime între ele
+
+## De ce contează?
+
+O fracție `a/b` este **ireductibilă** exact atunci când `a` și `b` sunt prime între ele. Orice simplificare a fracțiilor se reduce la acest test.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Verificare coprime | O(log(min(a,b))) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Confunzi „prime între ele" cu „ambele sunt numere prime". Sunt concepte distincte. 8 și 9 sunt prime între ele, dar niciunul nu este număr prim.
+
+**Greșeala 2:** Verifici individual dacă fiecare număr e prim pentru a decide dacă sunt coprime. Nu funcționează: 4 și 9 sunt coprime, dar niciunul nu e prim; 2 și 4 nu sunt coprime, deși 2 e prim.
+
+**Greșeala 3:** CMMDC(a, a) = a, nu 1. Un număr nu este coprim cu el însuși (cu excepția lui 1).
+</MistakeBox>

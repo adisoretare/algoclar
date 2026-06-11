@@ -1,0 +1,114 @@
+---
+title: "Factorialul unui număr"
+slug: factorial
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["factorial", "produs", "overflow", "for"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cât este 5! ?"
+    options:
+      - "25"
+      - "15"
+      - "120"
+      - "60"
+    correctIndex: 2
+    explanation: "5! = 5 × 4 × 3 × 2 × 1 = 120."
+  - question: "Cât este 0! ?"
+    options:
+      - "0"
+      - "1"
+      - "Nedefinit"
+      - "-1"
+    correctIndex: 1
+    explanation: "Prin convenție matematică, 0! = 1. Este elementul neutru al produsului și apare în toate formulele combinatorice."
+  - question: "Cel mai mare n pentru care n! încape în `int` (max ~2.1 miliarde) este:"
+    options:
+      - "n = 10"
+      - "n = 12"
+      - "n = 15"
+      - "n = 20"
+    correctIndex: 1
+    explanation: "12! = 479.001.600 < 2.147.483.647. 13! = 6.227.020.800 > 2.147.483.647. Max n = 12 pentru int."
+---
+
+<LessonHook>
+Ai 5 cărți și vrei să afli în câte ordini le poți aranja pe raft. Prima poziție are 5 opțiuni, a doua 4, a treia 3 și tot așa: 5 × 4 × 3 × 2 × 1 = 120. Asta e factorialul — numărul de permutări ale unui set, fundamental în combinatorică și probabilitate.
+</LessonHook>
+
+## Definiție
+
+**n! = n × (n−1) × (n−2) × ... × 2 × 1**
+
+Cazuri speciale: `0! = 1`, `1! = 1`
+
+| n | n! |
+|---|---|
+| 0 | 1 |
+| 1 | 1 |
+| 2 | 2 |
+| 3 | 6 |
+| 4 | 24 |
+| 5 | 120 |
+| 10 | 3.628.800 |
+| 12 | 479.001.600 |
+
+<ObservationBox>
+Factorialul crește extrem de rapid. Chiar și `long long` (max ~9.2 × 10¹⁸) nu ține decât până la 20! = 2.432.902.008.176.640.000. Pentru n > 20 ai nevoie de numere mari sau de calcul modulo un prim.
+</ObservationBox>
+
+## Implementare C++ — iterativă
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    long long fact = 1;          // long long pentru valori mari
+    for (int i = 2; i <= n; i++) {
+        fact *= i;
+    }
+
+    cout << n << "! = " << fact << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `5` → `5! = 120`
+
+## Varianta recursivă
+
+```cpp
+long long factorial(int n) {
+    if (n <= 1) return 1;          // caz de baza
+    return n * factorial(n - 1);   // pas recursiv
+}
+```
+
+Elegantă și ușor de citit, dar consumă O(n) memorie de stivă.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Iterativ | O(n) | O(1) |
+| Recursiv | O(n) | O(n) — stiva de apeluri |
+
+<MistakeBox>
+**Greșeala 1:** Folosești `int` în loc de `long long`. 13! depășește `int`. Inițializează și calculează cu `long long` mereu.
+
+**Greșeala 2:** Inițializezi `fact = 0` în loc de `fact = 1`. Produsul pornit de la 0 rămâne 0.
+
+**Greșeala 3:** Uiți că bucla `for(i=2; i<=0; ...)` nu rulează pentru n=0, deci `fact` rămâne 1 — corect prin definiție. Dar dacă n poate fi negativ, adaugă o verificare.
+
+**Greșeala 4:** La varianta recursivă, nu ai caz de bază pentru n=0 sau n=1 și intri în recursie infinită. Asigură-te că returnezi 1 pentru n ≤ 1.
+</MistakeBox>

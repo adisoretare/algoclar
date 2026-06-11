@@ -1,0 +1,129 @@
+---
+title: "Divizori și multipli"
+slug: divizori-si-multipli
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["divizori", "multipli", "modulo", "sqrt"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câți divizori are numărul 12?"
+    options:
+      - "3"
+      - "4"
+      - "6"
+      - "5"
+    correctIndex: 2
+    explanation: "Divizorii lui 12 sunt 1, 2, 3, 4, 6, 12 — adică 6 divizori."
+  - question: "Până unde trebuie să verifici pentru a găsi toți divizorii lui n?"
+    options:
+      - "Până la n/2"
+      - "Până la n"
+      - "Până la √n"
+      - "Până la n/3"
+    correctIndex: 2
+    explanation: "Dacă d divide n și d ≤ √n, atunci n/d ≥ √n este alt divizor. Găsești toți verificând doar până la √n."
+  - question: "Este 7 un multiplu al lui 3?"
+    options:
+      - "Da"
+      - "Nu"
+      - "Depinde de n"
+      - "Numai dacă 3 < 7"
+    correctIndex: 1
+    explanation: "7 % 3 = 1 ≠ 0, deci 7 nu este multiplu al lui 3."
+---
+
+<LessonHook>
+Ai 12 bomboane și vrei să le împarți în grupe egale, fără să rămână niciuna. Câte variante ai? Grupuri de 1, 2, 3, 4, 6 sau 12 — exact divizorii lui 12. Găsirea divizorilor este una dintre problemele fundamentale ale olimpiadei de informatică.
+</LessonHook>
+
+## Definiție
+
+`d` este **divizor** al lui `n` dacă `n % d == 0` (împărțirea este exactă). În același caz, `n` este **multiplu** al lui `d`.
+
+**Exemplu:** Divizorii lui 12 sunt 1, 2, 3, 4, 6, 12.
+
+## Varianta naivă — O(n)
+
+```cpp
+for (int d = 1; d <= n; d++) {
+    if (n % d == 0) cout << d << " ";
+}
+```
+
+Funcționează, dar pentru n = 1.000.000 face un milion de operații.
+
+## Varianta eficientă — O(√n)
+
+**Observație cheie:** Dacă `d` divide `n`, atunci și `n/d` divide `n`. Unul din cei doi este ≤ √n.
+
+```cpp
+for (int d = 1; d * d <= n; d++) {
+    if (n % d == 0) {
+        cout << d << " ";         // d este divizor
+        if (d != n / d)
+            cout << n / d << " "; // n/d este alt divizor
+    }
+}
+```
+
+<ObservationBox>
+Condiția `d * d <= n` evită calculul lui `sqrt(n)` (care poate da erori de rotunjire pentru pătrate perfecte). Este forma preferată în concursuri față de `d <= sqrt(n)`.
+</ObservationBox>
+
+## Implementare C++ — complet
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    cout << "Divizorii lui " << n << ": ";
+    for (int d = 1; d * d <= n; d++) {
+        if (n % d == 0) {
+            cout << d << " ";
+            if (d != n / d)
+                cout << n / d << " ";
+        }
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `12` → `1 12 2 6 3 4`
+
+## Numărarea divizorilor
+
+```cpp
+int nr_div = 0;
+for (int d = 1; d * d <= n; d++) {
+    if (n % d == 0) {
+        nr_div++;
+        if (d != n / d) nr_div++;
+    }
+}
+```
+
+## Complexitate
+
+| Variantă | Timp | Spațiu |
+|---|---|---|
+| Naivă (până la n) | O(n) | O(1) |
+| Eficientă (până la √n) | O(√n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Scrii `d <= sqrt(n)` cu tipul `double`. Erorile de rotunjire pot face ca un pătrat perfect (ex. n=9, d=3) să nu treacă condiția. Folosește `d * d <= n`.
+
+**Greșeala 2:** Uiți condiția `d != n / d` pentru pătrate perfecte. Pentru n=9 și d=3, ai 3 = 9/3 — dacă afișezi și `n/d`, obții `3` de două ori.
+
+**Greșeala 3:** Pornești de la `d = 0`. `n % 0` este eroare de împărțire prin zero. Pornește mereu de la `d = 1`.
+</MistakeBox>

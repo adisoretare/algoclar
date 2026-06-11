@@ -1,0 +1,117 @@
+---
+title: "Suma și produsul cifrelor"
+slug: suma-produsul-cifrelor
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["cifre", "suma", "produs", "acumulator"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care este suma cifrelor lui 3042?"
+    options:
+      - "7"
+      - "9"
+      - "8"
+      - "12"
+    correctIndex: 1
+    explanation: "3 + 0 + 4 + 2 = 9."
+  - question: "Cu ce inițializezi acumulatorul pentru produs?"
+    options:
+      - "0"
+      - "1"
+      - "-1"
+      - "n"
+    correctIndex: 1
+    explanation: "Produsul neutru este 1. Dacă inițializezi cu 0, produsul va fi mereu 0."
+  - question: "Ce returnează produsul cifrelor lui 305?"
+    options:
+      - "8"
+      - "15"
+      - "0"
+      - "45"
+    correctIndex: 2
+    explanation: "3 × 0 × 5 = 0. Dacă orice cifră este 0, produsul devine 0."
+---
+
+<LessonHook>
+La un joc de zaruri, aduni scorurile de pe față: 3, 1, 4 → total 8. Exact același pattern: parcurgi fiecare cifră a unui număr și o adaugi la un acumulator. Suma cifrelor e unul dintre cele mai frecvente exerciții de concurs și se rezolvă în 5 rânduri de cod.
+</LessonHook>
+
+## Ideea de acumulator
+
+Un **acumulator** este o variabilă care colectează un rezultat parțial. La fiecare pas adaugi sau înmulțești cifra curentă cu acumulatorul.
+
+| Operație | Inițializare | Actualizare |
+|---|---|---|
+| Sumă | `suma = 0` | `suma += cifra` |
+| Produs | `produs = 1` | `produs *= cifra` |
+
+<ObservationBox>
+Inițializarea contează! Pentru sumă folosești 0 (elementul neutru al adunării), pentru produs folosești 1 (elementul neutru al înmulțirii). Confuzia între 0 și 1 este una din cele mai frecvente greșeli de concurs.
+</ObservationBox>
+
+## Algoritmul
+
+Aceeași structură ca la extragerea cifrelor, cu un acumulator în plus:
+
+```
+n = 3042, suma = 0, produs = 1
+
+cifra = 2: suma = 2,  produs = 2
+cifra = 4: suma = 6,  produs = 8
+cifra = 0: suma = 6,  produs = 0
+cifra = 3: suma = 9,  produs = 0
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    if (n == 0) {
+        cout << "Suma: 0, Produs: 0" << endl;
+        return 0;
+    }
+
+    int suma = 0, produs = 1;
+    int temp = n;
+
+    while (temp > 0) {
+        int cifra = temp % 10;
+        suma += cifra;       // aduna cifra la acumulator
+        produs *= cifra;     // inmulteste cifra la produs
+        temp /= 10;
+    }
+
+    cout << "Suma: " << suma << ", Produs: " << produs << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `3042` → `Suma: 9, Produs: 0`
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Număr cu d cifre | O(log n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Inițializezi `produs = 0` în loc de `produs = 1`. Rezultatul va fi mereu 0.
+
+**Greșeala 2:** Modifici `n` direct în buclă și uiți valoarea originală. Dacă ai nevoie de `n` și după buclă, salvează-l în `temp`.
+
+**Greșeala 3:** Nu tratezi `n = 0` separat. Bucla `while` nu rulează, deci produsul rămâne 1 — incorect. Tratează explicit cazul `n == 0`.
+
+**Greșeala 4:** Overflow la produs pentru numere cu cifre mari. `9^9 = 387.420.489` intră în `int`, dar `9^10` depășește. Folosește `long long` dacă n poate fi mare.
+</MistakeBox>

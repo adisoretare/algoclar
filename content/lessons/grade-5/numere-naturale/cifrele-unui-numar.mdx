@@ -1,0 +1,117 @@
+---
+title: "Cifrele unui număr"
+slug: cifrele-unui-numar
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["cifre", "modulo", "impartire", "while"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum extragi ultima cifră a unui număr n?"
+    options:
+      - "n / 10"
+      - "n % 10"
+      - "n - 10"
+      - "n * 10"
+    correctIndex: 1
+    explanation: "Restul împărțirii la 10 dă exact ultima cifră. De exemplu, 374 % 10 = 4."
+  - question: "Cum elimini ultima cifră a unui număr n?"
+    options:
+      - "n % 10"
+      - "n - 10"
+      - "n / 10"
+      - "n * 10"
+    correctIndex: 2
+    explanation: "Împărțirea întreagă la 10 taie ultima cifră. 374 / 10 = 37 (în C++, împărțirea întreagă trunchiază)."
+  - question: "Câte iterații face bucla while(n > 0) { n /= 10; } pentru n = 1000?"
+    options:
+      - "3"
+      - "4"
+      - "5"
+      - "1000"
+    correctIndex: 1
+    explanation: "1000 → 100 → 10 → 1 → 0. Patru pași, deci 4 iterații."
+---
+
+<LessonHook>
+Ai o cutie cu combinație: 3-7-4. Ca să o deschizi, introduci cifrele una câte una, de la dreapta la stânga. Cum face calculatorul exact același lucru cu numărul 374? Împarte la 10 și ia restul — și ce pare complicat devine mecanic.
+</LessonHook>
+
+## Ce sunt cifrele unui număr?
+
+Orice număr natural este format din cifre: `374` are cifrele 3, 7 și 4. În programare nu avem acces direct la „poziția" cifrelor — trebuie să le extragem una câte una, de la dreapta la stânga.
+
+**Instrumentele de bază:**
+
+| Operație | Efect pe `n = 374` | Rezultat |
+|---|---|---|
+| `n % 10` | Ultima cifră | `4` |
+| `n / 10` | Eliminăm ultima cifră | `37` |
+
+## Algoritmul: parcurgerea cifrelor
+
+Repetăm doi pași cât timp `n > 0`:
+
+1. Extragem ultima cifră: `cifra = n % 10`
+2. O eliminăm: `n /= 10`
+
+Exemplu cu `n = 374`:
+
+```
+n = 374  → cifra = 4,  n = 37
+n = 37   → cifra = 7,  n = 3
+n = 3    → cifra = 3,  n = 0
+STOP (n == 0)
+```
+
+<ObservationBox>
+Cifrele sunt extrase de la dreapta la stânga (de la unități spre cifra cea mai semnificativă). Ține cont de asta când ordinea contează în problemă.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    if (n == 0) {
+        cout << 0 << endl;  // caz special: 0 are o singura cifra
+        return 0;
+    }
+
+    while (n > 0) {
+        int cifra = n % 10;  // extrage ultima cifra
+        cout << cifra << " ";
+        n /= 10;             // elimina ultima cifra
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+**Exemplu de rulare:** Input `374` → Output `4 7 3`
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Număr cu d cifre | O(log n) | O(1) |
+
+Un număr n are ⌊log₁₀(n)⌋ + 1 cifre, deci bucla rulează de ordinul log(n) ori.
+
+<MistakeBox>
+**Greșeala 1:** Uiți cazul `n = 0`. Bucla `while(n > 0)` nu se execută deloc pentru 0, deci nu afișezi nimic. Tratează `n == 0` separat.
+
+**Greșeala 2:** Folosești `int` pentru numere mari (ex. 1.000.000.000). `int` merge până la ~2.1 miliarde. Dacă n poate depăși asta, folosește `long long`.
+
+**Greșeala 3:** Crezi că cifrele ies în ordinea „normală" (stânga-dreapta). Ies de la dreapta la stânga. Dacă vrei ordinea inversă, stochează-le într-un vector și afișează în sens invers.
+</MistakeBox>

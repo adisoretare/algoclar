@@ -1,0 +1,112 @@
+---
+title: "Ridicare la putere prin înmulțiri repetate"
+slug: ridicare-la-putere
+grade: 5
+chapter: numere-naturale
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["putere", "inmultiri", "overflow", "for"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "2^10 = ?"
+    options:
+      - "20"
+      - "512"
+      - "1024"
+      - "100"
+    correctIndex: 2
+    explanation: "2^10 = 1024. Util de știut: 2^10 ≈ 1.000, 2^20 ≈ 10^6, 2^30 ≈ 10^9."
+  - question: "Care e cazul de bază pentru ridicarea la putere?"
+    options:
+      - "baza^0 = 0"
+      - "baza^0 = 1"
+      - "baza^1 = 0"
+      - "0^exp = exp"
+    correctIndex: 1
+    explanation: "Orice număr la puterea 0 este 1 — produsul gol are valoarea 1."
+  - question: "De ce inițializezi `rezultat = 1` și nu `rezultat = baza`?"
+    options:
+      - "E mai rapid"
+      - "Astfel funcționează și pentru exp = 0"
+      - "Inițializarea cu baza e mai corectă"
+      - "Nu contează inițializarea"
+    correctIndex: 1
+    explanation: "Dacă exp = 0, bucla nu rulează și rezultatul corect e 1. Dacă inițializezi cu baza, obții baza în loc de 1."
+---
+
+<LessonHook>
+Dacă îndoi o foaie de hârtie de 1 mm de 10 ori, obții ~1 metru. De 42 ori — ajungi la Lună. Puterile cresc exponențial și rapid depășesc orice limită practică. De aceea, calculul corect al puterii (și gestionarea overflow-ului) este esențial în algoritmică.
+</LessonHook>
+
+## Algoritmul simplu
+
+`baza^exp` = baza × baza × ... × baza (de `exp` ori)
+
+```
+2^5:
+rezultat = 1
+i=1: rezultat = 1 × 2 = 2
+i=2: rezultat = 2 × 2 = 4
+i=3: rezultat = 4 × 2 = 8
+i=4: rezultat = 8 × 2 = 16
+i=5: rezultat = 16 × 2 = 32
+Rezultat: 32
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    long long baza;
+    int exp;
+    cin >> baza >> exp;
+
+    long long rezultat = 1;
+    for (int i = 1; i <= exp; i++) {
+        rezultat *= baza;
+    }
+
+    cout << baza << "^" << exp << " = " << rezultat << endl;
+    return 0;
+}
+```
+
+**Exemple:**
+- Input `2 10` → `2^10 = 1024`
+- Input `3 5` → `3^5 = 243`
+- Input `5 0` → `5^0 = 1`
+
+## Cazuri speciale
+
+```cpp
+// baza^0 = 1 (bucla nu ruleaza, rezultat = 1 ✓)
+// 0^exp  = 0 pentru exp > 0 (1 × 0 × 0 × ... = 0 ✓)
+// 0^0    = 1 prin conventie in C++
+```
+
+<ObservationBox>
+Algoritmul de față este O(exp) — liniar în exponent. Pentru exp = 10⁹ e prea lent. La clasa a 7-a vei studia **exponențierea rapidă** (O(log exp)) care calculează puterea în câteva înmulțiri prin pătrat repetat.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Înmulțiri repetate | O(exp) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Inițializezi `rezultat = 0` în loc de `rezultat = 1`. Produsul pornit de la 0 rămâne 0.
+
+**Greșeala 2:** Overflow neobservat. `int` nu ține puteri mari. `2^31` depășește `int`. Folosește `long long` și ține cont că și el are limite (~9.2 × 10¹⁸ ≈ 2^63 − 1).
+
+**Greșeala 3:** Scrii `baza * exp` (înmulțire directă) în loc de `baza` la puterea `exp`. `2 * 10 = 20 ≠ 2^10 = 1024`. Ridicarea la putere cere o buclă, nu o înmulțire simplă.
+
+**Greșeala 4:** Inițializezi `rezultat = baza` și pornești bucla de la `i=2`. Corect pentru exp ≥ 1, dar greșit pentru exp = 0 — obții `baza` în loc de `1`. Forma sigură: `rezultat = 1`, buclă de la `i=1`.
+</MistakeBox>
