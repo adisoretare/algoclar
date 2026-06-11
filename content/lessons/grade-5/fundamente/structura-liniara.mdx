@@ -1,0 +1,140 @@
+---
+title: "Structura liniară"
+slug: structura-liniara
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: false
+tags: ["structura-liniara", "secventa", "instructiuni"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Într-o structură liniară, instrucțiunile se execută:"
+    options:
+      - "Aleatoriu"
+      - "Toate simultan"
+      - "Una câte una, în ordinea în care sunt scrise"
+      - "De la ultima la prima"
+    correctIndex: 2
+    explanation: "Structura liniară (secvențială) execută instrucțiunile strict în ordinea scrieri, de sus în jos, una câte una."
+  - question: "Dacă schimbi ordinea celor două linii de cod, rezultatul se schimbă?"
+    options:
+      - "Nu, niciodată"
+      - "Depinde — dacă a doua instrucțiune depinde de prima, da"
+      - "Mereu da"
+      - "Doar dacă sunt în funcții diferite"
+    correctIndex: 1
+    explanation: "Dacă instrucțiunile sunt independente (ex: cout<<a; cout<<b;), ordinea nu contează pentru corectitudine. Dar dacă b depinde de a (ex: b=a+1; a=5;), ordinea e critică."
+  - question: "Ce face blocul de cod delimitat de { }?"
+    options:
+      - "Creează o funcție nouă"
+      - "Grupează mai multe instrucțiuni ca una singură"
+      - "Comentează codul din interior"
+      - "Repetă instrucțiunile"
+    correctIndex: 1
+    explanation: "{ } grupează instrucțiuni într-un bloc. Util după if/for/while unde ai nevoie de mai mult de o instrucțiune."
+---
+
+<LessonHook>
+Dimineața faci mereu aceiași pași, în aceeași ordine: te trezești, te speli pe dinți, te îmbraci, iei micul dejun. Dacă le faci altfel, ceva nu iese bine — nu-ți iei micul dejun înainte să te îmbraci. Structura liniară în programare e exact asta: instrucțiunile se execută de sus în jos, fiecare după cealaltă.
+</LessonHook>
+
+## Ce este structura liniară?
+
+**Structura liniară** (sau secvențială) este cel mai simplu mod de organizare a instrucțiunilor: se execută una câte una, în ordinea în care sunt scrise.
+
+Nu există salturi, repetări sau alegeri — doar o secvență directă de pași.
+
+```
+Pas 1
+Pas 2
+Pas 3
+...
+```
+
+## Exemplu: calculul ariei unui dreptunghi
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    // Pasul 1: citeste datele
+    int latime, inaltime;
+    cin >> latime >> inaltime;
+
+    // Pasul 2: calculeaza
+    int arie = latime * inaltime;
+    int perimetru = 2 * (latime + inaltime);
+
+    // Pasul 3: afiseaza rezultatele
+    cout << "Arie: " << arie << endl;
+    cout << "Perimetru: " << perimetru << endl;
+
+    return 0;
+}
+```
+
+Fiecare linie se execută o singură dată, în ordine. Nu există decizie sau repetare.
+
+## Blocuri de cod `{ }`
+
+Acoladele grupează mai multe instrucțiuni ca un **bloc**:
+
+```cpp
+{
+    int x = 5;
+    int y = x + 3;
+    cout << y;
+}
+// x si y nu mai exista dupa acolada de inchidere
+```
+
+<ObservationBox>
+Variabilele declarate în interiorul unui bloc `{ }` există **doar în acel bloc**. Ies din existență când blocul se închide. Aceasta se numește **domeniu de vizibilitate** (scope).
+</ObservationBox>
+
+## Ordinea instrucțiunilor contează
+
+```cpp
+// CORECT: calculeaza inainte sa afiseze
+int a = 5;
+int b = a * 2;   // b = 10
+cout << b;       // afiseaza 10
+
+// GRESIT: afiseaza inainte sa calculeze
+int c;
+cout << c;       // afiseaza valoare nedefinita!
+c = 7;
+```
+
+## Schimbul de valori (swap)
+
+Un exemplu clasic unde ordinea e critică:
+
+```cpp
+int a = 5, b = 3;
+
+// Schimb corect -- cu variabila auxiliara
+int temp = a;  // pas 1: salvezi a
+a = b;         // pas 2: a ia valoarea lui b
+b = temp;      // pas 3: b ia vechea valoare a lui a
+
+// Acum a=3, b=5
+cout << a << " " << b; // 3 5
+```
+
+<HintBox>
+Dacă încerci `a = b; b = a;` fără `temp`, pierzi valoarea lui `a` la primul pas. Variabila auxiliară e esențială — e cel mai simplu exemplu de „de ce ordinea contează".
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** Uiți `;` la sfârșitul unei instrucțiuni. `int x = 5` fără `;` e eroare de compilare. Fiecare instrucțiune se termină cu `;`.
+
+**Greșeala 2:** Confunzi declararea cu atribuirea ulterioară. `int x = 5;` declară și inițializează. `x = 5;` (fără `int`) atribuie unei variabile deja declarate. `int x; int x = 5;` e eroare — variabila declarată de două ori.
+
+**Greșeala 3:** Scrii instrucțiunile în ordinea greșită față de dependențele dintre ele. Dacă `b` depinde de `a`, calculează `a` primul.
+</MistakeBox>

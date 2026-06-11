@@ -1,0 +1,118 @@
+---
+title: "Lecție-punte: urmărirea manuală a unui algoritm"
+slug: punte-urmarire-manuala
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 8
+free: true
+status: draft
+isBridge: true
+tags: ["trace", "urmarire", "debug", "algoritm"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce urmărim manual un algoritm înainte să-l programăm?"
+    options:
+      - "Ca să scriem mai puțin cod"
+      - "Ca să înțelegem ce face fiecare pas și să găsim greșelile de logică"
+      - "E obligatoriu la concursuri"
+      - "Calculatorul nu poate face asta singur"
+    correctIndex: 1
+    explanation: "Urmărirea manuală (trace) ajută să verifici că algoritmul gândești e corect ÎNAINTE să pierzi timp scriindu-l. Greșelile de logică se văd imediat pe hârtie."
+  - question: "Cum urmărești o variabilă care se modifică la fiecare iterație?"
+    options:
+      - "O scrii o singură dată"
+      - "Faci un tabel cu o coloană per variabilă și o linie per iterație"
+      - "Adaugi cout la fiecare modificare"
+      - "Folosești un debugger"
+    correctIndex: 1
+    explanation: "Tabelul de urmărire e instrumentul clasic: coloane pentru variabile, linii pentru fiecare pas sau iterație. Valoarea din celulă = valoarea după execuția acelui pas."
+  - question: "Ce faci dacă tabelul de urmărire arată o valoare greșită la pasul 3?"
+    options:
+      - "Ignori — calculatorul va corecta"
+      - "Te uiți la ce s-a întâmplat la pasul 2 și înainte"
+      - "Rescrii tot algoritmul"
+      - "Adaugi un if care corectează valoarea"
+    correctIndex: 1
+    explanation: "Urmărești înapoi: eroarea la pasul 3 vine dintr-o valoare greșită la pasul anterior sau dintr-o operație greșită la pasul 3. Cauzele sunt întotdeauna mai devreme în execuție."
+---
+
+<LessonHook>
+Un pilot verifică manual lista de pre-decolare înainte să pornească motoarele. Nu pentru că nu are încredere în avioane — ci pentru că o eroare la 10.000 de metri nu se poate repara. Urmărirea manuală a algoritmului e lista ta de pre-decolare: verifici că logica e corectă înainte să o trimiți la compilator.
+</LessonHook>
+
+## Ce este urmărirea manuală?
+
+**Urmărirea manuală** (*trace*) înseamnă să execuți un algoritm pe hârtie, pas cu pas, cu date concrete — notând valoarea fiecărei variabile după fiecare instrucțiune.
+
+Nu ai nevoie de calculator. Hârtie, pix, câteva date de test.
+
+## Cum faci un tabel de urmărire
+
+**Algoritmul:** calculează suma cifrelor lui 153.
+
+```
+n = 153, suma = 0
+Pas 1: suma += 153 % 10 = 3  →  suma = 3,  n = 15
+Pas 2: suma += 15 % 10  = 5  →  suma = 8,  n = 1
+Pas 3: suma += 1 % 10   = 1  →  suma = 9,  n = 0
+Condiție while: 0 > 0 = false → stop
+Rezultat: 9 ✓
+```
+
+Sub formă de tabel:
+
+| Pas | `n` | `n % 10` | `suma` |
+|-----|-----|----------|--------|
+| Start | 153 | — | 0 |
+| 1 | 15 | 3 | 3 |
+| 2 | 1 | 5 | 8 |
+| 3 | 0 | 1 | 9 |
+| Stop | — | — | **9** |
+
+<ObservationBox>
+Urmărești **toate** variabilele relevante, nu doar rezultatul final. O valoare intermediară greșită trădează exact unde algoritmul deviază față de ce ai intenționat.
+</ObservationBox>
+
+## Reguli practice pentru urmărire
+
+1. **Alege date concrete și mici** — nu te chinui cu n=1000. Testează cu n=3 sau n=5.
+2. **Verifică cazurile limită** — ce se întâmplă când n=0? Când n=1? Când toți sunt egali?
+3. **Urmărește condiția de oprire** — la while/for, notează explicit dacă condiția e true/false la fiecare iterație.
+4. **Compară cu rezultatul așteptat** — calculezi independent rezultatul corect (ex: manual suma 1+5+3=9) și verifici că algoritmul produce același lucru.
+
+## Exemplu cu structura alternativă
+
+Algoritmul decide dacă n e perfect pătrat. Testăm cu n=16:
+
+```
+n = 16
+radacina = sqrt(16) = 4.0
+(int)radacina = 4
+4 * 4 = 16 == n → afiseaza "DA"   ✓
+```
+
+Testăm cu n=15:
+
+```
+n = 15
+radacina = sqrt(15) ≈ 3.872...
+(int)radacina = 3
+3 * 3 = 9 ≠ 15 → afiseaza "NU"   ✓
+```
+
+<MistakeBox>
+**Greșeala 1:** Faci urmărirea cu date prea mari sau prea „normale". n=100 nu testează cazul n=0 sau n=1. Alege cazuri care stresează limitele.
+
+**Greșeala 2:** Modifici variabila în cap, nu pe hârtie. Memoria de lucru e limitată — notează explicit fiecare valoare intermediară sau pierzi firul.
+
+**Greșeala 3:** Presupui că algoritmul e corect și urmărești „ca să confirmi". Urmărirea e eficientă când ești sceptic — întreabă-te la fiecare pas „de ce valoarea asta e corectă?".
+</MistakeBox>
+
+---
+
+**De reținut în 3 idei:**
+- Urmărirea manuală = execuție cu date concrete + notarea valorilor la fiecare pas
+- Tabelul de urmărire (coloane per variabilă, linii per pas) e cel mai clar format
+- Testează mereu cazurile limită — n=0, n=1, valori negative, valori identice

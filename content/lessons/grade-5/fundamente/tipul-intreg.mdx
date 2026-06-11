@@ -1,0 +1,113 @@
+---
+title: "Tipul întreg"
+slug: tipul-intreg
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["int", "long-long", "overflow", "intregi"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care este valoarea maximă aproximativă a unui int (32 biți)?"
+    options:
+      - "32.767"
+      - "2.147.483.647 (≈ 2 miliarde)"
+      - "9.223.372.036.854.775.807 (≈ 9 cvintilioane)"
+      - "1.000.000.000"
+    correctIndex: 1
+    explanation: "int pe 32 biți merge de la −2.147.483.648 la 2.147.483.647. Dacă depășești, apare overflow — valoarea se înfășoară."
+  - question: "Când folosești long long în loc de int?"
+    options:
+      - "Când vrei rezultate mai precise"
+      - "Când valoarea poate depăși ≈ 2 miliarde"
+      - "Mereu — long long e mai rapid"
+      - "Când aduni mai mult de 10 numere"
+    correctIndex: 1
+    explanation: "long long merge până la ≈ 9.2 × 10^18. Folosit când intermediarele sau rezultatul final depășesc limita int."
+  - question: "Ce afișează: int x = 2147483647; x++; cout << x;"
+    options:
+      - "2147483648"
+      - "-2147483648"
+      - "Eroare de compilare"
+      - "0"
+    correctIndex: 1
+    explanation: "Overflow! int depășește maximul și se înfășoară la −2.147.483.648 (comportament nedefinit în C++, dar asta se vede practic)."
+---
+
+<LessonHook>
+Vrei să numeri câte furnici sunt pe Pământ — estimare: 10.000 de trilioane. Un `int` obișnuit poate ține maximum 2 miliarde. Nu încape. Alegerea tipului întreg potrivit e diferența dintre un program corect și unul care dă rezultate complet greșite fără nicio eroare.
+</LessonHook>
+
+## Tipurile întregi în C++
+
+C++ oferă mai multe tipuri pentru numere întregi, diferite prin spațiul ocupat și intervalul de valori:
+
+| Tip | Biți | Minim | Maxim |
+|-----|------|-------|-------|
+| `short` | 16 | −32.768 | 32.767 |
+| `int` | 32 | −2.147.483.648 | 2.147.483.647 |
+| `long long` | 64 | −9,2 × 10¹⁸ | 9,2 × 10¹⁸ |
+| `unsigned int` | 32 | 0 | 4.294.967.295 |
+
+<ObservationBox>
+La concursuri, regula de aur: dacă n ≤ 10⁹, poți folosi `int`. Dacă produse sau sume pot ajunge la 10¹⁸, folosești `long long`. Produsul a două `int` de 10⁹ depășește int — îl calculezi în `long long`.
+</ObservationBox>
+
+## Overflow — cel mai frecvent bug la concursuri
+
+Overflow se întâmplă când o valoare depășește maximul tipului. Calculul continuă fără eroare, dar rezultatul e greșit.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 100000;
+    int b = 100000;
+    int produs = a * b;         // 10^10 > 2*10^9 -- OVERFLOW!
+    long long produsCorect = (long long)a * b;  // corect: 10000000000
+
+    cout << produs << endl;       // rezultat gresit (negativ!)
+    cout << produsCorect << endl; // 10000000000
+    return 0;
+}
+```
+
+## Conversia (cast) între tipuri
+
+```cpp
+int a = 5, b = 2;
+int cat1 = a / b;             // 2 (impartire intreaga)
+double cat2 = (double)a / b;  // 2.5 (cast explicit)
+long long mare = (long long)a * 1000000000; // fortat la 64 biti
+```
+
+## Constante utile
+
+```cpp
+#include <climits>
+
+cout << INT_MAX   << endl;  // 2147483647
+cout << INT_MIN   << endl;  // -2147483648
+cout << LLONG_MAX << endl;  // 9223372036854775807
+```
+
+<HintBox>
+Când inițializezi un maxim sau minim pentru comparație, folosește `INT_MAX` / `INT_MIN` în loc de valori arbitrare ca `999999999` — e mai sigur și mai clar.
+</HintBox>
+
+## Complexitate
+
+Operațiile aritmetice pe întregi costă **O(1)** — sunt instrucțiuni hardware directe.
+
+<MistakeBox>
+**Greșeala 1:** Înmulțești doi `int` mari fără cast. `int a=100000; int b=100000; long long c = a*b;` NU e corect — înmulțirea se face în `int` și deja dă overflow ÎNAINTE să fie stocată în `long long`. Scrie: `long long c = (long long)a * b;`
+
+**Greșeala 2:** Folosești `unsigned` și scazi mai mult decât ai. `unsigned x = 0; x--;` nu dă −1, ci 4.294.967.295 (înfășurare la zero).
+
+**Greșeala 3:** Uiți sufixul `LL` la constante literale mari. `long long x = 3000000000;` poate da warning — scrie `3000000000LL`.
+</MistakeBox>

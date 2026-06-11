@@ -1,0 +1,149 @@
+---
+title: "Structura repetitivă"
+slug: structura-repetitiva
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["for", "while", "bucle", "repetitiv"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce afișează: for(int i=1; i<=5; i++) cout<<i<<\" \"; ?"
+    options:
+      - "1 2 3 4 5"
+      - "0 1 2 3 4"
+      - "1 2 3 4"
+      - "2 3 4 5 6"
+    correctIndex: 0
+    explanation: "i pornește de la 1, crește cu 1 la fiecare iterație, se oprește când i > 5. Deci afișează 1 2 3 4 5."
+  - question: "Când alegi while în loc de for?"
+    options:
+      - "Când știi exact de câte ori se repetă"
+      - "Când nu știi dinainte de câte ori se repetă — depinde de datele citite"
+      - "While e mai rapid decât for"
+      - "Niciodată — for e mereu mai bun"
+    correctIndex: 1
+    explanation: "for e ideal când numărul de iterații e cunoscut din start. while e mai natural când repeți până la o condiție care depinde de input sau de calcule."
+  - question: "Ce cauzează o buclă infinită?"
+    options:
+      - "Prea mulți pași în corp"
+      - "Condiția de continuare rămâne mereu true"
+      - "Variabila de control e int, nu long long"
+      - "Folosești break greșit"
+    correctIndex: 1
+    explanation: "Bucla rulează cât timp condiția e true. Dacă nicio instrucțiune din corp nu o face false, bucla nu se oprește niciodată."
+---
+
+<LessonHook>
+La sala de sport faci 3 serii de câte 10 flotări. Nu stai să numeri mental dacă ai mai rămas — ai un contor. Structura repetitivă face același lucru: repetă un set de pași de un număr precis de ori sau până când o condiție devine falsă. Fără bucle, ar trebui să scrii aceeași instrucțiune de o mie de ori.
+</LessonHook>
+
+## Bucla `for`
+
+Ideală când știi **dinainte** de câte ori se repetă:
+
+```cpp
+for (initializare; conditie; actualizare) {
+    // corpul buclei
+}
+```
+
+```cpp
+// Afiseaza numerele de la 1 la n
+int n;
+cin >> n;
+for (int i = 1; i <= n; i++) {
+    cout << i << " ";
+}
+```
+
+Cei trei pași:
+1. **Inițializare** (`int i = 1`) — se execută o singură dată, la start
+2. **Condiție** (`i <= n`) — verificată la fiecare iterație; dacă e `false`, bucla se oprește
+3. **Actualizare** (`i++`) — se execută după fiecare iterație
+
+## Bucla `while`
+
+Ideală când numărul de iterații **nu e cunoscut dinainte**:
+
+```cpp
+while (conditie) {
+    // corpul buclei
+}
+```
+
+```cpp
+// Citeste numere pana citesti 0
+int x;
+cin >> x;
+int suma = 0;
+while (x != 0) {
+    suma += x;
+    cin >> x;
+}
+cout << suma << endl;
+```
+
+<ObservationBox>
+Orice `for` se poate rescrie ca `while` și invers. Convenția: `for` pentru număr fix de iterații (1..n, i peste un vector), `while` pentru condiții pe date externe sau convergență.
+</ObservationBox>
+
+## Bucla `do-while`
+
+Corpul se execută **cel puțin o dată**, condiția e verificată după:
+
+```cpp
+int x;
+do {
+    cin >> x;
+} while (x < 0);  // repeta pana x este pozitiv
+```
+
+## Exemple practice
+
+**Suma cifrelor unui număr:**
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    int suma = 0;
+    while (n > 0) {
+        suma += n % 10;  // adauga ultima cifra
+        n /= 10;         // elimina ultima cifra
+    }
+    cout << suma << endl;
+    return 0;
+}
+```
+
+**Tabla înmulțirii:**
+
+```cpp
+for (int i = 1; i <= 10; i++) {
+    for (int j = 1; j <= 10; j++) {
+        cout << i * j << "\t";
+    }
+    cout << "\n";
+}
+```
+
+## Complexitate
+
+O buclă simplă de n iterații costă **O(n)**. Două bucle imbricate de n iterații fiecare costă **O(n²)**.
+
+<MistakeBox>
+**Greșeala 1:** Scrii `i <= n` în loc de `i < n` (sau invers) și bucla face cu 1 iterație mai mult sau mai puțin (eroare off-by-one). Testează mereu cu n=0 și n=1 pentru a prinde limita.
+
+**Greșeala 2:** Modifici variabila de control `i` în corpul buclei `for`. `for(int i=0; i<n; i++) { ... i++; ... }` face de fapt n/2 iterații, nu n.
+
+**Greșeala 3:** Uiți să actualizezi condiția într-un `while` și creezi buclă infinită. Verifică că ceva din corp face condiția să devină `false` la un moment dat.
+</MistakeBox>

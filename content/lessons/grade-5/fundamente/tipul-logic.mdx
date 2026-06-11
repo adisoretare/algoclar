@@ -1,0 +1,126 @@
+---
+title: "Tipul logic"
+slug: tipul-logic
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: false
+tags: ["bool", "logic", "conditii", "operatori"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce valoare are expresia: (3 > 5) || (2 < 10)?"
+    options:
+      - "false"
+      - "true"
+      - "3"
+      - "Eroare"
+    correctIndex: 1
+    explanation: "|| (SAU logic) e true dacă CEL PUȚIN un operand e true. (3>5) e false, dar (2<10) e true — deci rezultatul e true."
+  - question: "Ce afișează: bool x = 5; cout << x;"
+    options:
+      - "5"
+      - "true"
+      - "1"
+      - "Eroare de compilare"
+    correctIndex: 2
+    explanation: "bool afișat ca număr: orice valoare nenulă devine 1 (true), zero devine 0 (false). 5 se convertește la 1."
+  - question: "Care operator neagă o valoare bool?"
+    options:
+      - "~"
+      - "not"
+      - "!"
+      - "-"
+    correctIndex: 2
+    explanation: "! este operatorul de negație logică: !true = false, !false = true."
+---
+
+<LessonHook>
+Semaforul are doar două stări: roșu sau verde. Alarma e armată sau nu. Contul e activ sau blocat. Tipul `bool` captează exact această realitate binară — are sens sau nu are sens, adevărat sau fals. Orice condiție dintr-un `if` produce la final o valoare `bool`.
+</LessonHook>
+
+## Ce este bool?
+
+`bool` este tipul care stochează valori **logice**: `true` (adevărat) sau `false` (fals).
+
+Intern, `true` = 1 și `false` = 0. Orice valoare nenulă convertită la `bool` devine `true`.
+
+```cpp
+bool esteParit = true;
+bool esteNegativ = false;
+
+cout << esteParit   << endl;  // afiseaza 1
+cout << esteNegativ << endl;  // afiseaza 0
+```
+
+## Operatori de comparație
+
+Produc o valoare `bool`:
+
+| Operator | Semnificație | Exemplu | Rezultat |
+|----------|-------------|---------|---------|
+| `==` | egal | `5 == 5` | `true` |
+| `!=` | diferit | `3 != 4` | `true` |
+| `<` | mai mic | `7 < 3` | `false` |
+| `>` | mai mare | `7 > 3` | `true` |
+| `<=` | mai mic sau egal | `5 <= 5` | `true` |
+| `>=` | mai mare sau egal | `4 >= 6` | `false` |
+
+## Operatori logici
+
+Combină condiții `bool`:
+
+| Operator | Semnificație | Regulă |
+|----------|-------------|--------|
+| `&&` | ȘI logic (AND) | `true` doar dacă AMBII sunt `true` |
+| `\|\|` | SAU logic (OR) | `true` dacă CEL PUȚIN UNul e `true` |
+| `!` | NEGAȚIE | inversează: `!true` = `false` |
+
+```cpp
+int x = 7;
+bool inInterval = (x > 0) && (x < 10);  // true -- 7 e intre 1 si 9
+bool parSauMic  = (x % 2 == 0) || (x < 5);  // false -- nici par, nici < 5
+bool niciParar  = !(x % 2 == 0);  // true -- x e impar
+```
+
+<ObservationBox>
+`&&` și `||` folosesc **evaluare leneșă** (short-circuit): dacă primul operand al `&&` e `false`, al doilea nu mai e evaluat (rezultatul e oricum `false`). La `||`, dacă primul e `true`, al doilea se sare. Contează când al doilea operand are efecte secundare sau accesuri periculoase.
+</ObservationBox>
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    bool estePar   = (n % 2 == 0);
+    bool estePositiv = (n > 0);
+    bool esteParSiPositiv = estePar && estePositiv;
+
+    if (esteParSiPositiv) {
+        cout << n << " este par si pozitiv" << endl;
+    } else {
+        cout << n << " nu indeplineste ambele conditii" << endl;
+    }
+    return 0;
+}
+```
+
+<HintBox>
+Poți afișa `bool` ca text cu `boolalpha`: `cout << boolalpha << true;` afișează `true` în loc de `1`. Util la debug, nu la concursuri.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** Scrii `=` în loc de `==` într-o condiție. `if (x = 5)` atribuie 5 lui x și e mereu `true` (5 ≠ 0). Compilatorul poate avertiza, dar nu e eroare.
+
+**Greșeala 2:** Confunzi `&` (AND pe biți) cu `&&` (AND logic). Produc același rezultat pentru `0`/`1`, dar `&` nu face short-circuit și poate da rezultate greșite pentru valori nenule.
+
+**Greșeala 3:** Compari float-uri cu `==`. `0.1 + 0.2 == 0.3` e `false` din cauza erorilor de reprezentare. Compară cu toleranță: `fabs(a - b) < 1e-9`.
+</MistakeBox>

@@ -1,0 +1,139 @@
+---
+title: "Citire și afișare"
+slug: citire-si-afisare
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["cin", "cout", "fisiere", "io"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La concursurile OJI/ONI, datele se citesc de obicei din:"
+    options:
+      - "Tastatură (cin)"
+      - "Fișier text (.in)"
+      - "Baze de date"
+      - "Variabile predefinite"
+    correctIndex: 1
+    explanation: "OJI/ONI folosesc fișiere .in și .out. Programul trebuie să deschidă fișierul, să citească și să scrie în celălalt fișier."
+  - question: "Ce face endl?"
+    options:
+      - "Doar trece la linie nouă"
+      - "Trece la linie nouă și golește buffer-ul"
+      - "Adaugă un spațiu"
+      - "Termină programul"
+    correctIndex: 1
+    explanation: "endl face două lucruri: inserează '\\n' și flush-ează buffer-ul de ieșire. Din acest motiv, '\\n' e mai rapid decât endl în programe cu multă ieșire."
+  - question: "Dacă vrei să citești 3 numere pe aceeași linie, separate prin spații, cum faci?"
+    options:
+      - "cin >> a; cin >> b; cin >> c; (separat)"
+      - "cin >> a >> b >> c;"
+      - "scanf('%d %d %d', a, b, c);"
+      - "Oricare din primele două variante"
+    correctIndex: 3
+    explanation: "cin >> ignoră spațiile și newline-urile între citiri, deci ambele variante cin sunt echivalente. scanf e și el corect, dar stilul C++  preferă cin."
+---
+
+<LessonHook>
+Calculatorul tău e ca un funcționar care stă la ghișeu. Dacă nu-i spui nimic (nu ai citire), nu știe cu ce să lucreze. Dacă nu scrie rezultatul nicăieri (nu ai afișare), munca lui dispare. `cin` e vocea ta, `cout` e răspunsul lui — fără ele, programul e o cutie neagră.
+</LessonHook>
+
+## Citire de la tastatură cu `cin`
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;  // citeste un intreg
+
+    int a, b;
+    cin >> a >> b;  // citeste doua intregi, separate prin spatiu sau enter
+
+    double x;
+    cin >> x;  // citeste un real
+
+    char c;
+    cin >> c;  // citeste un caracter (sare spatii)
+    return 0;
+}
+```
+
+<ObservationBox>
+`cin >>` sare automat spațiile albe (spații, tab-uri, newline-uri) înainte de fiecare valoare. Nu trebuie să tratezi manual separatorii când citești numere.
+</ObservationBox>
+
+## Afișare cu `cout`
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 5, b = 3;
+    cout << a + b << endl;        // afiseaza 8 si trece la linie noua
+    cout << a << " " << b << "\n"; // afiseaza 5 3 si trece la linie noua (mai rapid)
+    cout << "Suma: " << a + b;    // afiseaza text + valoare
+    return 0;
+}
+```
+
+## Citire și scriere din fișiere (standard OJI/ONI)
+
+La concursuri datele vin din fișier `.in` și rezultatul se scrie în `.out`:
+
+```cpp
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("date.in");   // deschide fisierul de intrare
+    ofstream fout("date.out"); // deschide fisierul de iesire
+
+    int n;
+    fin >> n;  // citeste din fisier, exact ca cin
+
+    int suma = 0;
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        suma += x;
+    }
+
+    fout << suma << "\n";  // scrie in fisier, exact ca cout
+
+    fin.close();
+    fout.close();
+    return 0;
+}
+```
+
+<HintBox>
+La concursuri, înlocuiește `cin`/`cout` cu `fin`/`fout` și atât. Logica rămâne identică. Unele probleme cer nume specifice (`suma.in`, `suma.out`) — citește enunțul cu atenție.
+</HintBox>
+
+## Citire rapidă (când n > 100.000)
+
+```cpp
+ios_base::sync_with_stdio(false);
+cin.tie(NULL);
+```
+
+Adaugă aceste două linii la începutul `main()` dacă programul folosește `cin`/`cout` și datele sunt mari. Dezactivează sincronizarea cu stdio — de 5–10× mai rapid.
+
+## Complexitate
+
+Citirea/afișarea unui număr costă **O(1)**. Citirea unui șir de n numere costă **O(n)**.
+
+<MistakeBox>
+**Greșeala 1:** Uiți să schimbi `cin`/`cout` cu `fin`/`fout` la concurs. Programul rulează corect pe calculator dar nu citește nimic din fișier — scor 0.
+
+**Greșeala 2:** Folosești `endl` într-o buclă cu milioane de iterații. `endl` face flush la fiecare iterație — extrem de lent. Folosești `"\n"` în schimb.
+
+**Greșeala 3:** Citești un `char` cu `cin >> c` și primești caracterul greșit (un spațiu). `cin >>` sare spațiile, dar dacă vrei caracterul următor exact (inclusiv spațiu), folosești `cin.get(c)`.
+</MistakeBox>

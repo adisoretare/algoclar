@@ -1,0 +1,139 @@
+---
+title: "Lecție-punte: debugging de bază"
+slug: punte-debugging-baza
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 8
+free: true
+status: draft
+isBridge: true
+tags: ["debugging", "erori", "bug", "depanare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care tip de eroare îl detectează compilatorul?"
+    options:
+      - "Eroare logică"
+      - "Eroare de sintaxă (compilare)"
+      - "Eroare de răspuns greșit"
+      - "Eroare de timp limită depășit"
+    correctIndex: 1
+    explanation: "Erorile de sintaxă (punct și virgulă lipsă, paranteză neînchisă, variabilă nedeclarată) sunt detectate de compilator înainte să rulezi programul."
+  - question: "Programul compilează și rulează, dar rezultatul e greșit. Ce tip de eroare e?"
+    options:
+      - "Eroare de compilare"
+      - "Eroare de runtime"
+      - "Eroare logică"
+      - "Nu e o eroare — compilatorul verifică și asta"
+    correctIndex: 2
+    explanation: "Eroarea logică: programul rulează fără crash, dar produce rezultate greșite. Cauza e în logica algoritmului, nu în sintaxă."
+  - question: "Care e primul pas când un program dă Wrong Answer?"
+    options:
+      - "Rescrieți totul de la zero"
+      - "Adăugați cout-uri de debug să vedeți ce valori au variabilele"
+      - "Trimiteți din nou, poate e un bug al judecătorului"
+      - "Schimbați tipul variabilelor"
+    correctIndex: 1
+    explanation: "Cel mai rapid debug: adaugi cout (sau cerr) după fiecare calcul important ca să vezi unde deviază valoarea față de ce aștepți. Elimini cout-urile după ce găsești și repari bug-ul."
+---
+
+<LessonHook>
+Mașinile moderne au zeci de senzori care îți spun exact ce nu merge și unde. Programatorii de la NASA au pagini de log pentru fiecare misiune. Tu ai ceva mai simplu dar la fel de eficient: `cout` strategic și urmărire manuală. Debugging-ul nu e magie — e metodă.
+</LessonHook>
+
+## Cele trei tipuri de erori
+
+### 1. Erori de compilare (Compile Error)
+
+Compilatorul refuză să construiască programul. Cauze frecvente:
+
+```cpp
+int x = 5        // lipseste ;
+int y = x + ;    // expresie incompleta
+if x > 0 { }     // lipsesc parantezele de la if
+cout << z;       // z nedeclarat
+```
+
+**Ce faci:** Citești prima eroare din lista compilatorului (nu ultima!), mergi la linia indicată, corectezi.
+
+### 2. Erori de runtime (Runtime Error)
+
+Programul compilează, dar se oprește cu eroare în timpul rulării:
+
+```cpp
+int a[10];
+a[15] = 5;    // acces in afara vectorului -- crash
+
+int x = 0;
+int y = 5 / x; // impartire la zero -- crash
+```
+
+**Ce faci:** Citești mesajul de eroare (segfault, division by zero etc.), identifici linia, verifici condițiile de margine.
+
+### 3. Erori logice (Wrong Answer)
+
+Programul rulează complet, dar răspunsul e greșit. Cel mai greu tip de depanat.
+
+**Ce faci:** Urmărire manuală pe un exemplu mic, debug cu `cout`.
+
+<ObservationBox>
+Ordinea de rezolvat: mai întâi compile errors (blocante), apoi runtime errors (crash), la final logic errors (răspuns greșit). Nu poți vedea erorile logice dacă programul nici nu compilează.
+</ObservationBox>
+
+## Tehnica debug cu `cout`
+
+Adaugi `cout` temporare să vezi valorile intermediare:
+
+```cpp
+int suma = 0;
+for (int i = 1; i <= n; i++) {
+    suma += i * i;
+    cerr << "i=" << i << " suma=" << suma << "\n"; // debug
+}
+cout << suma << "\n";
+```
+
+Folosește `cerr` (nu `cout`) pentru debug: merge la stderr, nu interfereaza cu ieșirea programului.
+
+<HintBox>
+Când trimiti la concurs, **șterge sau comentează** toate liniile de debug. `cerr` ne-șters nu afectează răspunsul la OJI/ONI (stderr e ignorat), dar e o practică bună să cureți codul.
+</HintBox>
+
+## Checklist de debugging
+
+1. **Citești primul mesaj de eroare**, nu ultimul (compilatorul raportează cascade)
+2. **Testezi cu date mici** — n=1, n=2, cazul special n=0
+3. **Adaugi cout-uri** după fiecare calcul important pentru a identifica unde deviază valoarea
+4. **Urmărești manual** pe hârtie algoritmul cu datele de test ce dă greș
+5. **Verifici limitele** — variabilele ies din array? Dai cu modulo la 0?
+
+## Exemplu: găsirea unui bug
+
+Programul trebuie să calculeze suma numerelor de la 1 la n. Dă rezultat greșit pentru n=5.
+
+```cpp
+int suma = 0;
+for (int i = 0; i <= n; i++) {  // BUG: i incepe de la 0
+    suma += i;
+}
+// Pentru n=5: suma = 0+1+2+3+4+5 = 15, dar asteptam 1+2+3+4+5 = 15 -- ok de fapt!
+// Dar daca suma ar fi 0+1+...+n, ar da cu 0 in plus... zero nu afecteaza suma
+```
+
+Corecti: `i` ar trebui să înceapă de la `1`, dar adunarea lui 0 nu schimbă suma — bug găsit (nu e bug). Acum testăm formula `sum = n*(n+1)/2` ca verificare.
+
+<MistakeBox>
+**Greșeala 1:** Citești ultima linie din erorile de compilare și pierzi timpul depanând o eroare secundară. Prima eroare o cauzează pe a doua, a treia etc. Rezolvi prima, recompilezi.
+
+**Greșeala 2:** Lași `cout`-urile de debug în codul final. La concurs nu afectează răspunsul dacă e `cerr`, dar e cod murdar. Comentează-le sau șterge-le.
+
+**Greșeala 3:** Testezi numai cu exemplul din enunț. Exemplul e proiectat să funcționeze. Testează cu cazuri suplimentare: n=0, n=1, n maxim, valori negative.
+</MistakeBox>
+
+---
+
+**De reținut în 3 idei:**
+- 3 tipuri de erori: compilare (detectate de compilator), runtime (crash la execuție), logice (răspuns greșit)
+- Debug eficient: `cerr` pentru valori intermediare + urmărire manuală pe cazuri mici
+- Prima eroare din compilator e cea reală — rezolv-o, restul pot dispărea

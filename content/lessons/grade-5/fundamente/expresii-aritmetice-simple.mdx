@@ -1,0 +1,131 @@
+---
+title: "Expresii aritmetice simple"
+slug: expresii-aritmetice-simple
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["aritmetica", "operatori", "modulo", "impartire"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce afișează: cout << 7 / 2;"
+    options:
+      - "3.5"
+      - "3"
+      - "4"
+      - "Eroare"
+    correctIndex: 1
+    explanation: "7 și 2 sunt int, deci se face împărțire întreagă: 7 / 2 = 3 (restul se pierde). Pentru 3.5, scrieți 7.0 / 2 sau (double)7 / 2."
+  - question: "Ce afișează: cout << 17 % 5;"
+    options:
+      - "3"
+      - "2"
+      - "3.4"
+      - "0"
+    correctIndex: 1
+    explanation: "% returnează restul împărțirii. 17 = 5 * 3 + 2, deci 17 % 5 = 2."
+  - question: "Care expresie calculează corect media a trei numere reale a, b, c?"
+    options:
+      - "(a + b + c) / 3"
+      - "(a + b + c) / 3.0"
+      - "a + b + c / 3"
+      - "double m = a + b + c / 3"
+    correctIndex: 1
+    explanation: "Dacă a, b, c sunt int, (a+b+c)/3 face împărțire întreagă. Împărțind la 3.0 forțezi conversia la double. Varianta cu /3 fără paranteze e greșită — se aplică doar lui c."
+---
+
+<LessonHook>
+Calculatorul de buzunar face 2 + 3 = 5 fără să te gândești. Dar ce face computerul cu 7 ÷ 2? Dacă îi spui că lucrezi cu numere întregi, răspunde 3, nu 3.5. Dacă îi spui că lucrezi cu numere reale, răspunde 3.5. Tipul datelor schimbă sensul operației — asta e detaliul care face diferența.
+</LessonHook>
+
+## Operatorii aritmetici de bază
+
+| Operator | Operație | Exemplu | Rezultat |
+|----------|---------|---------|---------|
+| `+` | Adunare | `5 + 3` | `8` |
+| `-` | Scădere | `5 - 3` | `2` |
+| `*` | Înmulțire | `5 * 3` | `15` |
+| `/` | Împărțire | `7 / 2` | `3` (întreg!) |
+| `%` | Rest (modulo) | `7 % 2` | `1` |
+
+<ObservationBox>
+`/` între doi întregi dă **câtul întreg** (fără rest). `7 / 2 = 3`, nu 3.5. Operatorul `%` dă restul: `7 % 2 = 1`. Ambii lucrează DOAR pe tipuri întregi — `7.0 % 2` e eroare de compilare.
+</ObservationBox>
+
+## Împărțire întreagă vs reală
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 7, b = 2;
+
+    cout << a / b << endl;          // 3 -- impartire intreaga
+    cout << (double)a / b << endl;  // 3.5 -- cast la double
+    cout << a / (double)b << endl;  // 3.5 -- acelasi lucru
+    cout << 7.0 / 2 << endl;       // 3.5 -- literal real
+
+    // Restul impartirii
+    cout << a % b << endl;   // 1
+    cout << 13 % 4 << endl;  // 1 (13 = 4*3 + 1)
+    cout << 20 % 5 << endl;  // 0 (20 se divide exact)
+    return 0;
+}
+```
+
+## Ordinea operațiilor
+
+C++ respectă prioritatea matematică obișnuită:
+
+1. Expresiile din **paranteze** `()` — prima dată
+2. `*`, `/`, `%` — stânga la dreapta
+3. `+`, `-` — stânga la dreapta
+
+```cpp
+int r1 = 2 + 3 * 4;     // 14 (nu 20): 3*4=12, apoi 2+12
+int r2 = (2 + 3) * 4;   // 20: (2+3)=5, apoi 5*4
+int r3 = 10 - 3 - 2;    // 5: (10-3)=7, apoi 7-2
+int r4 = 10 / 2 / 5;    // 1: (10/2)=5, apoi 5/5
+```
+
+## Operatori de incrementare
+
+```cpp
+int x = 5;
+x++;   // x devine 6 (echivalent cu x = x + 1)
+x--;   // x devine 5 (echivalent cu x = x - 1)
+x += 3; // x devine 8 (echivalent cu x = x + 3)
+x *= 2; // x devine 16 (echivalent cu x = x * 2)
+```
+
+## Modulo — cel mai util operator la concursuri
+
+Modulo are zeci de aplicații directe:
+
+```cpp
+// Verifica paritate
+if (n % 2 == 0) cout << "par";
+
+// Ultima cifra a unui numar
+int ultimaCifra = n % 10;  // ex: 1234 % 10 = 4
+
+// Indice circular (wrap-around)
+int urmator = (i + 1) % n;  // dupa ultima pozitie, revine la 0
+```
+
+<HintBox>
+`n % 10` extrage ultima cifră. `n / 10` taie ultima cifră. Repetând, poți procesa toate cifrele unui număr — baza algoritmilor de la capitolul următor.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** Faci media cu împărțire întreagă. `(a + b) / 2` când a și b sunt `int` dă mereu un întreg, trunchiind. Scrie `(a + b) / 2.0` dacă vrei zecimale.
+
+**Greșeala 2:** Uiți parantezele. `a + b * c` ≠ `(a + b) * c`. Pune paranteze explicit dacă nu ești sigur.
+
+**Greșeala 3:** Calculezi `n % 2 == 1` pentru a verifica dacă n e impar, dar n poate fi negativ. `-3 % 2` poate fi `-1` în C++ (comportament definit de implementare). Pentru siguranță: `n % 2 != 0`.
+</MistakeBox>

@@ -1,0 +1,152 @@
+---
+title: "Structura alternativă"
+slug: structura-alternativa
+grade: 5
+chapter: fundamente
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["if", "else", "conditii", "alternativa"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce afișează codul: int x=4; if(x%2==0) cout<<\"par\"; else cout<<\"impar\";"
+    options:
+      - "impar"
+      - "par"
+      - "parimpar"
+      - "Nimic"
+    correctIndex: 1
+    explanation: "4 % 2 == 0 e true, deci se execută ramura if și se afișează 'par'."
+  - question: "Câte ramuri else poate avea un if?"
+    options:
+      - "Exact una"
+      - "Cel mult una"
+      - "Oricâte"
+      - "Zero"
+    correctIndex: 1
+    explanation: "Un if poate avea zero sau o ramură else. Pentru mai multe cazuri, folosești else if (înlănțuit)."
+  - question: "Ce se întâmplă dacă omiți { } la un if cu mai multe instrucțiuni?"
+    options:
+      - "Compilatorul adaugă automat { }"
+      - "Doar prima instrucțiune aparține lui if, celelalte se execută mereu"
+      - "Eroare de compilare"
+      - "Toate instrucțiunile aparțin lui if"
+    correctIndex: 1
+    explanation: "Fără { }, if controlează DOAR prima instrucțiune care urmează. Restul se execută indiferent de condiție — bug clasic."
+---
+
+<LessonHook>
+Stai la o intersecție și lumina e roșie sau verde. Dacă e verde, mergi înainte. Altfel, aștepți. Nu poți face ambele — alegi una din două drumuri. Structura alternativă îi spune programului exact același lucru: „dacă condiția asta e adevărată, fă X, altfel fă Y".
+</LessonHook>
+
+## Forma simplă: `if`
+
+Execută un bloc **doar dacă** condiția e `true`:
+
+```cpp
+if (conditie) {
+    // executat doar cand conditia e adevarata
+}
+```
+
+Exemplu:
+
+```cpp
+int nota;
+cin >> nota;
+if (nota >= 5) {
+    cout << "Promovat" << endl;
+}
+// daca nota < 5, nu se afiseaza nimic
+```
+
+## Forma completă: `if-else`
+
+Execută un bloc sau celălalt:
+
+```cpp
+if (conditie) {
+    // executat cand conditia e adevarata
+} else {
+    // executat cand conditia e falsa
+}
+```
+
+```cpp
+int n;
+cin >> n;
+if (n % 2 == 0) {
+    cout << n << " este par" << endl;
+} else {
+    cout << n << " este impar" << endl;
+}
+```
+
+## Forma înlănțuită: `if-else if-else`
+
+Verifică mai multe condiții în ordine — se execută **primul** bloc cu condiție adevărată:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int nota;
+    cin >> nota;
+
+    if (nota == 10) {
+        cout << "Perfect!" << endl;
+    } else if (nota >= 9) {
+        cout << "Foarte bine" << endl;
+    } else if (nota >= 7) {
+        cout << "Bine" << endl;
+    } else if (nota >= 5) {
+        cout << "Suficient" << endl;
+    } else {
+        cout << "Insuficient" << endl;
+    }
+    return 0;
+}
+```
+
+<ObservationBox>
+La `if-else if-else`, condițiile se verifică de sus în jos și **se oprește la primul `true`**. Ordinea contează. Dacă pui `nota >= 5` înainte de `nota >= 9`, notele mari vor intra mereu în ramura greșită.
+</ObservationBox>
+
+## `if`-uri imbricate
+
+Un `if` în interiorul altui `if`:
+
+```cpp
+int a, b;
+cin >> a >> b;
+
+if (a > 0) {
+    if (b > 0) {
+        cout << "Ambele pozitive" << endl;
+    } else {
+        cout << "Doar a pozitiv" << endl;
+    }
+} else {
+    cout << "a nu e pozitiv" << endl;
+}
+```
+
+<HintBox>
+Încearcă să reduci imbricarea excesivă — dacă ai 4–5 niveluri de `if` imbricate, codul devine greu de citit. Adesea poți combina condițiile cu `&&` sau `||`.
+</HintBox>
+
+## Complexitate
+
+`if`/`else` costă **O(1)** — evaluează condiția o singură dată.
+
+<MistakeBox>
+**Greșeala 1:** Scrii `=` în loc de `==` în condiție. `if (x = 5)` atribuie 5 lui `x` și condiția e mereu `true`. Compilatorul avertizează, dar nu e eroare. Unii scriu `if (5 == x)` pentru siguranță.
+
+**Greșeala 2:** Omiti `{ }` când ai mai multe instrucțiuni. Fără acolade, `if (cond) instr1; instr2;` — `instr2` se execută mereu, nu doar când `cond` e adevărată.
+
+**Greșeala 3:** Verifici intervalul greșit cu `else if`. Dacă ai `if (x > 0) ... else if (x > 5)`, ramura cu `x > 5` nu va fi atinsă niciodată pentru `x > 5`, pentru că `x > 0` e deja adevărat și o captează. Pune condițiile mai restrictive primele.
+</MistakeBox>
