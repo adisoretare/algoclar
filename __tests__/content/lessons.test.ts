@@ -72,6 +72,8 @@ import {
   getLessonBySlug,
   getLessonsByGrade,
   getChaptersByGrade,
+  getLessonsForChapter,
+  getPrevNextLesson,
 } from '@/lib/content/lessons'
 import type { LessonMeta } from '@/lib/content/types'
 
@@ -155,5 +157,47 @@ describe('getChaptersByGrade()', () => {
     const chapters = await getChaptersByGrade(9)
     // grade-9 has only sortare/bubble-sort.mdx → first chapter is 'sortare'
     expect(chapters[0]).toBe('sortare')
+  })
+})
+
+describe('getLessonsForChapter()', () => {
+  it('returns lessons matching grade + chapter', async () => {
+    const lessons = await getLessonsForChapter(9, 'cautare-binara')
+    expect(lessons.length).toBeGreaterThan(0)
+    for (const l of lessons) {
+      expect(l.grade).toBe(9)
+      expect(l.chapter).toBe('cautare-binara')
+    }
+  })
+
+  it('returns empty array for chapter with no content', async () => {
+    const lessons = await getLessonsForChapter(12, 'algoritmi-avansati')
+    expect(lessons).toEqual([])
+  })
+})
+
+describe('getPrevNextLesson()', () => {
+  it('returns null/null for unknown slug', async () => {
+    const result = await getPrevNextLesson('slug-inexistent')
+    expect(result.prev).toBeNull()
+    expect(result.next).toBeNull()
+  })
+
+  it('cautare-binara (grade 9, chapter order 2) has a prev lesson', async () => {
+    // grade-9 chapter "cautare-binara" has order:2; there are lessons in grades 5,6,7,9(sortare)
+    const { prev } = await getPrevNextLesson('cautare-binara')
+    expect(prev).not.toBeNull()
+  })
+
+  it('prev lesson comes from lower grade or earlier chapter order', async () => {
+    const { prev } = await getPrevNextLesson('cautare-binara')
+    // prev must be grade ≤ 9; the preceding it() asserts prev is not null
+    expect(prev!.grade).toBeLessThanOrEqual(9)
+  })
+
+  it('bubble-sort next is cautare-binara (same grade, chapter order 1 < 2)', async () => {
+    const { next } = await getPrevNextLesson('bubble-sort')
+    // grade-9 sortare (order 1) → next is grade-9 cautare-binara (order 2)
+    expect(next?.slug).toBe('cautare-binara')
   })
 })

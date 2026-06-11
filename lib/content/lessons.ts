@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { CURRICULUM } from '@/data/curriculum'
+import { CURRICULUM, getGradeData } from '@/data/curriculum'
 import { LessonFrontmatterSchema } from './types'
 import type { LessonMeta, LessonWithContent } from './types'
 
@@ -85,4 +85,42 @@ export async function getChaptersByGrade(grade: number): Promise<string[]> {
   }
 
   return [...lessonChapters].sort()
+}
+
+export async function getLessonsForChapter(
+  grade: number,
+  chapterId: string,
+): Promise<LessonMeta[]> {
+  const all = await getAllLessons()
+  return all.filter((l) => l.grade === grade && l.chapter === chapterId)
+}
+
+const UNKNOWN_CHAPTER_ORDER = 99
+
+function getChapterOrderInGrade(grade: number, chapterId: string): number {
+  return getGradeData(grade)?.chapters.find((c) => c.id === chapterId)?.order ?? UNKNOWN_CHAPTER_ORDER
+}
+
+function sortLessonsByCurriculum(lessons: LessonMeta[]): LessonMeta[] {
+  return [...lessons].sort((a, b) => {
+    if (a.grade !== b.grade) return a.grade - b.grade
+    const aOrder = getChapterOrderInGrade(a.grade, a.chapter)
+    const bOrder = getChapterOrderInGrade(b.grade, b.chapter)
+    if (aOrder !== bOrder) return aOrder - bOrder
+    return a.slug.localeCompare(b.slug)
+  })
+}
+
+export async function getPrevNextLesson(currentSlug: string): Promise<{
+  prev: LessonMeta | null
+  next: LessonMeta | null
+}> {
+  const all = await getAllLessons()
+  const sorted = sortLessonsByCurriculum(all)
+  const idx = sorted.findIndex((l) => l.slug === currentSlug)
+  if (idx === -1) return { prev: null, next: null }
+  return {
+    prev: idx > 0 ? sorted[idx - 1] : null,
+    next: idx < sorted.length - 1 ? sorted[idx + 1] : null,
+  }
 }

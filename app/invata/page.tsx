@@ -1,8 +1,7 @@
+import type { Metadata } from 'next'
 import { getAllLessons } from '@/lib/content/lessons'
 import { CURRICULUM } from '@/data/curriculum'
-import { LessonCard } from '@/components/lesson/LessonCard'
-import type { Metadata } from 'next'
-import type { Difficulty } from '@/components/shared/DifficultyBadge'
+import { GradeCard } from '@/components/lesson/GradeCard'
 
 export const metadata: Metadata = {
   title: 'Învață Algoritmică — AlgoClar',
@@ -23,45 +22,21 @@ export default async function InvataPage() {
         </p>
       </header>
 
-      <div className="space-y-16">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {CURRICULUM.map((gradeData) => {
-          const gradeLessons = allLessons.filter((l) => l.grade === gradeData.grade)
-          if (gradeLessons.length === 0) return null
+          const lessonCount = allLessons.filter(
+            (l) => l.grade === gradeData.grade,
+          ).length
 
           return (
-            <section key={gradeData.grade}>
-              <h2 className="mb-6 font-heading text-2xl font-semibold text-foreground">
-                {gradeData.label}
-              </h2>
-              <div className="space-y-8">
-                {gradeData.chapters.map((chapter) => {
-                  const chapterLessons = gradeLessons.filter(
-                    (l) => l.chapter === chapter.id,
-                  )
-                  if (chapterLessons.length === 0) return null
-
-                  return (
-                    <div key={chapter.id}>
-                      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                        {chapter.title}
-                      </h3>
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {chapterLessons.map((lesson) => (
-                          <LessonCard
-                            key={lesson.slug}
-                            href={`/invata/${lesson.grade}/${lesson.chapter}/${lesson.slug}`}
-                            chapter={lesson.chapter}
-                            title={lesson.title}
-                            duration={`${lesson.estimatedTime} min`}
-                            difficulty={lesson.difficulty as Difficulty}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
+            <GradeCard
+              key={gradeData.grade}
+              grade={gradeData.grade}
+              label={gradeData.label}
+              chapterCount={gradeData.chapters.length}
+              lessonCount={lessonCount}
+              href={`/invata/${gradeData.grade}`}
+            />
           )
         })}
       </div>
