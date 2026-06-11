@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["maxim", "minim", "initializare", "INT_MIN"]
-visualizers: []
+visualizers: ["array-traversal"]
 relatedProblems: []
 quiz:
   - question: "Care e inițializarea corectă a lui `maxim` înainte de a citi n numere?"
@@ -127,6 +127,16 @@ Dacă vrei **prima** apariție a maximului, condiția rămâne `x > maxim` (stri
 | Caz | Timp | Spațiu |
 |-----|------|--------|
 | Maxim și minim simultan | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește cum maximul se actualizează la fiecare element parcurs:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru animație automată. Apasă **Laborator** ca să testezi cu propriul tău șir.
+</HintBox>
 
 <MistakeBox>
 **Greșeala 1:** `maxim = 0` când valorile pot fi negative. Rezultatul va fi 0 chiar dacă nicio valoare nu e 0 sau pozitivă.

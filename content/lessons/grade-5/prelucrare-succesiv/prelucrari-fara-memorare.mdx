@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["streaming", "acumulator", "online", "memorie"]
-visualizers: []
+visualizers: ["array-traversal"]
 relatedProblems: []
 quiz:
   - question: "De ce procesăm uneori numerele fără să le stocăm pe toate?"
@@ -123,6 +123,16 @@ Aceasta e abordarea standard la olimpiade pentru secvențe mari de intrare. Dac�
 |-----|------|--------|
 | Orice calcul streaming | O(n) | O(1) |
 | Cu vector | O(n) | O(n) |
+
+## Vizualizare
+
+Urmărește cum suma și maximul se calculează din mers, fără să stochezi vectorul:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru animație automată. Apasă **Laborator** ca să testezi cu propriul tău șir.
+</HintBox>
 
 <MistakeBox>
 **Greșeala 1:** Declari `int x` în afara buclei din reflex. Nu e greșit, dar nu e necesar — variabila se poate declara în interiorul buclei (`int x; cin >> x;`).

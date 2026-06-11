@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["vector", "tablou", "index", "declaratie"]
-visualizers: []
+visualizers: ["array-traversal"]
 relatedProblems: []
 quiz:
   - question: "Cum accesezi al doilea element al vectorului v?"
@@ -102,6 +102,16 @@ cout << v[0];   // primul element: 5
 cout << v[4];   // ultimul (din 5): 9
 v[2] = 100;     // modifica al treilea element
 ```
+
+## Vizualizare
+
+Construiește-ți propriul vector și urmărește cum e parcurs element cu element:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru animație automată. Apasă **Laborator** ca să testezi cu vectorul tău.
+</HintBox>
 
 <MistakeBox>
 **Greșeala 1:** `v[n]` — accesezi elementul cu index `n`, care e în afara vectorului (indici valizi: 0..n-1). Provoacă comportament nedefinit sau crash.

@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["maxim", "minim", "doua-maxime", "podium"]
-visualizers: []
+visualizers: ["array-traversal"]
 relatedProblems: []
 quiz:
   - question: "În șirul 3, 7, 5, 7, 2 — care sunt max1 și max2 (permite duplicate)?"
@@ -131,6 +131,16 @@ Extinderea la top-3 urmează același tipar: verifici de la `max1` în jos și a
 | Caz | Timp | Spațiu |
 |-----|------|--------|
 | Primele două maxime | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește scanarea care găsește maximul — același principiu, pe care îl extinzi la al doilea maxim:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru animație automată. Apasă **Laborator** ca să testezi cu propriul tău șir.
+</HintBox>
 
 <MistakeBox>
 **Greșeala 1:** Scrii `max1 = x; max2 = max1;` — suprascrii `max1` înainte să-l salvezi în `max2`. Vechea valoare a lui `max1` se pierde. Ordinea corectă: `max2 = max1; max1 = x;`.

@@ -132,9 +132,9 @@ export const CURRICULUM: Grade[] = [
         title: 'Prelucrarea numerelor citite succesiv',
         order: 5,
         lessons: [
-          { id: 'prelucrari-fara-memorare', title: 'Prelucrări fără memorarea tuturor valorilor' },
-          { id: 'maxim-si-minim', title: 'Maxim și minim' },
-          { id: 'primele-doua-maxime', title: 'Primele două maxime sau minime' },
+          { id: 'prelucrari-fara-memorare', title: 'Prelucrări fără memorarea tuturor valorilor', visualizer: 'array-traversal' },
+          { id: 'maxim-si-minim', title: 'Maxim și minim', visualizer: 'array-traversal' },
+          { id: 'primele-doua-maxime', title: 'Primele două maxime sau minime', visualizer: 'array-traversal' },
           { id: 'stocarea-ultimului-element', title: 'Stocarea ultimului element' },
           { id: 'stocarea-ultimelor-p-elemente', title: 'Stocarea ultimelor p elemente' },
           { id: 'secvente-cu-proprietati', title: 'Secvențe cu proprietăți' },
@@ -147,7 +147,7 @@ export const CURRICULUM: Grade[] = [
         order: 6,
         isNationalExtension: true,
         lessons: [
-          { id: 'notiunea-de-vector', title: 'Noțiunea de vector' },
+          { id: 'notiunea-de-vector', title: 'Noțiunea de vector', visualizer: 'array-traversal' },
           { id: 'parcurgerea-unui-vector', title: 'Parcurgerea unui vector', visualizer: 'array-traversal' },
           { id: 'inversarea-unui-vector', title: 'Inversarea unui vector' },
           { id: 'verificarea-proprietatilor-vector', title: 'Verificarea proprietăților unui vector' },
