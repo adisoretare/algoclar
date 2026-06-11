@@ -30,6 +30,8 @@ export function VisualizerShell<T>({
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
+    const tag = (e.target as HTMLElement).tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault()
