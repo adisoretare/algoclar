@@ -155,7 +155,7 @@ describe('getChaptersByGrade()', () => {
 
   it('returns chapters in curriculum order for grade 9', async () => {
     const chapters = await getChaptersByGrade(9)
-    // grade-9 has only sortare/bubble-sort.mdx → first chapter is 'vectori-9'
+    // grade-9 demo lessons (bubble-sort, cautare-binara) are chapter 'vectori-9'
     expect(chapters[0]).toBe('vectori-9')
   })
 })
@@ -195,9 +195,11 @@ describe('getPrevNextLesson()', () => {
     expect(prev!.grade).toBeLessThanOrEqual(9)
   })
 
-  it('bubble-sort next is cautare-binara (same grade, chapter order 1 < 2)', async () => {
+  it('bubble-sort next is cautare-binara (deterministic slug tiebreaker)', async () => {
     const { next } = await getPrevNextLesson('bubble-sort')
-    // grade-9 sortare (order 1) → next is grade-9 cautare-binara (order 2)
+    // ambele demo-uri grade-9 sunt in chapter vectori-9 fara pozitie in
+    // curriculum (UNKNOWN_ORDER), deci ordinea e data de tiebreaker pe slug:
+    // 'bubble-sort' < 'cautare-binara'
     expect(next?.slug).toBe('cautare-binara')
   })
 })

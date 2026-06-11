@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["fractii", "cmmdc", "simplificare", "ireductibil"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-La o pizza tăiată în 12 felii, mănânci 8. Câtă pizza ai mâncat? 8/12. Dar e mai simplu de zis „2/3" — aceeași cantitate, exprimată cu numere mai mici. Simplificarea fracțiilor este exact asta: exprimi același raport cât mai clar.
+La o pizza tăiată în 12 felii, mănânci 8. Câtă pizza ai mâncat? 8/12. Dar e mai simplu de spus „2/3" — aceeași cantitate, cu numere mai mici. Simplificarea fracțiilor este exact asta: exprimi același raport în forma cea mai clară posibilă.
 </LessonHook>
 
 ## Cum se simplifică o fracție?
@@ -53,10 +53,10 @@ CMMDC(12, 18) = 6
 Forma ireductibilă: 2/3
 ```
 
-Rezultatul este **ireductibil** deoarece după împărțire, `CMMDC(p/d, q/d) = 1`.
+Rezultatul este **ireductibil** deoarece după împărțire `CMMDC(p/d, q/d) = 1` — nu mai există factor comun.
 
 <ObservationBox>
-Dacă `CMMDC(p, q) = 1`, fracția e deja ireductibilă. Împărțirea cu 1 o lasă neschimbată — nu trebuie să tratezi separat acest caz.
+Dacă `CMMDC(p, q) = 1`, fracția e deja ireductibilă. Împărțirea cu 1 o lasă neschimbată — nu trebuie tratat separat acest caz. Codul funcționează corect indiferent.
 </ObservationBox>
 
 ## Implementare C++
@@ -89,7 +89,7 @@ int main() {
 ## Cazuri speciale — fracții negative
 
 ```cpp
-// Conventia: semnul negativ la numarator
+// Conventie: semnul negativ la numarator, numitor pozitiv
 if (q < 0) { p = -p; q = -q; }
 int d = cmmdc(abs(p), q);
 cout << p / d << "/" << q / d;
@@ -102,9 +102,9 @@ cout << p / d << "/" << q / d;
 | Simplificare fracție | O(log(min(p,q))) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Simplifici cu alt număr decât CMMDC. Dacă simplifici 12/18 cu 2 obții 6/9 — reducție corectă, dar nu ireductibil. Trebuie CMMDC pentru forma finală.
+**Greșeala 1:** Simplifici cu un număr oarecare, nu cu CMMDC. Dacă simplifici 12/18 cu 2 obții 6/9 — reducție parțial corectă, dar nu ireductibilă. Trebuie neapărat CMMDC pentru forma finală.
 
-**Greșeala 2:** Uiți că ambii trebuie împărțiți cu același număr. Dacă împarți doar numărătorul sau doar numitorul, schimbi valoarea fracției.
+**Greșeala 2:** Împarți doar numărătorul sau doar numitorul. Dacă schimbi unul fără celălalt, modifici valoarea fracției — nu mai e echivalentă cu originalul.
 
-**Greșeala 3:** Aplici `cmmdc` pe numere negative. `a % b` în C++ poate fi negativ pentru `a < 0`. Lucrează cu `abs(p)` și `q > 0`.
+**Greșeala 3:** Aplici `cmmdc` direct pe numere negative. `a % b` în C++ poate fi negativ pentru `a < 0`. Lucrează cu `abs(p)` și asigură-te că `q > 0`.
 </MistakeBox>

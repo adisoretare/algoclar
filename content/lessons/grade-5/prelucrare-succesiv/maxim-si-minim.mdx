@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["maxim", "minim", "initializare", "INT_MIN"]
 visualizers: []
@@ -46,18 +46,27 @@ Stai la coadă la supermarket și vrei să știi cine e mai înalt decât tine. 
 
 Menținem o variabilă `maxim` pe care o actualizăm la fiecare nou element:
 
+<ArrayDiagram
+  values="4 7 2 9 1"
+  valueLabel="sir"
+  indexLabel="index"
+  highlight="3"
+  pointers="3:max"
+  caption="Șirul de intrare. Elementul maxim (9) se află la index 3 — îl descoperim parcurgând valorile una câte una."
+/>
+
 ```
 Citim: 4 7 2 9 1
 maxim = INT_MIN
 x=4: 4 > INT_MIN → maxim = 4
 x=7: 7 > 4       → maxim = 7
-x=2: 2 < 7       → rămâne 7
+x=2: 2 < 7       → ramane 7
 x=9: 9 > 7       → maxim = 9
-x=1: 1 < 9       → rămâne 9
+x=1: 1 < 9       → ramane 9
 Rezultat: 9
 ```
 
-## Inițializarea — capriciul clasic
+## Inițializarea — detaliul care decide corectitudinea
 
 Trei variante corecte:
 
@@ -110,7 +119,7 @@ int main() {
 **Exemplu:** Input `5` / `4 7 2 9 1` → `9 3` / `1 4`
 
 <ObservationBox>
-Dacă vrei **prima** apariție a maximului, condiția rămâne `x > maxim` (strict). Dacă vrei **ultima** apariție, schimb-o în `x >= maxim`. Mica diferență decide care poziție returnezi când există duplicate.
+Dacă vrei **prima** apariție a maximului, condiția rămâne `x > maxim` (strict mai mare). Dacă vrei **ultima** apariție, schimb-o în `x >= maxim`. Mica diferență — un singur caracter — decide care poziție returnezi când există duplicate.
 </ObservationBox>
 
 ## Complexitate

@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["precedent", "prev", "tranzitii", "schimbari"]
 visualizers: []
@@ -39,16 +39,16 @@ quiz:
 ---
 
 <LessonHook>
-Semaforul se schimbă din roșu în verde. Temperatura de ieri era 20°C, azi e 25°C — s-a schimbat. Mulți algoritmi nu depind doar de valoarea curentă, ci de raportul ei față de cea anterioară. Variabila `prev` (precedentul) îți dă memoria unui singur pas înapoi.
+Temperatura de ieri era 20°C, azi e 25°C — s-a schimbat. Mulți algoritmi nu depind doar de valoarea curentă, ci de relația ei cu cea de dinainte. Variabila `prev` îți dă exact asta: memoria unui singur pas înapoi.
 </LessonHook>
 
 ## Când ai nevoie de `prev`?
 
-Ori de câte ori logica depinde de **compararea elementului curent cu cel anterior**:
-- Numărul de schimbări de valoare
-- Dacă șirul e strict crescător
-- Detectarea momentului când ceva „pornește" sau „se oprește"
-- Lungimea unui bloc de valori egale
+Ori de câte ori logica depinde de **relația elementului curent cu cel anterior**:
+- Numărul de schimbări de valoare dintr-un șir
+- Verificarea că șirul e strict crescător (sau descrescător)
+- Detectarea momentului când o proprietate „pornește" sau „se oprește"
+- Lungimea unui bloc de valori consecutive egale
 
 ## Algoritmul
 
@@ -101,6 +101,8 @@ int main() {
 
 ## Verificarea unui șir strict crescător
 
+Același tipar cu `prev`, schimbi doar condiția:
+
 ```cpp
 fin >> prev;
 bool crescator = true;
@@ -112,7 +114,7 @@ for (int i = 1; i < n; i++) {
 ```
 
 <ObservationBox>
-Actualizează `prev = x` la **fiecare** iterație, nu doar când detectezi o schimbare. Dacă actualizezi doar la schimbare, `prev` rămâne la vechea valoare și nu mai reflectă elementul imediat anterior.
+Actualizează `prev = x` la **fiecare** iterație, nu doar când detectezi o schimbare. Dacă o faci condiționat, `prev` rămâne blocat la o valoare veche și comparația de la pasul următor e greșită.
 </ObservationBox>
 
 ## Complexitate

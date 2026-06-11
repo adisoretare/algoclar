@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["for", "while", "bucle", "repetitiv"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-La sala de sport faci 3 serii de câte 10 flotări. Nu stai să numeri mental dacă ai mai rămas — ai un contor. Structura repetitivă face același lucru: repetă un set de pași de un număr precis de ori sau până când o condiție devine falsă. Fără bucle, ar trebui să scrii aceeași instrucțiune de o mie de ori.
+Vrei să afișezi toate numerele de la 1 la 1000. Fără bucle, ai scrie 1000 de linii de `cout`. Cu o buclă `for`, scrii trei linii și lași calculatorul să numere. Structura repetitivă nu e un truc — e instrumentul care face posibilă prelucrarea unui volum mare de date cu cod compact.
 </LessonHook>
 
 ## Bucla `for`
@@ -89,7 +89,7 @@ cout << suma << endl;
 ```
 
 <ObservationBox>
-Orice `for` se poate rescrie ca `while` și invers. Convenția: `for` pentru număr fix de iterații (1..n, i peste un vector), `while` pentru condiții pe date externe sau convergență.
+Orice `for` se poate rescrie ca `while` și invers — sunt echivalente ca putere. Convenția: `for` când știi din start de câte ori se repetă (1..n, parcurgerea unui vector), `while` când numărul de iterații depinde de datele citite sau de un calcul care converge spre o condiție.
 </ObservationBox>
 
 ## Bucla `do-while`
@@ -141,9 +141,9 @@ for (int i = 1; i <= 10; i++) {
 O buclă simplă de n iterații costă **O(n)**. Două bucle imbricate de n iterații fiecare costă **O(n²)**.
 
 <MistakeBox>
-**Greșeala 1:** Scrii `i <= n` în loc de `i < n` (sau invers) și bucla face cu 1 iterație mai mult sau mai puțin (eroare off-by-one). Testează mereu cu n=0 și n=1 pentru a prinde limita.
+**Greșeala 1:** Confunzi `i <= n` cu `i < n` și bucla face cu o iterație mai mult sau mai puțin (eroarea off-by-one). Testează mereu cu n=0 și n=1 — cazurile limită le prind pe toate.
 
-**Greșeala 2:** Modifici variabila de control `i` în corpul buclei `for`. `for(int i=0; i<n; i++) { ... i++; ... }` face de fapt n/2 iterații, nu n.
+**Greșeala 2:** Modifici variabila de control `i` în interiorul corpului buclei `for`. `for(int i=0; i<n; i++) { ... i++; ... }` incrementează `i` de două ori per iterație — bucla face n/2 pași, nu n.
 
-**Greșeala 3:** Uiți să actualizezi condiția într-un `while` și creezi buclă infinită. Verifică că ceva din corp face condiția să devină `false` la un moment dat.
+**Greșeala 3:** Uiți să modifici condiția într-un `while` și obții buclă infinită. Verifică că cel puțin o instrucțiune din corp avansează spre starea în care condiția devine `false`.
 </MistakeBox>

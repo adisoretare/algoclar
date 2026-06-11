@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["vector", "parcurgere", "suma", "maxim"]
 visualizers: ["array-traversal"]
@@ -50,18 +50,18 @@ Tiparul de bază:
 
 ```
 pentru i de la 0 la n-1:
-    prelucrează v[i]
+    prelucreaza v[i]
 ```
 
 ## Algoritmul — sumă și maxim
 
 ```
-sumă  ← 0
+suma  ← 0
 maxim ← v[0]
 
 pentru i de la 0 la n-1:
-    sumă ← sumă + v[i]
-    dacă v[i] > maxim:
+    suma ← suma + v[i]
+    daca v[i] > maxim:
         maxim ← v[i]
 ```
 
@@ -124,9 +124,9 @@ Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru 
 </HintBox>
 
 <MistakeBox>
-**Greșeala 1:** `maxim = 0` când vectorul poate conține valori negative — vei returna 0 în loc de maximul real.
+**Greșeala 1:** `maxim = 0` când vectorul poate conține valori negative — vei returna 0 în loc de maximul real. Inițializează mereu cu `v[0]`.
 
-**Greșeala 2:** Pornești bucla de la `i = 1` dar inițializezi `maxim = v[0]` — pentru maxim e corect, dar dacă și suma trebuie calculată, `v[0]` rămâne neadăugat.
+**Greșeala 2:** Pornești bucla de la `i = 1` dar inițializezi `maxim = v[0]` — pentru maxim e corect, însă `v[0]` nu se mai adaugă la sumă.
 
 **Greșeala 3:** `suma = v[i]` în loc de `suma += v[i]` — suprascrii suma la fiecare pas în loc să acumulezi.
 </MistakeBox>

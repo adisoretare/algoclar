@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["int", "long-long", "overflow", "intregi"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Vrei să numeri câte furnici sunt pe Pământ — estimare: 10.000 de trilioane. Un `int` obișnuit poate ține maximum 2 miliarde. Nu încape. Alegerea tipului întreg potrivit e diferența dintre un program corect și unul care dă rezultate complet greșite fără nicio eroare.
+Ai un program care calculează produsul a două numere de 100.000. Scrii `int produs = a * b;`, compilatorul nu protestează, programul rulează — și afișează un număr negativ. Nicio eroare, rezultat complet greșit. Asta e overflow: depășești limita tipului și valoarea „se înfășoară". Alegerea tipului potrivit nu e un detaliu — previne o categorie întreagă de bug-uri silențioase.
 </LessonHook>
 
 ## Tipurile întregi în C++
@@ -54,7 +54,7 @@ C++ oferă mai multe tipuri pentru numere întregi, diferite prin spațiul ocupa
 | `unsigned int` | 32 | 0 | 4.294.967.295 |
 
 <ObservationBox>
-La concursuri, regula de aur: dacă n ≤ 10⁹, poți folosi `int`. Dacă produse sau sume pot ajunge la 10¹⁸, folosești `long long`. Produsul a două `int` de 10⁹ depășește int — îl calculezi în `long long`.
+Regula de la concursuri: dacă n ≤ 10⁹, `int` e suficient. Dacă produse sau sume pot ajunge la 10¹⁸, folosești `long long`. Atenție: produsul a două valori de 10⁹ e 10¹⁸ — depășește `int` chiar dacă fiecare factor în parte încăpea în `int`.
 </ObservationBox>
 
 ## Overflow — cel mai frecvent bug la concursuri
@@ -105,9 +105,9 @@ Când inițializezi un maxim sau minim pentru comparație, folosește `INT_MAX` 
 Operațiile aritmetice pe întregi costă **O(1)** — sunt instrucțiuni hardware directe.
 
 <MistakeBox>
-**Greșeala 1:** Înmulțești doi `int` mari fără cast. `int a=100000; int b=100000; long long c = a*b;` NU e corect — înmulțirea se face în `int` și deja dă overflow ÎNAINTE să fie stocată în `long long`. Scrie: `long long c = (long long)a * b;`
+**Greșeala 1:** Înmulțești doi `int` mari și stochezi în `long long`, crezând că e suficient. `long long c = a * b;` NU e corect dacă `a` și `b` sunt `int` — înmulțirea se face în `int` și dă overflow ÎNAINTE ca rezultatul să fie copiat în `long long`. Corect: `long long c = (long long)a * b;`
 
-**Greșeala 2:** Folosești `unsigned` și scazi mai mult decât ai. `unsigned x = 0; x--;` nu dă −1, ci 4.294.967.295 (înfășurare la zero).
+**Greșeala 2:** Folosești `unsigned` și scazi mai mult decât ai. `unsigned x = 0; x--;` nu dă −1, ci 4.294.967.295 — înfășurare la zero, fără nicio eroare vizibilă.
 
-**Greșeala 3:** Uiți sufixul `LL` la constante literale mari. `long long x = 3000000000;` poate da warning — scrie `3000000000LL`.
+**Greșeala 3:** Uiți sufixul `LL` la constante literale mari. `long long x = 3000000000;` poate da overflow sau warning — scrie `3000000000LL` pentru a forța tipul corect.
 </MistakeBox>

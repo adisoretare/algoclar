@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["putere", "inmultiri", "overflow", "for"]
 visualizers: []
@@ -39,15 +39,14 @@ quiz:
 ---
 
 <LessonHook>
-Dacă îndoi o foaie de hârtie de 1 mm de 10 ori, obții ~1 metru. De 42 ori — ajungi la Lună. Puterile cresc exponențial și rapid depășesc orice limită practică. De aceea, calculul corect al puterii (și gestionarea overflow-ului) este esențial în algoritmică.
+Dacă îndoi o foaie de hârtie de 1 mm de 10 ori, obții aproape 1 metru. De 42 de ori — ajungi la Lună. Puterile cresc exponențial și depășesc rapid orice limită practică. De aceea, calculul corect al puterii — și gestionarea overflow-ului — este esențial în algoritmică.
 </LessonHook>
 
 ## Algoritmul simplu
 
-`baza^exp` = baza × baza × ... × baza (de `exp` ori)
+`baza^exp` = baza × baza × ... × baza, de `exp` ori. Urmărește pentru `2^5`:
 
 ```
-2^5:
 rezultat = 1
 i=1: rezultat = 1 × 2 = 2
 i=2: rezultat = 2 × 2 = 4
@@ -86,13 +85,13 @@ int main() {
 ## Cazuri speciale
 
 ```cpp
-// baza^0 = 1 (bucla nu ruleaza, rezultat = 1 ✓)
-// 0^exp  = 0 pentru exp > 0 (1 × 0 × 0 × ... = 0 ✓)
+// baza^0 = 1 (bucla nu ruleaza, rezultat = 1 -- corect)
+// 0^exp  = 0 pentru exp > 0 (1 * 0 * 0 * ... = 0 -- corect)
 // 0^0    = 1 prin conventie in C++
 ```
 
 <ObservationBox>
-Algoritmul de față este O(exp) — liniar în exponent. Pentru exp = 10⁹ e prea lent. La clasa a 7-a vei studia **exponențierea rapidă** (O(log exp)) care calculează puterea în câteva înmulțiri prin pătrat repetat.
+Algoritmul de față este O(exp) — liniar în exponent. Pentru exp = 10⁹ este prea lent. La clasa a 7-a vei studia **exponențierea rapidă** (O(log exp)), care calculează puterea în câteva înmulțiri prin pătrat repetat.
 </ObservationBox>
 
 ## Complexitate
@@ -102,11 +101,11 @@ Algoritmul de față este O(exp) — liniar în exponent. Pentru exp = 10⁹ e p
 | Înmulțiri repetate | O(exp) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Inițializezi `rezultat = 0` în loc de `rezultat = 1`. Produsul pornit de la 0 rămâne 0.
+**Greșeala 1:** Inițializezi `rezultat = 0` în loc de `rezultat = 1`. Produsul pornit de la 0 rămâne 0, indiferent de câte înmulțiri faci.
 
-**Greșeala 2:** Overflow neobservat. `int` nu ține puteri mari. `2^31` depășește `int`. Folosește `long long` și ține cont că și el are limite (~9.2 × 10¹⁸ ≈ 2^63 − 1).
+**Greșeala 2:** Overflow neobservat. `int` nu ține puteri mari — `2^31` depășește `int`. Folosește `long long` și ține cont că și el are limite (~9.2 × 10¹⁸).
 
-**Greșeala 3:** Scrii `baza * exp` (înmulțire directă) în loc de `baza` la puterea `exp`. `2 * 10 = 20 ≠ 2^10 = 1024`. Ridicarea la putere cere o buclă, nu o înmulțire simplă.
+**Greșeala 3:** Scrii `baza * exp` (înmulțire directă) în loc să ridici la putere. `2 * 10 = 20 ≠ 2^10 = 1024`. Ridicarea la putere cere o buclă cu `exp` pași, nu o înmulțire simplă.
 
-**Greșeala 4:** Inițializezi `rezultat = baza` și pornești bucla de la `i=2`. Corect pentru exp ≥ 1, dar greșit pentru exp = 0 — obții `baza` în loc de `1`. Forma sigură: `rezultat = 1`, buclă de la `i=1`.
+**Greșeala 4:** Inițializezi `rezultat = baza` și pornești bucla de la `i = 2`. Corect pentru exp ≥ 1, dar greșit pentru exp = 0 — obții `baza` în loc de `1`. Forma sigură: `rezultat = 1`, buclă de la `i = 1`.
 </MistakeBox>

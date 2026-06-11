@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 8
 free: true
-status: draft
+status: published
 isBridge: true
 tags: ["trace", "urmarire", "debug", "algoritm"]
 visualizers: []
@@ -39,14 +39,14 @@ quiz:
 ---
 
 <LessonHook>
-Un pilot verifică manual lista de pre-decolare înainte să pornească motoarele. Nu pentru că nu are încredere în avioane — ci pentru că o eroare la 10.000 de metri nu se poate repara. Urmărirea manuală a algoritmului e lista ta de pre-decolare: verifici că logica e corectă înainte să o trimiți la compilator.
+Un pilot verifică manual lista de pre-decolare înainte să pornească motoarele — nu pentru că nu are încredere în avioane, ci pentru că o eroare la 10.000 de metri nu se mai poate repara. La fel, urmărirea manuală a algoritmului pe hârtie e cel mai rapid mod de a prinde o eroare de logică înainte să petreci ore căutând-o în cod.
 </LessonHook>
 
 ## Ce este urmărirea manuală?
 
-**Urmărirea manuală** (*trace*) înseamnă să execuți un algoritm pe hârtie, pas cu pas, cu date concrete — notând valoarea fiecărei variabile după fiecare instrucțiune.
+**Urmărirea manuală** (*trace*) înseamnă să execuți un algoritm pe hârtie, pas cu pas, cu date concrete — notând valoarea fiecărei variabile după fiecare instrucțiune executată.
 
-Nu ai nevoie de calculator. Hârtie, pix, câteva date de test.
+Nu ai nevoie de calculator. Hârtie, pix și câteva date de test concrete sunt suficiente.
 
 ## Cum faci un tabel de urmărire
 
@@ -57,7 +57,7 @@ n = 153, suma = 0
 Pas 1: suma += 153 % 10 = 3  →  suma = 3,  n = 15
 Pas 2: suma += 15 % 10  = 5  →  suma = 8,  n = 1
 Pas 3: suma += 1 % 10   = 1  →  suma = 9,  n = 0
-Condiție while: 0 > 0 = false → stop
+Conditie while: 0 > 0 = false → stop
 Rezultat: 9 ✓
 ```
 
@@ -77,10 +77,10 @@ Urmărești **toate** variabilele relevante, nu doar rezultatul final. O valoare
 
 ## Reguli practice pentru urmărire
 
-1. **Alege date concrete și mici** — nu te chinui cu n=1000. Testează cu n=3 sau n=5.
-2. **Verifică cazurile limită** — ce se întâmplă când n=0? Când n=1? Când toți sunt egali?
-3. **Urmărește condiția de oprire** — la while/for, notează explicit dacă condiția e true/false la fiecare iterație.
-4. **Compară cu rezultatul așteptat** — calculezi independent rezultatul corect (ex: manual suma 1+5+3=9) și verifici că algoritmul produce același lucru.
+1. **Alege date mici și concrete** — n=3 sau n=5 sunt de ajuns. Cu n=1000 nu poți urmări manual.
+2. **Verifică cazurile limită** — ce se întâmplă când n=0? Când n=1? Când toate valorile sunt egale?
+3. **Notează condiția de oprire** — la `while`/`for`, scrie explicit `true` sau `false` lângă condiție la fiecare iterație. Altfel e ușor să ratezi o buclă infinită sau una prea scurtă.
+4. **Calculează independent rezultatul corect** — mai întâi afli cât ar trebui să fie (ex: suma cifrelor lui 153 = 1+5+3 = 9), apoi verifici că algoritmul produce același număr.
 
 ## Exemplu cu structura alternativă
 
@@ -103,11 +103,11 @@ radacina = sqrt(15) ≈ 3.872...
 ```
 
 <MistakeBox>
-**Greșeala 1:** Faci urmărirea cu date prea mari sau prea „normale". n=100 nu testează cazul n=0 sau n=1. Alege cazuri care stresează limitele.
+**Greșeala 1:** Urmărești cu date prea mari sau prea „normale". n=100 nu testează ce se întâmplă la n=0 sau n=1. Alege intenționat cazuri care pot stresa limitele algoritmului.
 
-**Greșeala 2:** Modifici variabila în cap, nu pe hârtie. Memoria de lucru e limitată — notează explicit fiecare valoare intermediară sau pierzi firul.
+**Greșeala 2:** Calculezi valorile în minte fără să le notezi. Memoria de lucru e limitată — pierzi firul după 2–3 pași. Pune fiecare valoare pe hârtie, chiar dacă pare evident.
 
-**Greșeala 3:** Presupui că algoritmul e corect și urmărești „ca să confirmi". Urmărirea e eficientă când ești sceptic — întreabă-te la fiecare pas „de ce valoarea asta e corectă?".
+**Greșeala 3:** Urmărești „ca să confirmi" că algoritmul e corect. Urmărirea e eficientă când ești sceptic — întreabă-te la fiecare pas: „de ce această valoare e corectă?".
 </MistakeBox>
 
 ---

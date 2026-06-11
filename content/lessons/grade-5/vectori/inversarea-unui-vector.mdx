@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["vector", "inversare", "swap", "indici"]
 visualizers: []
@@ -39,16 +39,16 @@ quiz:
 ---
 
 <LessonHook>
-Ai o linie de 6 elevi ordonați după înălțime, de la cel mai scund la cel mai înalt. Vrei să inversezi ordinea fără să-i muți pe toți — schimbi cel mai scund cu cel mai înalt, al doilea cu penultimul, și tot așa. Trei schimburi și gata.
+Ai o linie de 6 elevi ordonați după înălțime, de la cel mai scund la cel mai înalt. Vrei să inversezi ordinea — nu să-i muți pe toți, ci să schimbi cel mai scund cu cel mai înalt, al doilea cu penultimul, și tot așa. Trei schimburi și gata.
 </LessonHook>
 
 ## Algoritmul de inversare
 
-Menținem doi indici: `st` (stânga, de la 0) și `dr` (dreapta, de la n-1). La fiecare pas îi apropiem:
+Menținem doi indici: `st` (stânga, pornind de la 0) și `dr` (dreapta, pornind de la n-1). La fiecare pas îi apropiem cu câte un pas spre centru:
 
 ```
 st ← 0, dr ← n-1
-cât timp st < dr:
+cat timp st < dr:
     swap(v[st], v[dr])
     st ← st + 1
     dr ← dr - 1
@@ -106,7 +106,7 @@ for (int i = 0; i < n; i++) w[i] = v[n - 1 - i];
 // w e inversul lui v
 ```
 
-Folosește O(n) spațiu suplimentar — corectă, dar varianta cu swap e preferabilă.
+Folosește O(n) spațiu suplimentar — corectă, dar varianta cu swap e preferabilă când nu ai nevoie să păstrezi originalul.
 
 ## Complexitate
 
@@ -116,15 +116,15 @@ Folosește O(n) spațiu suplimentar — corectă, dar varianta cu swap e prefera
 | Cu copie | O(n) | O(n) |
 
 <ObservationBox>
-Swap-ul clasic necesită variabilă temporară `t`. C++ oferă `std::swap(a, b)` care face exact asta intern — poți folosi direct.
+Swap-ul clasic necesită variabilă temporară `t`. C++ oferă `std::swap(a, b)` care face exact asta intern — poți folosi direct fără să-ți mai declari `t`.
 </ObservationBox>
 
 <MistakeBox>
 **Greșeala 1:** `v[st] = v[dr]; v[dr] = v[st];` fără variabilă temporară — prima valoare se pierde înainte de a fi salvată.
 
-**Greșeala 2:** Bucla `for (int i = 0; i < n; i++)` face n swap-uri — vectorul se inversează și se re-inversează, rezultând originalul. Inversarea e completă după n/2 swap-uri.
+**Greșeala 2:** Bucla `for (int i = 0; i < n; i++)` face n swap-uri — vectorul se inversează și se re-inversează, revenind la original. Inversarea e completă după exact n/2 swap-uri.
 
-**Greșeala 3:** Condiția `st <= dr` e incorectă — când n e impar și `st == dr`, faci swap cu el însuși (inofensiv, dar inutil). Folosește `st < dr`.
+**Greșeala 3:** Condiția `st <= dr` face un swap inutil când n e impar și `st == dr` — elementul din mijloc se interschimbă cu el însuși. Folosește `st < dr`.
 </MistakeBox>
 
 ## Recapitulare

@@ -96,7 +96,7 @@ if (c > maxim) maxim = c;  // am schimbat ordinea
 if (b > maxim) maxim = b;
 ```
 
-Rezultatul este același — ordinea `b`/`c` nu contează aici. Dar în alți algoritmi ordinea este critică. Exemplu: la sortare, dacă schimbi ordinea comparațiilor obții un șir nesortrat.
+Rezultatul este același — ordinea `b`/`c` nu contează aici. Dar în alți algoritmi ordinea este critică. Exemplu: la sortare, dacă schimbi ordinea comparațiilor obții un șir nesortat.
 
 <MistakeBox>
 Greșeală frecventă: inițializezi maximul cu `0` în loc de `a`. Funcționează dacă numerele sunt pozitive, dar pentru `a=-5, b=-3, c=-8` returnează `0` — greșit. Inițializează mereu cu primul element din șir, nu cu o valoare fixă.

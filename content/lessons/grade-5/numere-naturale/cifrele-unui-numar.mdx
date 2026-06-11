@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cifre", "modulo", "impartire", "while"]
 visualizers: []
@@ -39,19 +39,28 @@ quiz:
 ---
 
 <LessonHook>
-Ai o cutie cu combinație: 3-7-4. Ca să o deschizi, introduci cifrele una câte una, de la dreapta la stânga. Cum face calculatorul exact același lucru cu numărul 374? Împarte la 10 și ia restul — și ce pare complicat devine mecanic.
+Ai o cutie cu combinație: 3-7-4. Ca să o deschizi, introduci cifrele una câte una, de la dreapta la stânga. Calculatorul face exact același lucru cu numărul 374: împarte la 10 și ia restul — iar ce pare complicat devine pur mecanic.
 </LessonHook>
 
 ## Ce sunt cifrele unui număr?
 
-Orice număr natural este format din cifre: `374` are cifrele 3, 7 și 4. În programare nu avem acces direct la „poziția" cifrelor — trebuie să le extragem una câte una, de la dreapta la stânga.
+Orice număr natural este format din cifre: `374` are cifrele 3, 7 și 4. În programare nu ai acces direct la „poziția" cifrelor — trebuie să le extragi una câte una, de la dreapta la stânga, folosind două operații simple.
 
 **Instrumentele de bază:**
 
 | Operație | Efect pe `n = 374` | Rezultat |
 |---|---|---|
 | `n % 10` | Ultima cifră | `4` |
-| `n / 10` | Eliminăm ultima cifră | `37` |
+| `n / 10` | Elimină ultima cifră | `37` |
+
+Numărul 374 văzut ca o secvență de cifre:
+
+<ArrayDiagram
+  values="3 7 4"
+  valueLabel="cifra"
+  indexLabel="pozitie"
+  caption="374 are cifrele 3, 7, 4. Algoritmul le extrage de la dreapta spre stânga: 4, 7, 3."
+/>
 
 ## Algoritmul: parcurgerea cifrelor
 
@@ -60,7 +69,7 @@ Repetăm doi pași cât timp `n > 0`:
 1. Extragem ultima cifră: `cifra = n % 10`
 2. O eliminăm: `n /= 10`
 
-Exemplu cu `n = 374`:
+Urmărește cum evoluează `n = 374`:
 
 ```
 n = 374  → cifra = 4,  n = 37
@@ -70,7 +79,7 @@ STOP (n == 0)
 ```
 
 <ObservationBox>
-Cifrele sunt extrase de la dreapta la stânga (de la unități spre cifra cea mai semnificativă). Ține cont de asta când ordinea contează în problemă.
+Cifrele sunt extrase de la dreapta la stânga — de la unități spre cifra cea mai semnificativă. Ține cont de asta când ordinea contează în problemă: dacă ai nevoie de cifre în ordine normală, stochează-le într-un vector și parcurge-l invers.
 </ObservationBox>
 
 ## Implementare C++
@@ -106,7 +115,7 @@ int main() {
 |-----|------|--------|
 | Număr cu d cifre | O(log n) | O(1) |
 
-Un număr n are ⌊log₁₀(n)⌋ + 1 cifre, deci bucla rulează de ordinul log(n) ori.
+Un număr n are ⌊log₁₀(n)⌋ + 1 cifre, deci bucla rulează de ordinul log(n) ori — extrem de rapid.
 
 <MistakeBox>
 **Greșeala 1:** Uiți cazul `n = 0`. Bucla `while(n > 0)` nu se execută deloc pentru 0, deci nu afișezi nimic. Tratează `n == 0` separat.

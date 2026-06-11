@@ -6,7 +6,7 @@ chapter: siruri-generate
 difficulty: baza
 estimatedTime: 14
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["recurenta", "siruri", "for", "predecesori"]
 visualizers: []
@@ -39,22 +39,37 @@ quiz:
 ---
 
 <LessonHook>
-Fiecare domino dintr-un lanț cade pentru că cel dinainte l-a împins. Dacă știi starea celor 1–2 dominouri anterioare, poți prezice orice termen următor. Asta e esența unui șir recurent: fiecare termen e calculat din câțiva predecesori, după o regulă fixă.
+Fiecare domino dintr-un lanț cade pentru că cel dinainte l-a împins. Dacă știi starea ultimelor 1–2 piese, poți prezice exact ce urmează. Asta e esența unui șir recurent: fiecare termen este calculat din câțiva predecesori după o regulă fixă — fără formulă directă, pas cu pas.
 </LessonHook>
 
 ## Ce este o recurență?
 
-O **recurență** este o regulă care exprimă termenul `a[n]` în funcție de termenii anteriori. Spre deosebire de un șir aritmetic sau geometric, nu există o formulă directă — calculezi termenul n pornind de la cei de dinainte.
+O **recurență** este o regulă care exprimă termenul `a[n]` în funcție de câțiva termeni anteriori. Spre deosebire de un șir aritmetic sau geometric, nu există o formulă directă pentru termenul n — trebuie să calculezi pas cu pas, pornind de la valorile inițiale.
 
 **Ordin 1** (depinde de un singur predecesor):
-```
-a[n] = a[n-1] * 2,  a[0] = 1  → 1, 2, 4, 8, 16, ...
-```
+
+`a[n] = a[n-1] * 2`, cu `a[0] = 1`:
+
+<ArrayDiagram
+  values="1 2 4 8 16 32"
+  valueLabel="a"
+  indexLabel="n"
+  index="0 1 2 3 4 5"
+  caption="Recurență de ordin 1: fiecare termen = dublul precedentului."
+/>
 
 **Ordin 2** (depinde de doi predecesori — ca Fibonacci):
-```
-a[n] = a[n-1] + a[n-2] + 1,  a[0]=1, a[1]=2  → 1, 2, 4, 7, 12, 20, ...
-```
+
+`a[n] = a[n-1] + a[n-2] + 1`, cu `a[0] = 1`, `a[1] = 2`:
+
+<ArrayDiagram
+  values="1 2 4 7 12 20"
+  valueLabel="a"
+  indexLabel="n"
+  index="0 1 2 3 4 5"
+  pointers="3:a 4:b:warning"
+  caption="Recurență de ordin 2: fiecare termen = suma celor doi anteriori + 1. Pointerii indică ultimii doi termeni folosiți la calculul următorului."
+/>
 
 ## Algoritmul general
 
@@ -120,7 +135,7 @@ int main() {
 ```
 
 <ObservationBox>
-Un șir recurent de ordin k are nevoie de exact k valori inițiale. Fibonacci e de ordin 2: ai nevoie de F(0) și F(1). Un șir de ordin 3 (de exemplu tribonacci: a[n] = a[n-1]+a[n-2]+a[n-3]) are nevoie de a[0], a[1], a[2].
+Un șir recurent de ordin k are nevoie de exact k valori inițiale. Fibonacci este de ordin 2: ai nevoie de F(0) și F(1). Un șir de ordin 3 — de exemplu tribonacci, `a[n] = a[n-1] + a[n-2] + a[n-3]` — are nevoie de a[0], a[1], a[2]. Fără toate valorile inițiale, șirul nu poate fi generat.
 </ObservationBox>
 
 ## Complexitate

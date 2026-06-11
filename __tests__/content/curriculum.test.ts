@@ -103,7 +103,7 @@ describe('visualizer field', () => {
   it('bubble-sort lesson in grade 5 vectori chapter has visualizer', () => {
     const g = getGradeById('5')!
     const ch = g.chapters.find((c) => c.id === 'vectori')!
-    const bs = ch.lessons.find((l) => l.id === 'bubble-sort')
+    const bs = ch.lessons.find((l) => l.id === 'bubble-sort-5')
     expect(bs?.visualizer).toBe('bubble-sort')
   })
 

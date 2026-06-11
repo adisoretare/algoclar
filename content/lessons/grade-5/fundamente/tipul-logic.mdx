@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 10
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["bool", "logic", "conditii", "operatori"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Semaforul are doar două stări: roșu sau verde. Alarma e armată sau nu. Contul e activ sau blocat. Tipul `bool` captează exact această realitate binară — are sens sau nu are sens, adevărat sau fals. Orice condiție dintr-un `if` produce la final o valoare `bool`.
+Semaforul are exact două stări: roșu sau verde. Contul e activ sau blocat. Nu există o a treia opțiune. Tipul `bool` captează această realitate: doar `true` sau `false`, 1 sau 0. Orice condiție pe care o scrii într-un `if` sau `while` produce, în final, o valoare `bool` — de aceea merită să o înțelegi bine.
 </LessonHook>
 
 ## Ce este bool?
@@ -87,7 +87,7 @@ bool niciParar  = !(x % 2 == 0);  // true -- x e impar
 ```
 
 <ObservationBox>
-`&&` și `||` folosesc **evaluare leneșă** (short-circuit): dacă primul operand al `&&` e `false`, al doilea nu mai e evaluat (rezultatul e oricum `false`). La `||`, dacă primul e `true`, al doilea se sare. Contează când al doilea operand are efecte secundare sau accesuri periculoase.
+`&&` și `||` folosesc **evaluare leneșă** (*short-circuit*): dacă primul operand al `&&` e `false`, al doilea nu mai e evaluat — rezultatul e oricum `false`. La `||`, dacă primul e `true`, al doilea se sare. Asta contează când al doilea operand ar putea provoca un crash (ex: împărțire la zero): `n != 0 && 10/n > 2` e sigur, `10/n > 2 && n != 0` nu e.
 </ObservationBox>
 
 ## Exemplu complet
@@ -100,11 +100,11 @@ int main() {
     int n;
     cin >> n;
 
-    bool estePar   = (n % 2 == 0);
-    bool estePositiv = (n > 0);
-    bool esteParSiPositiv = estePar && estePositiv;
+    bool estePar     = (n % 2 == 0);
+    bool estePozitiv = (n > 0);
+    bool esteParSiPozitiv = estePar && estePozitiv;
 
-    if (esteParSiPositiv) {
+    if (esteParSiPozitiv) {
         cout << n << " este par si pozitiv" << endl;
     } else {
         cout << n << " nu indeplineste ambele conditii" << endl;
@@ -118,9 +118,9 @@ Poți afișa `bool` ca text cu `boolalpha`: `cout << boolalpha << true;` afișea
 </HintBox>
 
 <MistakeBox>
-**Greșeala 1:** Scrii `=` în loc de `==` într-o condiție. `if (x = 5)` atribuie 5 lui x și e mereu `true` (5 ≠ 0). Compilatorul poate avertiza, dar nu e eroare.
+**Greșeala 1:** Scrii `=` în loc de `==` într-o condiție. `if (x = 5)` atribuie 5 lui `x` și condiția e mereu `true`. Compilatorul poate avertiza, dar nu refuză compilarea — bug-ul rămâne silențios.
 
-**Greșeala 2:** Confunzi `&` (AND pe biți) cu `&&` (AND logic). Produc același rezultat pentru `0`/`1`, dar `&` nu face short-circuit și poate da rezultate greșite pentru valori nenule.
+**Greșeala 2:** Confunzi `&` (AND pe biți) cu `&&` (AND logic). Pentru valorile `0`/`1` produc același rezultat, dar `&` nu face short-circuit și pentru valori nenule poate da rezultate diferite de `&&`.
 
-**Greșeala 3:** Compari float-uri cu `==`. `0.1 + 0.2 == 0.3` e `false` din cauza erorilor de reprezentare. Compară cu toleranță: `fabs(a - b) < 1e-9`.
+**Greșeala 3:** Compari numere reale cu `==`. `0.1 + 0.2 == 0.3` e `false` din cauza erorilor de reprezentare în virgulă mobilă. Compară cu o toleranță: `fabs(a - b) < 1e-9`.
 </MistakeBox>

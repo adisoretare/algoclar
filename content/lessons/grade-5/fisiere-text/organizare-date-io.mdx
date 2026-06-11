@@ -6,7 +6,7 @@ chapter: fisiere-text
 difficulty: baza
 estimatedTime: 14
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["fisiere", "io", "format", "citire-multipla"]
 visualizers: []
@@ -39,12 +39,12 @@ quiz:
 ---
 
 <LessonHook>
-Algoritmul tău e perfect, dar citești datele în ordinea greșită sau scrii rezultatul într-un format nepotrivit — și tot primești 0. Formatul datelor e jumătate din problemă. Înainte să scrii o linie de cod, citește enunțul de două ori și înțelege exact cum arată `problema.in`.
+Algoritmul tău e perfect, dar citești datele în ordinea greșită sau scrii rezultatul într-un format nepotrivit — și tot primești 0. Formatul datelor contează la fel de mult ca logica. Înainte să scrii o linie de cod, citește enunțul de două ori și înțelege exact cum arată `problema.in`.
 </LessonHook>
 
 ## Structura tipică a unui fișier `.in`
 
-Enunțurile românești au câteva formate standard:
+Enunțurile românești folosesc câteva formate standard. Recunoaște-le din prima și știi imediat cum să citești.
 
 **Format 1 — n urmat de n valori:**
 ```
@@ -96,6 +96,8 @@ while (fin >> x) { ... }
 
 ## Șablonul complet de concurs
 
+Acesta e punctul de plecare pe care îl poți folosi la orice problemă OJI/ONI:
+
 ```cpp
 #include <iostream>
 #include <fstream>
@@ -116,29 +118,29 @@ int main() {
 ```
 
 <ObservationBox>
-Declararea `fin` și `fout` global (în afara lui `main`) e o practică comună la concurs — le poți folosi din orice funcție fără să le transmiți ca parametri. Nu e obligatoriu, dar simplifică codul.
+Declararea `fin` și `fout` global (în afara lui `main`) e o practică comună la concurs — le poți folosi din orice funcție fără să le transmiți ca parametri. Nu e obligatoriu, dar simplifică codul când ai mai multe funcții.
 </ObservationBox>
 
 ## `ios::sync_with_stdio` — citire mai rapidă
 
-Pentru probleme cu foarte multe date (n = 10⁶+), adaugă la începutul lui `main`:
+Pentru probleme cu foarte multe date (n = 10⁶ sau mai mult), adaugă la începutul lui `main`:
 
 ```cpp
 ios::sync_with_stdio(false);
 cin.tie(nullptr);
 ```
 
-Dezactivează sincronizarea cu `scanf`/`printf` și accelerează `cin`/`cout` de ~5–10×. **Nu combina cu `scanf`/`printf` dacă folosești acest trick.**
+Dezactivează sincronizarea cu `scanf`/`printf` și accelerează `cin`/`cout` de ~5–10×. **Nu combina cu `scanf`/`printf` după ce activezi acest trick** — comportamentul devine nedefinit.
 
 ## Greșeli de format frecvente
 
+Un spațiu în plus la finalul liniei poate face diferența dintre AC și WA pe unii graderi:
+
 ```cpp
-// GRESIT: spatiu in plus la final
+// GRESIT: spatiu in plus dupa ultimul element
 fout << a << " " << b << " " << c << "\n";   // "1 2 3 "
 
-// CORECT: fara spatiu dupa ultimul element
-fout << a << " " << b << " " << c << "\n";   // daca enuntul cere asta
-// sau
+// CORECT: spatiu doar intre elemente
 for (int i = 0; i < n; i++) {
     if (i > 0) fout << " ";
     fout << v[i];
@@ -147,11 +149,11 @@ fout << "\n";
 ```
 
 <MistakeBox>
-**Greșeala 1:** Amesteci `fin >>` cu `getline(fin, ...)`. După `fin >> n`, cursorul e înainte de `\n`. Primul `getline` citește acel `\n` gol. Adaugă `fin.ignore()` între ele.
+**Greșeala 1:** Amesteci `fin >>` cu `getline(fin, ...)`. După `fin >> n`, cursorul rămâne chiar înainte de `\n`. Primul `getline` citește acel newline gol. Adaugă `fin.ignore()` între ele pentru a-l consuma.
 
-**Greșeala 2:** Folosești `while (!fin.eof())` în loc de `while (fin >> x)`. Varianta cu `eof()` poate executa o iterație în plus cu date nedefinite după ultimul element.
+**Greșeala 2:** Folosești `while (!fin.eof())` în loc de `while (fin >> x)`. Varianta cu `eof()` poate executa o iterație în plus cu date nedefinite după ultimul element valid.
 
-**Greșeala 3:** Citești cu indecși greșiți: `for (i=1; i<=n; i++)` dar declari `int v[n]` (indexat 0..n-1). Sau invers. Alege o convenție (0-based sau 1-based) și aplică-o consistent.
+**Greșeala 3:** Indecși inconsistenți: declari `int v[n]` indexat 0..n-1, dar citești cu `for (i=1; i<=n; i++)`. Sau invers. Alege o convenție (0-based sau 1-based) și aplică-o uniform în tot programul.
 
 **Greșeala 4:** Scrii `endl` în loc de `"\n"` în bucle mari. `endl` golește bufferul la fiecare apel — de 50–100× mai lent decât `"\n"` pentru output voluminos.
 </MistakeBox>

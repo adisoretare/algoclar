@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 10
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cmmdc", "coprime", "fractii", "simplificare"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Fracția 8/15 nu poate fi simplificată — 8 și 15 nu au niciun divizor comun în afară de 1. Spunem că sunt „prime între ele". Asta nu înseamnă că fiecare e număr prim. Înseamnă că împreună nu au niciun „secret comun" care ar permite simplificarea fracției.
+Fracția 8/15 nu poate fi simplificată — 8 și 15 nu au niciun divisor comun în afară de 1. Spunem că sunt „prime între ele". Asta nu înseamnă că fiecare e număr prim în sine. Înseamnă că, împreună, nu au niciun „factor comun" care ar permite simplificarea.
 </LessonHook>
 
 ## Definiție
@@ -56,7 +56,7 @@ Două numere `a` și `b` sunt **prime între ele** (sau **coprime**) dacă `CMMD
 | 9 | 16 | 1 | ✓ (niciunul nu e prim) |
 
 <ObservationBox>
-Două numere prime distincte sunt întotdeauna prime între ele. Dar pot fi prime între ele și numere care nu sunt prime individual: 8 (= 2³) și 9 (= 3²) nu au factori comuni, deci sunt coprime.
+Două numere prime distincte sunt întotdeauna prime între ele. Dar pot fi coprime și numere care nu sunt prime individual: 8 (= 2³) și 9 (= 3²) nu au factori comuni, deci sunt coprime — deși niciunul nu este număr prim.
 </ObservationBox>
 
 ## Implementare C++
@@ -91,7 +91,7 @@ int main() {
 
 ## De ce contează?
 
-O fracție `a/b` este **ireductibilă** exact atunci când `a` și `b` sunt prime între ele. Orice simplificare a fracțiilor se reduce la acest test.
+O fracție `a/b` este **ireductibilă** exact atunci când `a` și `b` sunt prime între ele. Orice simplificare a fracțiilor — în matematică sau în probleme de concurs — se reduce la verificarea dacă CMMDC = 1.
 
 ## Complexitate
 
@@ -102,7 +102,7 @@ O fracție `a/b` este **ireductibilă** exact atunci când `a` și `b` sunt prim
 <MistakeBox>
 **Greșeala 1:** Confunzi „prime între ele" cu „ambele sunt numere prime". Sunt concepte distincte. 8 și 9 sunt prime între ele, dar niciunul nu este număr prim.
 
-**Greșeala 2:** Verifici individual dacă fiecare număr e prim pentru a decide dacă sunt coprime. Nu funcționează: 4 și 9 sunt coprime, dar niciunul nu e prim; 2 și 4 nu sunt coprime, deși 2 e prim.
+**Greșeala 2:** Verifici individual dacă fiecare număr e prim pentru a decide dacă sunt coprime. Nu funcționează: 4 și 9 sunt coprime dar niciunul nu e prim; 2 și 4 nu sunt coprime deși 2 e prim.
 
 **Greșeala 3:** CMMDC(a, a) = a, nu 1. Un număr nu este coprim cu el însuși (cu excepția lui 1).
 </MistakeBox>

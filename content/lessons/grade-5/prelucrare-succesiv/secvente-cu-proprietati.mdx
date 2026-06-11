@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: mediu
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["secvente", "lungime-maxima", "run", "contor"]
 visualizers: []
@@ -39,29 +39,29 @@ quiz:
 ---
 
 <LessonHook>
-Metereologul vrea să știe cel mai lung șir de zile consecutive cu ploaie. Nu numără toate zilele cu ploaie — numără ziua curentă a unui bloc continuu și ține minte cel mai lung bloc văzut. Când soarele apare, resetează contorul.
+Meteorologul vrea să știe cel mai lung șir de zile consecutive cu ploaie. Nu numără toate zilele cu ploaie — numără ziua curentă a blocului continuu și ține minte cel mai lung bloc văzut. Când apare soarele, contorul se resetează la zero.
 </LessonHook>
 
 ## Structura algoritmului
 
 Menținem două variabile:
-- `lung_curenta` — lungimea blocului curent (elementele consecutive cu proprietatea)
+- `lung_cur` — lungimea blocului activ (elementele consecutive care satisfac proprietatea)
 - `lung_max` — cel mai lung bloc văzut până acum
 
-La fiecare element:
-- Dacă satisface proprietatea: `lung_curenta++`, actualizează `lung_max`
-- Dacă nu: resetează `lung_curenta = 0`
+La fiecare element nou:
+- Dacă satisface proprietatea: `lung_cur++`, actualizează `lung_max`
+- Dacă nu: resetează `lung_cur = 0`
 
 ```
-Șir: 2 4 3 6 8 10 1   (proprietate: par)
-lung_curenta = 0, lung_max = 0
+Sir: 2 4 3 6 8 10 1   (proprietate: par)
+lung_cur = 0, lung_max = 0
 
-x=2:  par  → lung_cur=1, lung_max=1
-x=4:  par  → lung_cur=2, lung_max=2
+x=2:  par   → lung_cur=1, lung_max=1
+x=4:  par   → lung_cur=2, lung_max=2
 x=3:  impar → lung_cur=0
-x=6:  par  → lung_cur=1, lung_max=2
-x=8:  par  → lung_cur=2, lung_max=2
-x=10: par  → lung_cur=3, lung_max=3
+x=6:  par   → lung_cur=1, lung_max=2
+x=8:  par   → lung_cur=2, lung_max=2
+x=10: par   → lung_cur=3, lung_max=3
 x=1:  impar → lung_cur=0
 Rezultat: 3
 ```
@@ -102,6 +102,8 @@ int main() {
 
 ## Varianta cu prev — secvențe de valori egale
 
+Când proprietatea depinde de relația față de elementul anterior (de exemplu valori egale), citești primul element separat și pornești bucla de la `i = 1`:
+
 ```cpp
 fin >> prev;
 int lung_cur = 1, lung_max = 1;
@@ -119,7 +121,7 @@ for (int i = 1; i < n; i++) {
 ```
 
 <ObservationBox>
-Actualizează `lung_max` **în interiorul** blocului valid, nu doar la final sau la resetare. Dacă șirul se termină în mijlocul celui mai lung bloc, nu mai ajungi la instrucțiunea de după buclă cu valoarea corectă.
+Actualizează `lung_max` **în interiorul** blocului valid, nu doar la resetare. Dacă șirul se termină în mijlocul celui mai lung bloc, nu mai treci prin ramura `else` — `lung_max` ar rămâne la valoarea mai mică.
 </ObservationBox>
 
 ## Complexitate

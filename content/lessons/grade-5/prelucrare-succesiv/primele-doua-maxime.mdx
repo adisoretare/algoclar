@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["maxim", "minim", "doua-maxime", "podium"]
 visualizers: []
@@ -39,20 +39,30 @@ quiz:
 ---
 
 <LessonHook>
-La olimpiadele sportive se acordă aur, argint și bronz. Ca să găsești câștigătorul de argint, nu sortezi toți participanții — îl ții pe „campionul curent" și „cel mai bun perdant". La fiecare nou concurent actualizezi cu grijă ambele.
+La olimpiadele sportive se acordă aur și argint. Ca să găsești câștigătorul de argint, nu sortezi toți participanții — ții „campionul curent" și „cel mai bun clasat după el". La fiecare nou concurent actualizezi cu grijă ambele, în ordinea corectă.
 </LessonHook>
 
 ## Algoritmul
 
-Menținem `max1` (cel mai mare) și `max2` (al doilea). Trei cazuri la fiecare element nou `x`:
+Menținem `max1` (cel mai mare) și `max2` (al doilea). Patru cazuri la fiecare element nou `x`:
 
-1. `x > max1` → `x` e noul maxim absolut. Vechiul `max1` devine `max2`.
+1. `x > max1` → `x` e noul maxim absolut. Vechiul `max1` coboară în `max2`.
 2. `x == max1` → depinde dacă vrem duplicate (vezi mai jos).
 3. `max2 < x < max1` → `x` e noul `max2`.
 4. `x <= max2` → nimic de actualizat.
 
+<ArrayDiagram
+  values="3 7 5 2 9 4"
+  valueLabel="sir"
+  indexLabel="index"
+  highlight="4"
+  pointers="4:max1 1:max2:warning"
+  dim="2 3 5"
+  caption="Șirul de intrare. La final: max1=9 (index 4), max2=7 (index 1). Elementele nesemnificative sunt estompate."
+/>
+
 ```
-Șir: 3, 7, 5, 2, 9, 4
+Sir: 3, 7, 5, 2, 9, 4
 max1=INT_MIN, max2=INT_MIN
 
 x=3: 3>INT_MIN → max2=INT_MIN, max1=3
@@ -113,7 +123,7 @@ if (x >= max1) {          // >= in loc de >
 ```
 
 <ObservationBox>
-Extinderea la top-3 (sau top-k) urmează același tipar: verifici de la `max1` în jos și actualizezi prima variabilă care e mai mică decât `x`. Dar pentru k mare, un vector sortat e mai practic.
+Extinderea la top-3 urmează același tipar: verifici de la `max1` în jos și actualizezi primul slot mai mic decât `x`. Pentru k mare însă, un vector sortat (sau un heap) e mult mai practic decât k variabile separate.
 </ObservationBox>
 
 ## Complexitate

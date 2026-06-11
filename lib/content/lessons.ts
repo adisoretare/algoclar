@@ -115,8 +115,12 @@ function sortLessonsByCurriculum(lessons: LessonMeta[]): LessonMeta[] {
     const aChapter = getChapterOrderInGrade(a.grade, a.chapter)
     const bChapter = getChapterOrderInGrade(b.grade, b.chapter)
     if (aChapter !== bChapter) return aChapter - bChapter
-    return getLessonOrderInChapter(a.grade, a.chapter, a.slug) -
-           getLessonOrderInChapter(b.grade, b.chapter, b.slug)
+    const aLesson = getLessonOrderInChapter(a.grade, a.chapter, a.slug)
+    const bLesson = getLessonOrderInChapter(b.grade, b.chapter, b.slug)
+    if (aLesson !== bLesson) return aLesson - bLesson
+    // tiebreaker stabil: lectii fara pozitie in curriculum (UNKNOWN_ORDER)
+    // nu trebuie sa depinda de ordinea din filesystem
+    return a.slug.localeCompare(b.slug)
   })
 }
 

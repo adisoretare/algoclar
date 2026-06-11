@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cifre", "verificare", "contor", "proprietati"]
 visualizers: []
@@ -39,19 +39,19 @@ quiz:
 ---
 
 <LessonHook>
-Codul PIN 1221 e palindrom. Numărul 2244 are toate cifrele pare. Verificările pe cifrele unui număr sunt tipice la olimpiade: „Câte cifre pare are?", „Toate cifrele sunt distincte?", „E palindrom?". Toate folosesc același mecanism: parcurgerea cifrelor cu o condiție adăugată.
+Codul PIN 1221 este palindrom. Numărul 2244 are toate cifrele pare. Verificările pe cifrele unui număr sunt tipice la olimpiade: „Câte cifre pare are?", „Toate cifrele sunt distincte?", „E palindrom?". Toate se rezolvă cu același mecanism: parcurgerea cifrelor cu o condiție adăugată.
 </LessonHook>
 
 ## Pattern general
 
-Orice verificare pe cifre arată la fel:
+Orice verificare pe cifre arată la fel — o buclă de extragere cu logica ta specifică în interior:
 
 ```cpp
-bool proprietate = true;  // presupunem că e adevărat
+bool proprietate = true;  // presupunem ca e adevarat
 int temp = n;
 while (temp > 0) {
     int cifra = temp % 10;
-    // verifică condiția pe cifra curentă
+    // verifica conditia pe cifra curenta
     temp /= 10;
 }
 ```
@@ -123,7 +123,7 @@ int main() {
 **Exemplu:** Input `3526` → `Cifre pare: 2` / `Cifre impare: 2`
 
 <ObservationBox>
-Poți combina mai multe verificări într-o singură parcurgere. Nu ai nevoie de mai multe bucle — o singură buclă, mai mulți acumulatori sau condiții paralele.
+Poți combina oricâte verificări într-o singură parcurgere. Nu ai nevoie de bucle separate — o buclă cu mai mulți acumulatori sau condiții paralele este mai clară și mai eficientă.
 </ObservationBox>
 
 ## Complexitate
@@ -133,9 +133,9 @@ Poți combina mai multe verificări într-o singură parcurgere. Nu ai nevoie de
 | Număr cu d cifre | O(log n) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Verifici `n % 2 == 0` pentru „toate cifrele pare". Asta verifică doar ultima cifră (paritatea lui n), nu toate cifrele.
+**Greșeala 1:** Verifici `n % 2 == 0` pentru „toate cifrele pare". Asta testează doar ultima cifră (paritatea lui n), nu toate cifrele. Exemplu: 12 este par, dar cifra 1 este impară.
 
-**Greșeala 2:** Nu tratezi `n = 0`. Decide de la început: 0 are o singură cifră (0), care este pară.
+**Greșeala 2:** Nu tratezi `n = 0`. Prin convenție, 0 are o singură cifră (0), care este pară.
 
-**Greșeala 3:** Uiți `break` după ce ai găsit o condiție falsă. Pentru „există o cifră impară?", odată găsită nu mai trebuie să continui — `break` evită iterații inutile.
+**Greșeala 3:** Uiți `break` după ce ai găsit o cifră care invalidează condiția. Odată ce știi că răspunsul e NU, oprești bucla — `break` evită iterații inutile.
 </MistakeBox>

@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["vector", "tablou", "index", "declaratie"]
 visualizers: []
@@ -46,12 +46,13 @@ Ai 10 cutii numerotate pe un raft, fiecare conținând câte un număr. Ca să i
 
 Un **vector** (sau *tablou unidimensional*) este o colecție de valori de același tip, stocate consecutiv în memorie și identificate printr-un **index**.
 
-```
-Index:   0    1    2    3    4
-         ┌────┬────┬────┬────┬────┐
-v =      │ 5  │ 3  │ 8  │ 1  │ 9  │
-         └────┴────┴────┴────┴────┘
-```
+<ArrayDiagram
+  values="5 3 8 1 9"
+  valueLabel="v"
+  indexLabel="index"
+  highlight="2"
+  caption="Vector cu 5 elemente. Accesezi orice valoare instant prin index: v[2] = 8."
+/>
 
 Trei proprietăți esențiale:
 - Toate elementele au **același tip** (`int`, `long long` etc.).

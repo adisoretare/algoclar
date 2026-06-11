@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cmmdc", "euclid", "modulo", "recursiv"]
 visualizers: []
@@ -39,30 +39,30 @@ quiz:
 ---
 
 <LessonHook>
-Vrei să împarți o tablă de 84 cm și una de 36 cm în bucăți egale, cât mai mari, fără risipă. Răspunsul este cel mai mare număr care divide ambele lungimi — CMMDC. Algoritmul lui Euclid îl calculează în câteva scăderi succesive (sau împărțiri) — și e folosit de mai bine de 2300 de ani.
+Vrei să tai o tablă de 84 cm și una de 36 cm în bucăți egale, cât mai mari, fără risipă. Răspunsul este cel mai mare număr care divide ambele lungimi — CMMDC. Algoritmul lui Euclid îl calculează în câteva pași și este folosit de mai bine de 2300 de ani.
 </LessonHook>
 
 ## Ce este CMMDC?
 
 **Cel Mai Mare Divizor Comun** al lui `a` și `b` este cel mai mare număr care divide exact ambele.
 
-**Exemplu:** CMMDC(84, 36) = 12, deoarece 84 = 12×7 și 36 = 12×3.
+**Exemplu:** CMMDC(84, 36) = 12, deoarece 84 = 12 × 7 și 36 = 12 × 3.
 
 ## Algoritmul lui Euclid
 
 **Proprietate cheie:** `CMMDC(a, b) = CMMDC(b, a % b)`
 
-Aplicăm repetat până când `b` devine 0:
+Aplicăm repetat această proprietate până când `b` devine 0:
 
 ```
 CMMDC(84, 36):
   84 % 36 = 12 → CMMDC(36, 12)
   36 % 12 = 0  → CMMDC(12, 0)
-  b = 0 → rezultat: 12
+  b = 0        → rezultat: 12
 ```
 
 <ObservationBox>
-La fiecare pas, cel mai mic argument se înjumătățește cel puțin o dată. Asta garantează că algoritmul se termină rapid — în O(log(min(a,b))) pași, chiar și pentru numere foarte mari.
+La fiecare pas, cel mai mic argument se reduce cu cel puțin jumătate. Asta garantează că algoritmul se termină rapid — în O(log(min(a,b))) pași, chiar și pentru numere cu milioane de cifre.
 </ObservationBox>
 
 ## Implementare C++ — iterativă
@@ -99,7 +99,7 @@ int cmmdc(int a, int b) {
 }
 ```
 
-Elegantă, dar consumă mai multă memorie (stiva de apeluri).
+Elegantă și compactă, dar consumă memorie de stivă proporțional cu numărul de pași.
 
 ## Complexitate
 
@@ -109,9 +109,9 @@ Elegantă, dar consumă mai multă memorie (stiva de apeluri).
 | Recursiv | O(log(min(a,b))) | O(log n) — stivă |
 
 <MistakeBox>
-**Greșeala 1:** Confunzi ordinea la pasul de reducere. `CMMDC(a, b) = CMMDC(b, a % b)` — noul prim argument e `b`, nu `a % b`.
+**Greșeala 1:** Confunzi ordinea la pasul de reducere. `CMMDC(a, b) = CMMDC(b, a % b)` — noul prim argument este `b`, nu `a % b`.
 
 **Greșeala 2:** Aplici algoritmul cu `a = 0`. `CMMDC(0, b) = b` prin definiție. Dacă inputul poate conține 0, verifică separat.
 
-**Greșeala 3:** La varianta iterativă, uiți să salvezi `rest = a % b` înainte de `a = b`. Dacă scrii `a = b; b = a % b`, al doilea `a` e deja suprascris — rezultat greșit.
+**Greșeala 3:** La varianta iterativă, suprascrii `a` înainte de a calcula `rest`. Dacă scrii `a = b; b = a % b`, al doilea `a` e deja modificat — rezultat greșit. Salvează `rest = a % b` mai întâi.
 </MistakeBox>

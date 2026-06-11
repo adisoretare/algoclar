@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: mediu
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["buffer-circular", "fereastrafenestrat", "ultimele-p", "modulo"]
 visualizers: []
@@ -39,19 +39,27 @@ quiz:
 ---
 
 <LessonHook>
-Prognoza meteo folosește media temperaturilor din ultimele 7 zile. Nu ține minte toată istoria — când vine ziua 8, uită ziua 1. Un buffer circular de 7 poziții face exact asta: ține mereu ultimele 7 valori, suprascrierind cele mai vechi.
+Prognoza meteo folosește media temperaturilor din ultimele 7 zile. Nu ține minte toată istoria — când vine ziua 8, uită ziua 1. Un buffer circular de 7 poziții face exact asta: ține mereu ultimele 7 valori, suprascriind cele mai vechi.
 </LessonHook>
 
 ## Ideea de buffer circular
 
 Folosim un array de dimensiune `p`. La pasul `i`, scriem în poziția `i % p` — când ajungem la capăt, continuăm de la 0, suprascriind cele mai vechi valori.
 
+<ArrayDiagram
+  values="1 9 4"
+  valueLabel="buf"
+  indexLabel="index"
+  pointers="2:nou"
+  caption="Starea finală a buffer-ului după p=3, șirul 5 2 8 1 9 4. buf[0]=1 (ultimul scris la i=3), buf[1]=9 (i=4), buf[2]=4 (i=5). Ultimele 3 elemente din șir."
+/>
+
 ```
-p = 3, șir: 5 2 8 1 9 4
+p = 3, sir: 5 2 8 1 9 4
 
 i=0: buf[0]=5  → [5, -, -]
 i=1: buf[1]=2  → [5, 2, -]
-i=2: buf[2]=8  → [5, 2, 8]  ← plin
+i=2: buf[2]=8  → [5, 2, 8]  <- plin
 i=3: buf[0]=1  → [1, 2, 8]  (suprascrie cel mai vechi: 5)
 i=4: buf[1]=9  → [1, 9, 8]  (suprascrie 2)
 i=5: buf[2]=4  → [1, 9, 4]  (suprascrie 8)
@@ -96,19 +104,18 @@ int main() {
 **Exemplu:** n=6, p=3, șir `5 2 8 1 9 4` → suma la i=2: 15, i=3: 11, i=4: 18, i=5: 14
 
 <ObservationBox>
-Trucul cheie: la pasul `i`, elementul care iese din fereastra de p este chiar `buf[i % p]` — același slot pe care urmează să-l suprascrii. Citești-l înainte de suprascriere.
+Trucul cheie: la pasul `i`, elementul care iese din fereastră este chiar `buf[i % p]` — exact slotul pe care urmează să-l suprascrii. Îl citești (și scazi din sumă) **înainte** de suprascriere, altfel valoarea veche e pierdută.
 </ObservationBox>
 
 ## Varianta simplă (fără suma curentă)
 
-Dacă vrei doar să afișezi ultimele p elemente la final:
+Dacă vrei doar să afișezi ultimele p elemente la final, nu mai ai nevoie de suma glisantă — citești tot șirul în buffer și la sfârșit parcurgi circular:
 
 ```cpp
 for (int i = 0; i < n; i++) {
     fin >> buf[i % p];
 }
-// ultimele p: de la ((n-1)%p + 1) % p, in ordine circulara
-// sau mai simplu: afisezi buf in doua bucle
+// start = primul element valid in ordinea circulara
 int start = n % p;
 for (int i = 0; i < p; i++) {
     fout << buf[(start + i) % p] << " ";

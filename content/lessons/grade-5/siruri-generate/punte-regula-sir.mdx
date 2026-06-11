@@ -6,7 +6,7 @@ chapter: siruri-generate
 difficulty: baza
 estimatedTime: 10
 free: true
-status: draft
+status: published
 isBridge: true
 tags: ["siruri", "recunoastere", "diferente", "rapoarte"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-La olimpiadă primești un șir de numere și trebuie să continui sau să generezi. Jumătate din muncă e să recunoști tipul: aritmetic, geometric, recurent? Câteva secunde de analiză economisesc ore de cod greșit.
+La olimpiadă primești un șir de numere și trebuie să-l continui sau să-l generezi. Cel mai costisitor greșit e să scrii cod pentru tipul greșit. Câteva secunde de diagnostic — diferențe, rapoarte, recurență — îți salvează ore.
 </LessonHook>
 
 ## Diagnosticul în 3 pași
@@ -67,7 +67,7 @@ a[i] / a[i-1] pentru fiecare i
 Verifici dacă `a[i] = a[i-1] + a[i-2]` (Fibonacci) sau alte combinații ale termenilor anteriori. Uneori apare o constantă adăugată sau înmulțită.
 
 <ObservationBox>
-Dacă nici una din cele trei nu funcționează, caută o formulă care depinde direct de index: `a[i] = i²`, `a[i] = 2^i + i`, etc. Testează cu 3–4 perechi (index, valoare) înainte să scrii cod.
+Dacă niciuna din cele trei strategii nu funcționează, caută o formulă care depinde direct de index: `a[i] = i²`, `a[i] = 2^i + i` etc. Testează întotdeauna cu cel puțin 3–4 perechi (index, valoare) înainte să scrii cod.
 </ObservationBox>
 
 ## Tabel rapid de recunoaștere
@@ -81,13 +81,19 @@ Dacă nici una din cele trei nu funcționează, caută o formulă care depinde d
 
 ## Exemplu pas cu pas
 
-Șirul: `3, 5, 9, 15, 23, 33`
+<ArrayDiagram
+  values="3 5 9 15 23 33"
+  valueLabel="a"
+  indexLabel="i"
+  index="0 1 2 3 4 5"
+  caption="Șirul de analizat: 3, 5, 9, 15, 23, 33."
+/>
 
-**Diferențe:** 2, 4, 6, 8, 10 — nu constante → nu e aritmetic
+**Diferențe:** 2, 4, 6, 8, 10 — nu constante → nu e aritmetic.
 
 **Diferențele diferențelor:** 2, 2, 2, 2 — constante!
 
-Asta înseamnă că diferența crește aritmetic → **a[n] = a[n-1] + 2n** sau altă formulă pătratică. Verifici cu `a[i] = i² + i + 3`: i=0: 3 ✓, i=1: 5 ✓, i=2: 9 ✓.
+Diferența crește ea însăși aritmetic → formula este pătratică. Verifici cu `a[i] = i² + i + 3`: i=0: 3 ✓, i=1: 5 ✓, i=2: 9 ✓, i=3: 15 ✓. Confirmă cu toți termenii înainte să scrii codul.
 
 <MistakeBox>
 **Greșeala 1:** Te grăbești și presupui că orice șir care crește e aritmetic. Verifică mereu cu cel puțin 3-4 perechi consecutive.

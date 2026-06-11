@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cin", "cout", "fisiere", "io"]
 visualizers: []
@@ -35,11 +35,11 @@ quiz:
       - "scanf('%d %d %d', a, b, c);"
       - "Oricare din primele două variante"
     correctIndex: 3
-    explanation: "cin >> ignoră spațiile și newline-urile între citiri, deci ambele variante cin sunt echivalente. scanf e și el corect, dar stilul C++  preferă cin."
+    explanation: "cin >> ignoră spațiile și newline-urile între citiri, deci ambele variante cin sunt echivalente. scanf e și el corect, dar stilul C++ preferă cin."
 ---
 
 <LessonHook>
-Calculatorul tău e ca un funcționar care stă la ghișeu. Dacă nu-i spui nimic (nu ai citire), nu știe cu ce să lucreze. Dacă nu scrie rezultatul nicăieri (nu ai afișare), munca lui dispare. `cin` e vocea ta, `cout` e răspunsul lui — fără ele, programul e o cutie neagră.
+Orice program face trei lucruri, în ordine: primește date, le prelucrează, afișează rezultatul. Sari primul pas și programul nu știe cu ce să lucreze. Sari ultimul și rezultatul dispare în neant. `cin` și `cout` sunt cele două capete ale acestui lanț — fără ele, programul există doar pentru el însuși.
 </LessonHook>
 
 ## Citire de la tastatură cu `cin`
@@ -50,22 +50,22 @@ using namespace std;
 
 int main() {
     int n;
-    cin >> n;  // citeste un intreg
+    cin >> n;         // citeste un intreg
 
     int a, b;
-    cin >> a >> b;  // citeste doua intregi, separate prin spatiu sau enter
+    cin >> a >> b;    // citeste doua intregi, separate prin spatiu sau enter
 
     double x;
-    cin >> x;  // citeste un real
+    cin >> x;         // citeste un numar real
 
     char c;
-    cin >> c;  // citeste un caracter (sare spatii)
+    cin >> c;         // citeste un caracter (sare spatiile albe)
     return 0;
 }
 ```
 
 <ObservationBox>
-`cin >>` sare automat spațiile albe (spații, tab-uri, newline-uri) înainte de fiecare valoare. Nu trebuie să tratezi manual separatorii când citești numere.
+`cin >>` sare automat spațiile albe (spații, tab-uri, newline-uri) înainte de fiecare valoare. Poți scrie `cin >> a >> b >> c;` pe o singură linie sau `cin >> a;` pe linii separate — rezultatul e identic.
 </ObservationBox>
 
 ## Afișare cu `cout`
@@ -85,7 +85,7 @@ int main() {
 
 ## Citire și scriere din fișiere (standard OJI/ONI)
 
-La concursuri datele vin din fișier `.in` și rezultatul se scrie în `.out`:
+La concursuri, datele vin dintr-un fișier `.in` și rezultatul se scrie într-un fișier `.out`. Logica programului nu se schimbă cu nimic — înlocuiești doar `cin`/`cout` cu `fin`/`fout`:
 
 ```cpp
 #include <fstream>
@@ -114,7 +114,7 @@ int main() {
 ```
 
 <HintBox>
-La concursuri, înlocuiește `cin`/`cout` cu `fin`/`fout` și atât. Logica rămâne identică. Unele probleme cer nume specifice (`suma.in`, `suma.out`) — citește enunțul cu atenție.
+Numele fișierelor (`suma.in`, `suma.out`) sunt specificate în enunț — citește-l cu atenție. Dacă greșești numele, programul nu citește nimic și obții scor 0, chiar dacă logica e perfectă.
 </HintBox>
 
 ## Citire rapidă (când n > 100.000)
@@ -124,16 +124,16 @@ ios_base::sync_with_stdio(false);
 cin.tie(NULL);
 ```
 
-Adaugă aceste două linii la începutul `main()` dacă programul folosește `cin`/`cout` și datele sunt mari. Dezactivează sincronizarea cu stdio — de 5–10× mai rapid.
+Adaugă aceste două linii imediat după `{` din `main()`, înainte de orice `cin`. Dezactivează sincronizarea cu `stdio` — programul devine de 5–10× mai rapid la citire/afișare.
 
 ## Complexitate
 
-Citirea/afișarea unui număr costă **O(1)**. Citirea unui șir de n numere costă **O(n)**.
+Citirea sau afișarea unui număr costă **O(1)**. Citirea unui șir de n numere costă **O(n)**.
 
 <MistakeBox>
-**Greșeala 1:** Uiți să schimbi `cin`/`cout` cu `fin`/`fout` la concurs. Programul rulează corect pe calculator dar nu citește nimic din fișier — scor 0.
+**Greșeala 1:** Uiți să înlocuiești `cin`/`cout` cu `fin`/`fout` la concurs. Programul compilează și rulează, dar nu citește nimic din fișier — scor 0 garantat.
 
-**Greșeala 2:** Folosești `endl` într-o buclă cu milioane de iterații. `endl` face flush la fiecare iterație — extrem de lent. Folosești `"\n"` în schimb.
+**Greșeala 2:** Folosești `endl` într-o buclă cu sute de mii de iterații. `endl` face flush la fiecare apel — e de 10–100× mai lent decât `"\n"`. Rezervă `endl` pentru afișări punctuale.
 
-**Greșeala 3:** Citești un `char` cu `cin >> c` și primești caracterul greșit (un spațiu). `cin >>` sare spațiile, dar dacă vrei caracterul următor exact (inclusiv spațiu), folosești `cin.get(c)`.
+**Greșeala 3:** Vrei să citești un caracter care poate fi spațiu și folosești `cin >> c`. `cin >>` sare spațiile — nu îl vei prinde niciodată. Folosește `cin.get(c)` când contează și spațiile.
 </MistakeBox>

@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 14
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["sortare", "selectie", "minim", "swap"]
 visualizers: ["sorting"]
@@ -51,12 +51,14 @@ La fiecare pas `i` (de la 0 la n-2):
 Urmărire pe `v = {5, 3, 8, 1, 9}`:
 
 ```
-Pas 0: min în [5,3,8,1,9] = 1 la poz 3 → swap v[0]↔v[3] → {1, 3, 8, 5, 9}
-Pas 1: min în [3,8,5,9]   = 3 la poz 1 → swap v[1]↔v[1] → {1, 3, 8, 5, 9}
-Pas 2: min în [8,5,9]     = 5 la poz 3 → swap v[2]↔v[3] → {1, 3, 5, 8, 9}
-Pas 3: min în [8,9]       = 8 la poz 3 → swap v[3]↔v[3] → {1, 3, 5, 8, 9}
+Pas 0: min in [5,3,8,1,9] = 1 la poz 3 → swap v[0]↔v[3] → {1, 3, 8, 5, 9}
+Pas 1: min in [3,8,5,9]   = 3 la poz 1 → swap v[1]↔v[1] → {1, 3, 8, 5, 9}
+Pas 2: min in [8,5,9]     = 5 la poz 3 → swap v[2]↔v[3] → {1, 3, 5, 8, 9}
+Pas 3: min in [8,9]       = 8 la poz 3 → swap v[3]↔v[3] → {1, 3, 5, 8, 9}
 Sortat!
 ```
+
+La fiecare pas, zona sortată (stânga) crește cu un element. Minimul găsit în zona nesortată ajunge definitiv pe locul lui.
 
 ## Implementare C++
 
@@ -98,15 +100,15 @@ Sortarea prin selecție face **întotdeauna** O(n²) comparații — chiar dacă
 <Visualizer name="sorting" />
 
 <HintBox>
-Urmărește cum zona sortată (stânga) crește cu câte un element la fiecare pas. Elementul marcat e minimul din zona nesortată care se mută pe locul corect.
+Urmărește cum zona sortată (stânga) crește cu câte un element la fiecare pas. Elementul evidențiat e minimul din zona nesortată care se mută pe locul corect.
 </HintBox>
 
 <MistakeBox>
-**Greșeala 1:** `poz_min = 0` în loc de `poz_min = i` la inițializare — cauți minimul din tot vectorul la fiecare pas, nu din zona nesortată. Primele elemente (deja sortate) ar putea fi re-selectate greșit.
+**Greșeala 1:** `poz_min = 0` în loc de `poz_min = i` la inițializare — cauți minimul din tot vectorul la fiecare pas, nu din zona nesortată. Elementele deja sortate pot fi re-selectate greșit.
 
 **Greșeala 2:** Swap fără variabilă temporară: `v[i] = v[poz_min]; v[poz_min] = v[i];` — suprascrii `v[i]` înainte de a-l salva.
 
-**Greșeala 3:** Bucla exterioară merge până la `i < n` în loc de `i < n-1` — ultimul pas (un singur element) e inutil; nu strică corectitudinea, dar adaugă un ciclu.
+**Greșeala 3:** Bucla exterioară merge până la `i < n` în loc de `i < n-1` — ultimul pas e inutil (un singur element nu necesită sortare). Nu strică corectitudinea, dar adaugă un ciclu.
 </MistakeBox>
 
 ## Recapitulare

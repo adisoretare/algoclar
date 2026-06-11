@@ -1,12 +1,12 @@
 ---
 title: "Bubble Sort"
-slug: bubble-sort
+slug: bubble-sort-5
 grade: 5
 chapter: vectori
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["sortare", "bubble-sort", "comparatie", "swap"]
 visualizers: ["bubble-sort"]
@@ -39,12 +39,12 @@ quiz:
 ---
 
 <LessonHook>
-Ai o coloană de baloane cu greutăți diferite. La fiecare pas, compari baloanele vecine: dacă cel din stânga e mai greu, le schimbi. Cel mai greu „plutește" spre dreapta. Repeți până când niciun balon nu mai trebuie mutat.
+Ai o coloană de baloane cu greutăți diferite. La fiecare pas, compari baloanele vecine: dacă cel din stânga e mai greu, le schimbi locurile. Cel mai greu „plutește" spre dreapta. Repeți până când niciun balon nu mai trebuie mutat.
 </LessonHook>
 
 ## Cum funcționează Bubble Sort?
 
-La fiecare **trecere**, parcurgem vectorul și comparăm elementele vecine. Dacă sunt în ordine greșită, le schimbăm. Cel mai mare element „burbuiește" spre dreapta.
+La fiecare **trecere**, parcurgem vectorul și comparăm elementele vecine. Dacă sunt în ordine greșită, le schimbăm. Cel mai mare element „burbuiește" spre dreapta și ajunge pe locul lui final.
 
 O trecere pe `v = {5, 3, 8, 1, 9}`:
 
@@ -84,6 +84,8 @@ int main() {
 
 ## Versiunea optimizată
 
+Dacă o trecere completă nu produce niciun swap, vectorul e deja sortat — nu mai continuăm:
+
 ```cpp
 for (int i = 0; i < n - 1; i++) {
     bool swapped = false;
@@ -105,7 +107,7 @@ for (int i = 0; i < n - 1; i++) {
 | Mediu / Cel mai rău | O(n²) |
 
 <ObservationBox>
-Fără optimizare, Bubble Sort face mereu O(n²), chiar pe date sortate. Cu flagul `swapped`, se oprește după o singură trecere pe date deja sortate — O(n).
+Fără optimizare, Bubble Sort face mereu O(n²), chiar pe date sortate. Cu flagul `swapped`, se oprește după o singură trecere pe date deja sortate — O(n). Adăugarea flagului nu costă nimic și poate economisi mult timp.
 </ObservationBox>
 
 ## Vizualizare
@@ -113,7 +115,7 @@ Fără optimizare, Bubble Sort face mereu O(n²), chiar pe date sortate. Cu flag
 <Visualizer name="bubble-sort" />
 
 <HintBox>
-Urmărește bulele mari deplasându-se spre dreapta la fiecare trecere. Zona gri din dreapta marchează elementele deja pe pozițiile finale — zona de căutare se micșorează la fiecare pas.
+Urmărește bulele mari deplasându-se spre dreapta la fiecare trecere. Zona din dreapta marchează elementele deja pe pozițiile finale — zona de lucru se micșorează cu fiecare trecere.
 </HintBox>
 
 <MistakeBox>
@@ -121,7 +123,7 @@ Urmărește bulele mari deplasându-se spre dreapta la fiecare trecere. Zona gri
 
 **Greșeala 2:** Nu reduci limita buclei interioare cu `-i` — recomparăm elementele deja sortate la fiecare trecere (corect, dar ineficient).
 
-**Greșeala 3:** Swap fără variabilă temporară: `v[j] = v[j+1]; v[j+1] = v[j];` pierde prima valoare.
+**Greșeala 3:** Swap fără variabilă temporară: `v[j] = v[j+1]; v[j+1] = v[j];` — prima valoare se pierde înainte de a fi salvată.
 </MistakeBox>
 
 ## Recapitulare

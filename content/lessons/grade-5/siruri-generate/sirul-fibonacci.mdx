@@ -6,7 +6,7 @@ chapter: siruri-generate
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["fibonacci", "siruri-recurente", "for", "doi-predecesori"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Un iepure devine adult după o lună. O pereche de adulți produce o pereche de pui în fiecare lună. Câte perechi ai după 12 luni? Răspunsul urmează șirul lui Fibonacci — observat de Fibonacci în 1202, dar prezent în natură cu mult înaintea lui: în spiralele floarea-soarelui, în cochiliile melcilor, în ramificările copacilor.
+Un iepure devine adult după o lună, iar o pereche de adulți produce o pereche de pui în fiecare lună. Câte perechi ai după 12 luni? Răspunsul urmează șirul lui Fibonacci — descris în 1202, dar prezent în natură cu mult înainte: în spiralele floarea-soarelui, în cochiliile melcilor, în ramificările copacilor.
 </LessonHook>
 
 ## Definiția șirului Fibonacci
@@ -50,25 +50,32 @@ F(1) = 1
 F(n) = F(n-1) + F(n-2)  pentru n ≥ 2
 ```
 
-Primii termeni: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+<ArrayDiagram
+  values="0 1 1 2 3 5 8 13"
+  valueLabel="F"
+  indexLabel="n"
+  index="0 1 2 3 4 5 6 7"
+  pointers="6:a 7:b:warning"
+  caption="Primii 8 termeni Fibonacci. Pointerii a și b marchează ultimii doi termeni — exact ce păstrăm în memorie pentru a calcula următorul."
+/>
 
 <ObservationBox>
-Fiecare termen este suma exactă a celor doi dinaintea lui. Asta face Fibonacci diferit de un șir aritmetic sau geometric — nu există o formulă simplă pentru termenul n (există formula lui Binet cu numere iraționale, dar la concurs calculezi iterativ).
+Fiecare termen este suma exactă a celor doi dinaintea lui. Asta face Fibonacci diferit de un șir aritmetic sau geometric: nu există o formulă simplă pentru termenul n (există formula lui Binet cu numere iraționale, dar la concurs calculezi mereu iterativ).
 </ObservationBox>
 
 ## Algoritmul iterativ
 
-Nu avem nevoie să stocăm toți termenii anteriori — doar ultimii doi:
+Nu trebuie să stocăm toți termenii anteriori — este suficient să păstrăm mereu ultimii doi. La fiecare pas calculăm următorul termen și deplasăm „fereastra" cu o poziție:
 
 ```
-a = 0, b = 1  (F(0) și F(1))
+a = 0, b = 1  (F(0) si F(1))
 Pasul 1: c = a + b = 1  → a=1, b=1
 Pasul 2: c = a + b = 2  → a=1, b=2
 Pasul 3: c = a + b = 3  → a=2, b=3
 ...
 ```
 
-La fiecare pas: `c = a + b`, apoi `a = b`, `b = c`.
+La fiecare pas: `c = a + b`, apoi `a = b`, `b = c`. Ordinea contează — vezi MistakeBox.
 
 ## Implementare C++ — primii n termeni
 

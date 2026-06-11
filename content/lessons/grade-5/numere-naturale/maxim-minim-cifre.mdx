@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cifre", "maxim", "minim", "comparatie"]
 visualizers: []
@@ -39,24 +39,26 @@ quiz:
 ---
 
 <LessonHook>
-Triezi cutii după greutate și vrei s-o găsești pe cea mai grea. Nu le cântărești pe toate deodată — compari câte una cu „campionul" curent. Dacă găsești una mai grea, ea devine noul campion. Exact asta faci și cu cifrele unui număr.
+Triezi cutii după greutate și vrei s-o găsești pe cea mai grea. Nu le cântărești pe toate deodată — compari câte una cu „campionul" curent. Dacă găsești una mai grea, ea devine noul campion. Exact asta faci și cu cifrele unui număr: menții un câștigător și îl actualizezi pe parcurs.
 </LessonHook>
 
 ## Ideea de maxim și minim curent
 
-Menținem un **maxim curent** și îl actualizăm la fiecare cifră extrasă:
+Menținem un **maxim curent** și îl actualizăm la fiecare cifră extrasă. Urmărește pentru `n = 3927`:
 
 ```
 Pornim: maxim = -1
-Cifra 3: max(-1, 3) = 3  → maxim = 3
-Cifra 9: max(3, 9)  = 9  → maxim = 9
-Cifra 2: max(9, 2)  = 9  → maxim = 9
-Cifra 7: max(9, 7)  = 9  → maxim = 9
+Cifra 7: max(-1, 7) = 7  → maxim = 7
+Cifra 2: max(7, 2)  = 7  → maxim = 7
+Cifra 9: max(7, 9)  = 9  → maxim = 9
+Cifra 3: max(9, 3)  = 9  → maxim = 9
 Rezultat: 9
 ```
 
+(Cifrele sunt extrase de la dreapta la stânga, dar ordinea nu afectează maximul.)
+
 <ObservationBox>
-Inițializează `maxim = -1` și `minim = 10`. Astfel orice cifră (0–9) va actualiza corect valorile la prima comparație. Dacă inițializezi `minim = 0`, nu vei detecta că minimul este 0 când există cifra 0.
+Inițializează `maxim = -1` și `minim = 10`. Valorile sunt în afara intervalului [0, 9], deci orice cifră reală va actualiza corect variabila la prima comparație. Dacă inițializezi `minim = 0`, nu vei detecta că minimul este 0 atunci când numărul conține cifra 0.
 </ObservationBox>
 
 ## Implementare C++
@@ -98,9 +100,9 @@ int main() {
 | Număr cu d cifre | O(log n) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Inițializezi `maxim = 0`. Dacă toate cifrele sunt 0 (cazul n = 0), `maxim` rămâne 0 — aparent corect, dar nu ai parcurs nicio cifră. Inițializarea cu `-1` e mai sigură.
+**Greșeala 1:** Inițializezi `maxim = 0`. Dacă toate cifrele sunt 0 (cazul `n = 0`), `maxim` rămâne 0 — aparent corect, dar nu ai parcurs nicio cifră. Inițializarea cu `-1` e mai sigură și mai explicită.
 
-**Greșeala 2:** Inițializezi `minim = 0`. Pentru numărul 123, `minim` rămâne 0 deși 1 e mai mic — pentru că 0 < 1. Inițializează `minim = 10` (mai mare decât orice cifră).
+**Greșeala 2:** Inițializezi `minim = 0`. Pentru numărul 123, `minim` rămâne 0 deși 1 e cea mai mică cifră — pentru că 0 < 1 și condiția `cifra < minim` nu se declanșează niciodată. Inițializează `minim = 10` (mai mare decât orice cifră posibilă).
 
-**Greșeala 3:** Compari cu `temp` (valoarea în schimbare) în loc de `cifra = temp % 10`. Extrage cifra mai întâi, compară cu ea.
+**Greșeala 3:** Compari cu `temp` (valoarea în continuă schimbare) în loc de `cifra = temp % 10`. Extrage cifra mai întâi, compară cu ea.
 </MistakeBox>

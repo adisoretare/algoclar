@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["prime", "divizori", "verificare", "sqrt"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Un număr prim e ca o cărămidă: nu poți să-l spargi în bucăți mai mici egale (fără rest). Toate celelalte numere sunt construite din aceste cărămizi — de aceea numerele prime sunt „atomii" matematicii. Verificarea primalității apare în jumătate din problemele de matematică de concurs.
+Un număr prim este ca o cărămidă: nu poți să-l spargi în factori mai mici fără rest. Toate celelalte numere se construiesc din aceste cărămizi — de aceea numerele prime sunt „atomii" matematicii. Verificarea primalității apare în jumătate din problemele de matematică de concurs.
 </LessonHook>
 
 ## Definiție
@@ -54,9 +54,11 @@ Un număr natural `n > 1` este **prim** dacă are exact 2 divizori: 1 și el în
 | 7 | 1, 7 | ✓ |
 | 12 | 1, 2, 3, 4, 6, 12 | ✗ |
 
+Notează: **1 nu este prim** (are un singur divizor), iar **2 este prim** (singurul număr prim par).
+
 ## Algoritmul eficient — O(√n)
 
-Dacă `n` are un divizor `d` cu `1 < d < n`, atunci fie `d ≤ √n`, fie `n/d ≤ √n`. Deci e suficient să verificăm până la `√n`:
+Dacă `n` are un divizor `d` cu `1 < d < n`, atunci fie `d ≤ √n`, fie `n/d ≤ √n`. E suficient să verificăm până la `√n` — dacă nu găsim niciun divizor acolo, `n` este prim:
 
 ```cpp
 bool estePrim(int n) {
@@ -105,15 +107,15 @@ int main() {
 | Variantă naivă (d până la n) | O(n) | O(1) |
 
 <ObservationBox>
-Dacă trebuie să verifici primalitatea pentru toate numerele până la ~10⁶, folosește **Ciurul lui Eratostene** (care se studiază în clasa a 6-a) — precalculezi totul în O(n log log n). Funcția de mai sus e bună pentru numere individuale.
+Dacă trebuie să verifici primalitatea pentru toate numerele până la ~10⁶, folosește **Ciurul lui Eratostene** (studiat în clasa a 6-a) — precalculezi totul în O(n log log n). Funcția de mai sus este potrivită pentru numere individuale.
 </ObservationBox>
 
 <MistakeBox>
-**Greșeala 1:** Nu tratezi cazurile `n < 2`. Fără `if (n < 2) return false`, funcția returnează `true` pentru 0 și 1 — greșit.
+**Greșeala 1:** Nu tratezi cazurile `n < 2`. Fără `if (n < 2) return false`, funcția returnează `true` pentru 0 și 1 — greșit prin definiție.
 
-**Greșeala 2:** Verifici divisori până la `n` în loc de `√n`. De sute sau mii de ori mai lent pentru n mare.
+**Greșeala 2:** Verifici divizori până la `n` în loc de `√n`. De sute sau mii de ori mai lent pentru n mare.
 
-**Greșeala 3:** Crezi că 2 nu e prim (este — singurul număr prim par). Crezi că 1 e prim (nu este — are un singur divizor, nu doi).
+**Greșeala 3:** Crezi că 2 nu e prim (este — singurul număr prim par) sau că 1 e prim (nu este — are un singur divizor, nu doi).
 
-**Greșeala 4:** Scrii `d * d < n` cu `<` strict și pierzi cazul n = 4 (d=2, 2×2=4). Folosește `d * d <= n`.
+**Greșeala 4:** Scrii `d * d < n` cu `<` strict și pierzi cazul n = 4 (d=2, 2×2=4). Condiția corectă este `d * d <= n`.
 </MistakeBox>

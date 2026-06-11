@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["frecventa", "caracteristic", "prezenta", "multimi"]
 visualizers: ["frequency"]
@@ -48,11 +48,15 @@ Un **vector caracteristic** e o variantă binară a vectorului de frecvență:
 - `caract[x] = 1` dacă valoarea `x` apare în colecție
 - `caract[x] = 0` dacă `x` nu apare
 
-```
-Multime A: {1, 3, 5, 7}
-caract:     0  1  0  1  0  1  0  1
-index:      0  1  2  3  4  5  6  7
-```
+Pentru mulțimea A = {1, 3, 5, 7}, vectorul caracteristic arată așa:
+
+<ArrayDiagram
+  values="0 1 0 1 0 1 0 1"
+  valueLabel="caract"
+  indexLabel="valoare"
+  index="0 1 2 3 4 5 6 7"
+  caption="caract[x] = 1 dacă x aparține mulțimii, 0 altfel."
+/>
 
 ## Când vectorul caracteristic, când de frecvență?
 
@@ -120,7 +124,7 @@ Reuniunea cu vectori caracteristici e O(maxVal), față de O(n·m) pentru varian
 <Visualizer name="frequency" />
 
 <HintBox>
-La construcția caracteristicului, celula corespunzătoare valorii citite se colorează la 1. Vizualizatorul arată același mecanism ca frecvența — diferența e că scriim `= 1`, nu `++`.
+La construcția caracteristicului, celula corespunzătoare valorii citite se colorează la 1. Vizualizatorul arată același mecanism ca frecvența — diferența e că scriem `= 1`, nu `++`.
 </HintBox>
 
 <MistakeBox>

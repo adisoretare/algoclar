@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cifre", "invers", "reconstructie", "palindrom"]
 visualizers: []
@@ -39,12 +39,12 @@ quiz:
 ---
 
 <LessonHook>
-Privești numărul 374 într-o oglindă și obții 473. Calculatorul nu are oglindă — în schimb construiește noul număr cifră cu cifră: ia ultima cifră a originalului și o pune la dreapta inversului în construcție.
+Privești numărul 374 într-o oglindă și obții 473. Calculatorul nu are oglindă — în schimb construiește noul număr cifră cu cifră: ia ultima cifră a originalului și o „lipește" la dreapta inversului în construcție. Formula se derulează singură, pas cu pas.
 </LessonHook>
 
 ## Cum se construiește inversul?
 
-La fiecare pas extragem ultima cifră a lui `n` și o „lipim" la dreapta inversului curent:
+La fiecare pas extragem ultima cifră a lui `n` și o adăugăm la dreapta inversului curent. Urmărește pentru `n = 374`:
 
 ```
 n = 374,  invers = 0
@@ -54,10 +54,10 @@ cifra = 3: invers = 47 * 10 + 3 = 473
 Rezultat: 473
 ```
 
-Formula: `invers = invers * 10 + cifra`
+Formula-cheie: `invers = invers * 10 + cifra`
 
 <ObservationBox>
-Multiplicarea cu 10 „mută" cifrele deja colectate cu o poziție la stânga, eliberând locul unităților pentru noua cifră. E ca și cum ai scrie numărul invers, cifră cu cifră.
+Înmulțirea cu 10 „mută" cifrele deja colectate cu o poziție la stânga, eliberând locul unităților pentru noua cifră. E exact ca și cum ai scrie numărul invers, cifră cu cifră, pe hârtie.
 </ObservationBox>
 
 ## Implementare C++
@@ -88,7 +88,7 @@ int main() {
 
 ## Aplicație: verificarea palindromului
 
-Un număr e **palindrom** dacă e egal cu inversul său:
+Un număr e **palindrom** dacă e egal cu inversul său — se citește la fel în ambele sensuri:
 
 ```cpp
 if (n == invers)
@@ -97,7 +97,7 @@ else
     cout << "nu e palindrom" << endl;
 ```
 
-Exemple: `121`, `3443`, `7` sunt palindroame.
+Exemple: `121`, `3443`, `7` sunt palindroame. `123` nu este.
 
 ## Complexitate
 
@@ -106,9 +106,9 @@ Exemple: `121`, `3443`, `7` sunt palindroame.
 | Număr cu d cifre | O(log n) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Zerourile finale ale originalului dispar în invers. `1200` inversat e `21`, nu `0021`. Ca număr întreg e corect, dar dacă problema cere să păstrezi zerourile, lucrează cu string-uri.
+**Greșeala 1:** Zerourile finale ale originalului dispar în invers. `1200` inversat numeric este `21`, nu `0021`. Ca număr întreg e corect, dar dacă problema cere să păstrezi zerourile, lucrează cu șiruri de caractere.
 
 **Greșeala 2:** Overflow la inversare. `int` ține până la ~2.1 miliarde. Inversând `1.000.000.007` obții `7.000.000.001` care nu încape în `int`. Folosește `long long`.
 
-**Greșeala 3:** Compari `n` cu `invers` dar ai modificat `n` în buclă. Salvează `n` înainte de buclă sau folosește o copie `temp`.
+**Greșeala 3:** Compari `n` cu `invers` dar ai modificat `n` în buclă. Salvează `n` înainte de buclă sau folosește copia `temp` pentru extragere.
 </MistakeBox>

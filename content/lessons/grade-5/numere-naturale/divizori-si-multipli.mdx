@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["divizori", "multipli", "modulo", "sqrt"]
 visualizers: []
@@ -39,12 +39,12 @@ quiz:
 ---
 
 <LessonHook>
-Ai 12 bomboane și vrei să le împarți în grupe egale, fără să rămână niciuna. Câte variante ai? Grupuri de 1, 2, 3, 4, 6 sau 12 — exact divizorii lui 12. Găsirea divizorilor este una dintre problemele fundamentale ale olimpiadei de informatică.
+Ai 12 bomboane și vrei să le împarți în grupe egale, fără să rămână niciuna. Câte variante ai? Grupe de 1, 2, 3, 4, 6 sau 12 — exact divizorii lui 12. Găsirea eficientă a divizorilor este una dintre problemele fundamentale ale olimpiadei de informatică.
 </LessonHook>
 
 ## Definiție
 
-`d` este **divizor** al lui `n` dacă `n % d == 0` (împărțirea este exactă). În același caz, `n` este **multiplu** al lui `d`.
+`d` este **divizor** al lui `n` dacă `n % d == 0` (împărțirea este exactă, fără rest). În același timp, `n` este **multiplu** al lui `d`.
 
 **Exemplu:** Divizorii lui 12 sunt 1, 2, 3, 4, 6, 12.
 
@@ -56,24 +56,24 @@ for (int d = 1; d <= n; d++) {
 }
 ```
 
-Funcționează, dar pentru n = 1.000.000 face un milion de operații.
+Funcționează, dar pentru n = 1.000.000 face un milion de operații. Există o cale mult mai rapidă.
 
 ## Varianta eficientă — O(√n)
 
-**Observație cheie:** Dacă `d` divide `n`, atunci și `n/d` divide `n`. Unul din cei doi este ≤ √n.
+**Observație cheie:** Dacă `d` divide `n`, atunci și `n/d` divide `n`. Cei doi divisori vin în perechi, iar cel mai mic din pereche este ≤ √n. Deci nu trebuie să verifici mai departe de √n:
 
 ```cpp
 for (int d = 1; d * d <= n; d++) {
     if (n % d == 0) {
         cout << d << " ";         // d este divizor
         if (d != n / d)
-            cout << n / d << " "; // n/d este alt divizor
+            cout << n / d << " "; // n/d este celalalt divizor din pereche
     }
 }
 ```
 
 <ObservationBox>
-Condiția `d * d <= n` evită calculul lui `sqrt(n)` (care poate da erori de rotunjire pentru pătrate perfecte). Este forma preferată în concursuri față de `d <= sqrt(n)`.
+Condiția `d * d <= n` este preferată lui `d <= sqrt(n)` în concursuri: evită calculul virgulă mobilă și erorile de rotunjire care pot apărea la pătrate perfecte (de exemplu, `sqrt(9)` poate da `2.9999...` în unele implementări).
 </ObservationBox>
 
 ## Implementare C++ — complet
@@ -101,6 +101,8 @@ int main() {
 
 **Exemplu:** Input `12` → `1 12 2 6 3 4`
 
+(Divizorii apar în ordinea în care sunt descoperiți, nu sortat — dacă ai nevoie de ei sortați, stochează-i într-un vector.)
+
 ## Numărarea divizorilor
 
 ```cpp
@@ -123,7 +125,7 @@ for (int d = 1; d * d <= n; d++) {
 <MistakeBox>
 **Greșeala 1:** Scrii `d <= sqrt(n)` cu tipul `double`. Erorile de rotunjire pot face ca un pătrat perfect (ex. n=9, d=3) să nu treacă condiția. Folosește `d * d <= n`.
 
-**Greșeala 2:** Uiți condiția `d != n / d` pentru pătrate perfecte. Pentru n=9 și d=3, ai 3 = 9/3 — dacă afișezi și `n/d`, obții `3` de două ori.
+**Greșeala 2:** Uiți condiția `d != n / d` pentru pătrate perfecte. Pentru n=9 și d=3 ai 3 = 9/3 — dacă afișezi și `n/d`, obții `3` de două ori.
 
-**Greșeala 3:** Pornești de la `d = 0`. `n % 0` este eroare de împărțire prin zero. Pornește mereu de la `d = 1`.
+**Greșeala 3:** Pornești de la `d = 0`. `n % 0` provoacă eroare de împărțire prin zero. Pornește mereu de la `d = 1`.
 </MistakeBox>

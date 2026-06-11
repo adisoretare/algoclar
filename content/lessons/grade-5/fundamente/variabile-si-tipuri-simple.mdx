@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["variabile", "tipuri", "memorie", "declarare"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Gândește-te la variabile ca la niște cutii etichetate din depozit. Cutia „vârsta" conține numărul 14. Cutia „nota" conține 9.50. Cutia „litera" conține 'A'. Fiecare cutie are o etichetă (numele variabilei), un tip (ce fel de lucruri încap) și un conținut (valoarea).
+Gândește-te la variabile ca la niște cutii etichetate pe un raft. Cutia „vârsta" are scris pe ea că ține doar numere întregi și conține 14. Cutia „nota" ține numere cu zecimale și conține 9.50. Nu poți pune un text în cutia pentru numere — tipul determină ce încape. Asta e tot ce e o variabilă: un nume, un tip și o valoare.
 </LessonHook>
 
 ## Ce este o variabilă?
@@ -61,7 +61,7 @@ Orice variabilă are trei caracteristici:
 | `bool` | Valoare logică | `true`, `false` |
 
 <ObservationBox>
-`char` stochează intern un număr întreg mic (0–255) — codul ASCII al caracterului. `'A'` are codul 65. Poți face operații aritmetice cu `char`, dar e mai clar să folosești `int` pentru numere.
+`char` stochează intern un număr întreg mic (0–255) — codul ASCII al caracterului. `'A'` are codul 65, `'a'` are 97, `'0'` are 48. Poți face operații aritmetice cu `char` (`'A' + 1` dă `'B'`), dar pentru numere propriu-zise folosește `int`.
 </ObservationBox>
 
 ## Declararea și inițializarea variabilelor
@@ -86,7 +86,7 @@ int main() {
 ```
 
 <HintBox>
-Inițializează mereu variabilele la declarare. O variabilă neinițializată conține „gunoi" din memorie — valoare aleatorie care cauzează bug-uri greu de găsit.
+Inițializează mereu variabilele la declarare. O variabilă neinițializată conține ce se afla în acea zonă de memorie — o valoare imprevizibilă care cauzează bug-uri greu de reprodus. Regula simplă: `int x = 0;` în loc de `int x;`.
 </HintBox>
 
 ## Reguli pentru numele variabilelor
@@ -103,12 +103,12 @@ invalid: 1suma, nota-finala, int, suma finala
 
 ## Atribuirea valorilor
 
-Operatorul `=` atribuie o valoare. Expresia din dreapta se evaluează **înainte** de atribuire:
+Operatorul `=` atribuie o valoare. Expresia din dreapta se evaluează complet **înainte** de atribuire:
 
 ```cpp
 int a = 5;
-int b = a + 3;    // b devine 8
-a = a + 1;        // a devine 6 (nu 5+1=6 cu a vechi)
+int b = a + 3;    // b devine 8 (a e 5 in momentul calculului)
+a = a + 1;        // a devine 6 (valoarea veche, 5, e folosita in dreapta)
 ```
 
 ## Complexitate
@@ -116,9 +116,9 @@ a = a + 1;        // a devine 6 (nu 5+1=6 cu a vechi)
 Declararea și atribuirea unei variabile costă **O(1)** — o singură operație, indiferent de valoare.
 
 <MistakeBox>
-**Greșeala 1:** Confunzi `=` (atribuire) cu `==` (comparație). `x = 5` schimbă valoarea lui x; `x == 5` verifică dacă x e egal cu 5.
+**Greșeala 1:** Confunzi `=` (atribuire) cu `==` (comparație). `x = 5` schimbă valoarea lui `x`; `x == 5` verifică dacă `x` e egal cu 5 și produce `true` sau `false`.
 
-**Greșeala 2:** Declari variabila cu tipul greșit. `int medie = 9.75` trunchiază la `9`. Dacă ai nevoie de zecimale, folosește `double`.
+**Greșeala 2:** Alegi tipul greșit pentru valoare. `int medie = 9.75` trunchiază la `9` fără avertisment. Dacă ai nevoie de zecimale, folosește `double`.
 
-**Greșeala 3:** Uiți să inițializezi. `int suma; suma += 10;` dă rezultat nedefinit pentru că `suma` nu are o valoare de start.
+**Greșeala 3:** Uiți să inițializezi variabila. `int suma; suma += 10;` dă rezultat nedefinit — `suma` conține ce era în memorie înainte, nu 0.
 </MistakeBox>

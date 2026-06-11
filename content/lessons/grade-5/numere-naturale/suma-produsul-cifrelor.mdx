@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cifre", "suma", "produs", "acumulator"]
 visualizers: []
@@ -39,12 +39,12 @@ quiz:
 ---
 
 <LessonHook>
-La un joc de zaruri, aduni scorurile de pe față: 3, 1, 4 → total 8. Exact același pattern: parcurgi fiecare cifră a unui număr și o adaugi la un acumulator. Suma cifrelor e unul dintre cele mai frecvente exerciții de concurs și se rezolvă în 5 rânduri de cod.
+La un joc de zaruri aduni scorurile de pe fiecare față: 3, 1, 4 → total 8. Exact același pattern se aplică cifrelor unui număr: parcurgi fiecare cifră și o adaugi la un acumulator. Suma cifrelor este unul dintre cele mai frecvente exerciții de concurs și se rezolvă în cinci rânduri de cod.
 </LessonHook>
 
 ## Ideea de acumulator
 
-Un **acumulator** este o variabilă care colectează un rezultat parțial. La fiecare pas adaugi sau înmulțești cifra curentă cu acumulatorul.
+Un **acumulator** este o variabilă care colectează un rezultat parțial. La fiecare pas adaugi sau înmulțești cifra curentă cu acumulatorul existent.
 
 | Operație | Inițializare | Actualizare |
 |---|---|---|
@@ -52,12 +52,12 @@ Un **acumulator** este o variabilă care colectează un rezultat parțial. La fi
 | Produs | `produs = 1` | `produs *= cifra` |
 
 <ObservationBox>
-Inițializarea contează! Pentru sumă folosești 0 (elementul neutru al adunării), pentru produs folosești 1 (elementul neutru al înmulțirii). Confuzia între 0 și 1 este una din cele mai frecvente greșeli de concurs.
+Inițializarea contează! Pentru sumă folosești 0 (elementul neutru al adunării), pentru produs folosești 1 (elementul neutru al înmulțirii). Confuzia dintre 0 și 1 este una dintre cele mai frecvente greșeli la concurs — și una dintre cele mai ușor de evitat dacă înțelegi de ce.
 </ObservationBox>
 
 ## Algoritmul
 
-Aceeași structură ca la extragerea cifrelor, cu un acumulator în plus:
+Aceeași structură ca la extragerea cifrelor, cu un acumulator în plus. Urmărește pentru `n = 3042`:
 
 ```
 n = 3042, suma = 0, produs = 1
@@ -67,6 +67,8 @@ cifra = 4: suma = 6,  produs = 8
 cifra = 0: suma = 6,  produs = 0
 cifra = 3: suma = 9,  produs = 0
 ```
+
+Observă cum cifra 0 nu schimbă suma, dar anulează produsul imediat.
 
 ## Implementare C++
 
@@ -107,11 +109,11 @@ int main() {
 | Număr cu d cifre | O(log n) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Inițializezi `produs = 0` în loc de `produs = 1`. Rezultatul va fi mereu 0.
+**Greșeala 1:** Inițializezi `produs = 0` în loc de `produs = 1`. Rezultatul va fi mereu 0, indiferent de cifre.
 
-**Greșeala 2:** Modifici `n` direct în buclă și uiți valoarea originală. Dacă ai nevoie de `n` și după buclă, salvează-l în `temp`.
+**Greșeala 2:** Modifici `n` direct în buclă și ai nevoie de valoarea originală după. Salvează-o în `temp` înainte de buclă.
 
-**Greșeala 3:** Nu tratezi `n = 0` separat. Bucla `while` nu rulează, deci produsul rămâne 1 — incorect. Tratează explicit cazul `n == 0`.
+**Greșeala 3:** Nu tratezi `n = 0` separat. Bucla `while` nu rulează, deci produsul rămâne 1 — incorect matematic. Tratează explicit cazul `n == 0`.
 
 **Greșeala 4:** Overflow la produs pentru numere cu cifre mari. `9^9 = 387.420.489` intră în `int`, dar `9^10` depășește. Folosește `long long` dacă n poate fi mare.
 </MistakeBox>

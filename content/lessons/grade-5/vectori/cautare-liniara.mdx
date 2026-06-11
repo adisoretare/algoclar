@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 11
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["vector", "cautare", "gasit", "pozitie"]
 visualizers: []
@@ -46,17 +46,17 @@ Cauți un elev pe lista clasei și nu știi în ce ordine sunt scrisi: citești 
 
 **Căutarea liniară** parcurge vectorul de la stânga la dreapta și verifică fiecare element până îl găsește pe cel dorit (sau epuizează lista).
 
-Nu cere vector sortat. E cea mai simplă strategie de căutare.
+Nu cere vector sortat. E cea mai simplă strategie de căutare și primul lucru la care apelezi când nu ai nicio informație despre ordinea datelor.
 
 ## Algoritmul
 
 ```
 gasit ← fals, pozitie ← -1
 pentru i de la 0 la n-1:
-    dacă v[i] = valoare_cautata:
-        gasit ← adevărat
+    daca v[i] = valoare_cautata:
+        gasit ← adevarat
         pozitie ← i
-        stop   ← prima apariție
+        stop   ← prima aparitie
 ```
 
 ## Implementare C++
@@ -92,6 +92,8 @@ int main() {
 
 ## Toate aparițiile
 
+Dacă vrei toate pozițiile în care apare valoarea, renunți la `break` și parcurgi vectorul complet:
+
 ```cpp
 bool gasit = false;
 for (int i = 0; i < n; i++) {
@@ -118,7 +120,7 @@ Dacă vectorul e **sortat**, poți folosi căutarea binară — O(log n). Pentru
 <MistakeBox>
 **Greșeala 1:** Returnezi `pozitie = 0` ca „negăsit" — dar 0 e o poziție validă! Folosește `-1` pentru „negăsit".
 
-**Greșeala 2:** Vrei toate aparițiile dar ai `break` în buclă — te oprești la prima apariție.
+**Greșeala 2:** Vrei toate aparițiile dar ai `break` în buclă — te oprești la prima apariție și ratezi restul.
 
 **Greșeala 3:** `if (v[i] = x)` în loc de `if (v[i] == x)` — `=` e atribuire, nu comparație. Compilatorul poate da un avertisment, dar codul compilează și produce rezultate greșite.
 </MistakeBox>

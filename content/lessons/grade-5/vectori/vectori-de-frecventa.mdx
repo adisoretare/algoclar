@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 15
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["frecventa", "numarare", "aparitii", "vector"]
 visualizers: ["frequency"]
@@ -46,18 +46,22 @@ Ai un borcan cu bile colorate și vrei să știi câte bile de fiecare culoare s
 
 Un **vector de frecvență** numără de câte ori apare fiecare valoare dintr-un set de date.
 
-```
-Date:    3  1  4  1  5  9  2  6  5  3
-frec:    0  2  1  2  1  2  1  0  0  1
-index:   0  1  2  3  4  5  6  7  8  9
-```
+Pentru datele `3 1 4 1 5 9 2 6 5 3`, vectorul de frecvență arată așa:
+
+<ArrayDiagram
+  values="0 2 1 2 1 2 1 0 0 1"
+  valueLabel="frec"
+  indexLabel="valoare"
+  index="0 1 2 3 4 5 6 7 8 9"
+  caption="frec[x] = de câte ori apare valoarea x în date."
+/>
 
 `frec[x]` = de câte ori apare valoarea `x` în date.
 
 ## Algoritmul
 
 ```
-frec[] ← {0, 0, ..., 0}     // inițializare cu zerouri
+frec[] ← {0, 0, ..., 0}     // initializare cu zerouri
 pentru i de la 0 la n-1:
     frec[v[i]] ← frec[v[i]] + 1
 ```

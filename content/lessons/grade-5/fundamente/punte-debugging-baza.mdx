@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 8
 free: true
-status: draft
+status: published
 isBridge: true
 tags: ["debugging", "erori", "bug", "depanare"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Mașinile moderne au zeci de senzori care îți spun exact ce nu merge și unde. Programatorii de la NASA au pagini de log pentru fiecare misiune. Tu ai ceva mai simplu dar la fel de eficient: `cout` strategic și urmărire manuală. Debugging-ul nu e magie — e metodă.
+Programul compilează, rulează — și dă un răspuns greșit. Ce faci? Nu rescrii totul. Nu ghicești. Adaugi câteva `cout`-uri ca să vezi exact unde calculul deviază față de ce așteptai. Debugging-ul nu e magie: e metodă aplicată pas cu pas, până găsești locul exact unde logica ta și realitatea se despart.
 </LessonHook>
 
 ## Cele trei tipuri de erori
@@ -75,10 +75,10 @@ int y = 5 / x; // impartire la zero -- crash
 
 Programul rulează complet, dar răspunsul e greșit. Cel mai greu tip de depanat.
 
-**Ce faci:** Urmărire manuală pe un exemplu mic, debug cu `cout`.
+**Ce faci:** Urmărire manuală pe un exemplu mic, debug cu `cerr` pentru a vedea valorile la fiecare pas.
 
 <ObservationBox>
-Ordinea de rezolvat: mai întâi compile errors (blocante), apoi runtime errors (crash), la final logic errors (răspuns greșit). Nu poți vedea erorile logice dacă programul nici nu compilează.
+Rezolvă erorile în ordine: mai întâi compile errors (blocante — programul nici nu pornește), apoi runtime errors (crash), la final logic errors (răspuns greșit). Nu poți vedea erorile logice dacă programul nici nu compilează.
 </ObservationBox>
 
 ## Tehnica debug cu `cout`
@@ -94,10 +94,10 @@ for (int i = 1; i <= n; i++) {
 cout << suma << "\n";
 ```
 
-Folosește `cerr` (nu `cout`) pentru debug: merge la stderr, nu interfereaza cu ieșirea programului.
+Folosește `cerr` în loc de `cout` pentru debug: mesajele merg la stderr și nu se amestecă cu ieșirea programului (care trebuie să rămână curată pentru judecător).
 
 <HintBox>
-Când trimiti la concurs, **șterge sau comentează** toate liniile de debug. `cerr` ne-șters nu afectează răspunsul la OJI/ONI (stderr e ignorat), dar e o practică bună să cureți codul.
+Când trimiți la concurs, **șterge sau comentează** toate liniile de debug. `cerr` ne-șters nu afectează răspunsul la OJI/ONI (stderr e ignorat), dar e o practică bună să cureți codul.
 </HintBox>
 
 ## Checklist de debugging
@@ -110,18 +110,27 @@ Când trimiti la concurs, **șterge sau comentează** toate liniile de debug. `c
 
 ## Exemplu: găsirea unui bug
 
-Programul trebuie să calculeze suma numerelor de la 1 la n. Dă rezultat greșit pentru n=5.
+Programul trebuie să calculeze suma pătratelor de la 1 la n. Dă un rezultat prea mare pentru n=3 (așteptăm 1+4+9=14, primim 15).
 
 ```cpp
 int suma = 0;
-for (int i = 0; i <= n; i++) {  // BUG: i incepe de la 0
-    suma += i;
+for (int i = 0; i <= n; i++) {  // BUG: i porneste de la 0 in loc de 1
+    suma += i * i;
+    cerr << "i=" << i << " suma=" << suma << "\n"; // debug
 }
-// Pentru n=5: suma = 0+1+2+3+4+5 = 15, dar asteptam 1+2+3+4+5 = 15 -- ok de fapt!
-// Dar daca suma ar fi 0+1+...+n, ar da cu 0 in plus... zero nu afecteaza suma
+cout << suma << "\n";
 ```
 
-Corecti: `i` ar trebui să înceapă de la `1`, dar adunarea lui 0 nu schimbă suma — bug găsit (nu e bug). Acum testăm formula `sum = n*(n+1)/2` ca verificare.
+Debug output pentru n=3:
+```
+i=0 suma=0
+i=1 suma=1
+i=2 suma=5
+i=3 suma=14
+i=... -- bucla nu s-a terminat inca?
+```
+
+Citind output-ul: bucla adaugă și `0*0 = 0` (iterația cu i=0), deci suma finală include un termen în plus față de 1²+2²+3². Corectezi `i = 0` → `i = 1` și bug-ul dispare.
 
 <MistakeBox>
 **Greșeala 1:** Citești ultima linie din erorile de compilare și pierzi timpul depanând o eroare secundară. Prima eroare o cauzează pe a doua, a treia etc. Rezolvi prima, recompilezi.

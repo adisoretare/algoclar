@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["vector", "verificare", "sortat", "palindrom"]
 visualizers: []
@@ -39,27 +39,27 @@ quiz:
 ---
 
 <LessonHook>
-Vrei să verifici dacă o serie de măsurători e mereu crescătoare, dacă un cod e format doar din cifre pozitive, sau dacă un șir se citește la fel de la stânga și de la dreapta. Toate sunt variante ale aceleiași idei: parcurgi vectorul și verifici o condiție, oprindu-te imediat ce găsești un element care nu o respectă.
+Vrei să verifici dacă o serie de măsurători e mereu crescătoare, dacă un cod e format doar din cifre pozitive, sau dacă un șir se citește la fel de la stânga și de la dreapta. Toate sunt variante ale aceleiași idei: parcurgi vectorul și verifici o condiție, oprindu-te imediat ce găsești primul element care o încalcă.
 </LessonHook>
 
 ## Tiparul general
 
 ```
-ok ← adevărat
+ok ← adevarat
 pentru i de la 0 la n-1:
-    dacă v[i] nu respectă condiția:
+    daca v[i] nu respecta conditia:
         ok ← fals
-        stop   ← ieșire timpurie
-dacă ok: proprietatea e îndeplinită
+        stop   ← iesire timpurie
+daca ok: proprietatea e indeplinita
 ```
 
-**Ieșirea timpurie** e importantă la concursuri: nu continuăm verificarea după ce am găsit prima „greșeală".
+**Ieșirea timpurie** e importantă la concursuri: nu continuăm verificarea după ce am găsit prima „greșeală". Dacă primele 3 elemente din 1.000 încalcă condiția, nu mai verificăm celelalte 997.
 
 ## Sortat crescător
 
 ```cpp
 bool sortat = true;
-for (int i = 0; i < n - 1; i++) {    // comparăm perechi consecutive
+for (int i = 0; i < n - 1; i++) {    // comparam perechi consecutive
     if (v[i] > v[i + 1]) {
         sortat = false;
         break;
@@ -72,10 +72,10 @@ Comparăm n-1 perechi: `(v[0],v[1])`, `(v[1],v[2])`, ..., `(v[n-2],v[n-1])`.
 ## Toate elementele pozitive
 
 ```cpp
-bool toatePoziive = true;
+bool toatePozitive = true;
 for (int i = 0; i < n; i++) {
     if (v[i] <= 0) {
-        toatePoziive = false;
+        toatePozitive = false;
         break;
     }
 }
@@ -128,15 +128,15 @@ int main() {
 | Orice proprietate | O(n) în cel mai rău caz | Ieșire timpurie: adesea mai rapid |
 
 <ObservationBox>
-Toate verificările urmează același tipar: `bool ok = true; for (...) { if (conditie_rea) { ok = false; break; } }`. Schimbi doar condiția, nu structura.
+Toate verificările urmează același tipar: `bool ok = true; for (...) { if (conditie_rea) { ok = false; break; } }`. Schimbi doar condiția, nu structura. Recunoașterea tiparului te ajută să scrii rapid oricare verificare nouă.
 </ObservationBox>
 
 <MistakeBox>
 **Greșeala 1:** Bucla pentru „sortat" merge până la `i < n` în loc de `i < n-1` — accesezi `v[n]`, care e în afara vectorului.
 
-**Greșeala 2:** Nu folosești `break` după `ok = false` — verificarea continuă inutil; la concurs pierzi timp prețios.
+**Greșeala 2:** Nu folosești `break` după `ok = false` — verificarea continuă inutil; la concurs pierzi timp prețios pe date mari.
 
-**Greșeala 3:** Verifici palindromul cu bucla `i < n` în loc de `i < n/2` — compari fiecare pereche de două ori și ajungi la concluzia greșită că nu e palindrom.
+**Greșeala 3:** Verifici palindromul cu bucla `i < n` în loc de `i < n/2` — compari fiecare pereche de două ori și, dacă n e impar, compari elementul din mijloc cu el însuși (inofensiv, dar irositor).
 </MistakeBox>
 
 ## Recapitulare

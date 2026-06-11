@@ -1,12 +1,12 @@
 ---
 title: "Factorialul unui număr"
-slug: factorial
+slug: factorial-5
 grade: 5
 chapter: numere-naturale
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["factorial", "produs", "overflow", "for"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Ai 5 cărți și vrei să afli în câte ordini le poți aranja pe raft. Prima poziție are 5 opțiuni, a doua 4, a treia 3 și tot așa: 5 × 4 × 3 × 2 × 1 = 120. Asta e factorialul — numărul de permutări ale unui set, fundamental în combinatorică și probabilitate.
+Ai 5 cărți și vrei să știi în câte ordini le poți aranja pe raft. Prima poziție are 5 variante, a doua 4, a treia 3 și tot așa: 5 × 4 × 3 × 2 × 1 = 120. Asta este factorialul — numărul de permutări ale unui set, fundamental în combinatorică și probabilitate.
 </LessonHook>
 
 ## Definiție
@@ -60,7 +60,7 @@ Cazuri speciale: `0! = 1`, `1! = 1`
 | 12 | 479.001.600 |
 
 <ObservationBox>
-Factorialul crește extrem de rapid. Chiar și `long long` (max ~9.2 × 10¹⁸) nu ține decât până la 20! = 2.432.902.008.176.640.000. Pentru n > 20 ai nevoie de numere mari sau de calcul modulo un prim.
+Factorialul crește extrem de rapid. Chiar și `long long` (max ~9.2 × 10¹⁸) nu ține decât până la 20! = 2.432.902.008.176.640.000. Pentru n > 20 ai nevoie de numere mari (big integer) sau de calcul modulo un prim.
 </ObservationBox>
 
 ## Implementare C++ — iterativă
@@ -85,6 +85,8 @@ int main() {
 
 **Exemplu:** Input `5` → `5! = 120`
 
+Observă că bucla pornește de la 2, nu de la 1 — înmulțirea cu 1 este inutilă. Pentru `n = 0` sau `n = 1`, bucla nu rulează deloc și `fact` rămâne 1 — corect prin definiție.
+
 ## Varianta recursivă
 
 ```cpp
@@ -94,7 +96,7 @@ long long factorial(int n) {
 }
 ```
 
-Elegantă și ușor de citit, dar consumă O(n) memorie de stivă.
+Elegantă și ușor de citit, dar consumă O(n) memorie de stivă — evita-o pentru n mare.
 
 ## Complexitate
 
@@ -104,11 +106,11 @@ Elegantă și ușor de citit, dar consumă O(n) memorie de stivă.
 | Recursiv | O(n) | O(n) — stiva de apeluri |
 
 <MistakeBox>
-**Greșeala 1:** Folosești `int` în loc de `long long`. 13! depășește `int`. Inițializează și calculează cu `long long` mereu.
+**Greșeala 1:** Folosești `int` în loc de `long long`. 13! depășește `int`. Declară și calculează cu `long long` mereu.
 
 **Greșeala 2:** Inițializezi `fact = 0` în loc de `fact = 1`. Produsul pornit de la 0 rămâne 0.
 
-**Greșeala 3:** Uiți că bucla `for(i=2; i<=0; ...)` nu rulează pentru n=0, deci `fact` rămâne 1 — corect prin definiție. Dar dacă n poate fi negativ, adaugă o verificare.
+**Greșeala 3:** Uiți că bucla `for(i=2; i<=0; ...)` nu rulează pentru n=0, deci `fact` rămâne 1 — corect prin definiție. Dacă n poate fi negativ, adaugă o verificare înainte de buclă.
 
-**Greșeala 4:** La varianta recursivă, nu ai caz de bază pentru n=0 sau n=1 și intri în recursie infinită. Asigură-te că returnezi 1 pentru n ≤ 1.
+**Greșeala 4:** La varianta recursivă, nu ai caz de bază pentru n=0 sau n=1 și intri în recursie infinită. Asigură-te că returnezi 1 pentru `n <= 1`.
 </MistakeBox>

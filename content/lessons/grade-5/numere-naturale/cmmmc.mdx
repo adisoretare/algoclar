@@ -6,7 +6,7 @@ chapter: numere-naturale
 difficulty: baza
 estimatedTime: 12
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["cmmmc", "cmmdc", "multipli", "overflow"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Două trenuri pleacă din aceeași gară: unul la fiecare 4 minute, celălalt la fiecare 6 minute. Când se vor întâlni din nou în gară? La minutul 12 — cel mai mic multiplu comun. CMMMC apare ori de câte ori sincronizezi cicluri sau găsești numitorul comun al unor fracții.
+Două trenuri pleacă din aceeași gară: unul la fiecare 4 minute, celălalt la fiecare 6 minute. Când se vor întâlni din nou? La minutul 12 — cel mai mic multiplu comun. CMMMC apare ori de câte ori sincronizezi cicluri sau găsești numitorul comun al unor fracții.
 </LessonHook>
 
 ## Ce este CMMMC?
@@ -56,7 +56,7 @@ CMMMC(a, b) = a × b / CMMDC(a, b)
 
 ## De ce funcționează formula?
 
-Produsul `a × b` conține toți factorii ambelor numere, dar cei comuni apar de două ori. Împărțind la CMMDC (care este produsul factorilor comuni), eliminăm duplicatele.
+Produsul `a × b` conține toți factorii ambelor numere, dar factorii comuni apar de două ori. Împărțind la CMMDC — care este produsul factorilor comuni — eliminăm duplicatele și obținem exact ce avem nevoie.
 
 ## Implementare C++
 
@@ -88,7 +88,7 @@ int main() {
 **Exemplu:** Input `4 6` → `CMMMC(4, 6) = 12`
 
 <ObservationBox>
-Formula `(a / cmmdc) * b` împarte mai întâi, pentru a reduce riscul de overflow. Varianta `a * b / cmmdc` poate depăși `int` chiar și pentru numere moderate: 100.000 × 100.000 = 10¹⁰, care depășește `int` și chiar limita inferioară a `long long`-ului util.
+Formula `(a / cmmdc) * b` împarte mai întâi, reducând riscul de overflow. Varianta `a * b / cmmdc` calculează produsul înainte de împărțire: pentru a = b = 100.000, `a * b = 10¹⁰` depășește `int` și chiar `long long`-ul util. Ordinea operațiilor contează.
 </ObservationBox>
 
 ## Complexitate
@@ -98,9 +98,9 @@ Formula `(a / cmmdc) * b` împarte mai întâi, pentru a reduce riscul de overfl
 | CMMMC via CMMDC | O(log(min(a,b))) | O(1) |
 
 <MistakeBox>
-**Greșeala 1:** Scrii `a * b / cmmdc(a, b)` — produsul `a * b` dă overflow la `int` pentru valori mari. Formula corectă: `(a / cmmdc(a, b)) * b`.
+**Greșeala 1:** Scrii `a * b / cmmdc(a, b)` — produsul `a * b` poate da overflow la `int` chiar pentru valori moderate. Formula sigură: `(a / cmmdc(a, b)) * b`.
 
-**Greșeala 2:** Confunzi CMMDC cu CMMMC. CMMDC ≤ min(a, b). CMMMC ≥ max(a, b). Dacă rezultatul tău e mai mic decât ambele numere, ai calculat CMMDC în loc de CMMMC.
+**Greșeala 2:** Confunzi CMMDC cu CMMMC. CMMDC ≤ min(a, b); CMMMC ≥ max(a, b). Dacă rezultatul tău e mai mic decât ambele numere, ai calculat CMMDC în loc de CMMMC.
 
-**Greșeala 3:** CMMMC(a, 0) sau CMMMC(0, b) — CMMMC cu zero e nedefinit sau 0 (depinde de convenție). Verifică că inputul e pozitiv.
+**Greșeala 3:** CMMMC cu zero este nedefinit (sau 0 prin convenție). Verifică că inputul este pozitiv înainte de apel.
 </MistakeBox>

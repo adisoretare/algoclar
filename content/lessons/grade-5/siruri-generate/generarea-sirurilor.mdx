@@ -6,7 +6,7 @@ chapter: siruri-generate
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["siruri", "regula", "for", "aritmetica", "geometrica"]
 visualizers: []
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-O rețetă de gătit: adaugi un ingredient nou la fiecare pas, mereu după aceeași regulă. Temperatura crește cu 10°C la fiecare 5 minute. Dobânda se dublează în fiecare an. Orice șir de numere cu o regulă poate fi generat de un calculator cu câteva linii de cod.
+Dobânda bancară crește cu aceeași sumă în fiecare an — șir aritmetic. Populația unei bacterii se dublează la fiecare oră — șir geometric. Ambele urmează o regulă fixă și pot fi generate de un calculator cu câteva linii de cod.
 </LessonHook>
 
 ## Ce este un șir generat după o regulă?
@@ -56,7 +56,13 @@ Fiecare termen = precedentul + o valoare fixă `d` (rația):
 a[0], a[0]+d, a[0]+2d, a[0]+3d, ...
 ```
 
-**Exemplu:** 2, 5, 8, 11, 14 (primul termen 2, rație d = 3)
+<ArrayDiagram
+  values="2 5 8 11 14"
+  valueLabel="a"
+  indexLabel="i"
+  index="0 1 2 3 4"
+  caption="Șir aritmetic: primul termen 2, rație d = 3. Fiecare termen = precedentul + 3."
+/>
 
 ### Șir geometric
 
@@ -66,7 +72,13 @@ Fiecare termen = precedentul × o valoare fixă `r` (rația):
 a[0], a[0]*r, a[0]*r², a[0]*r³, ...
 ```
 
-**Exemplu:** 3, 6, 12, 24, 48 (primul termen 3, rație r = 2)
+<ArrayDiagram
+  values="3 6 12 24 48"
+  valueLabel="a"
+  indexLabel="i"
+  index="0 1 2 3 4"
+  caption="Șir geometric: primul termen 3, rație r = 2. Fiecare termen = precedentul × 2."
+/>
 
 ## Algoritmul de generare
 
@@ -125,7 +137,7 @@ Dacă vrei direct al n-lea termen fără să calculezi toți cei dinaintea lui:
 | Geometric | `a[i] = a[0] * pow(r, i)` |
 
 <ObservationBox>
-Formula directă e mai rapidă (O(1) per termen) față de varianta iterativă (O(n) pentru toate). Dar pentru șiruri recurente (Fibonacci, de exemplu) nu există formulă simplă — trebuie să calculezi pas cu pas.
+Formula directă calculează orice termen în O(1), fără să parcurgă toți cei dinaintea lui. Dar pentru șiruri recurente (Fibonacci, de exemplu) nu există o formulă simplă — calculul pas cu pas este singura opțiune practică la concurs.
 </ObservationBox>
 
 ## Complexitate

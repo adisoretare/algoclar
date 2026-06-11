@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: baza
 estimatedTime: 13
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["streaming", "acumulator", "online", "memorie"]
 visualizers: []
@@ -44,20 +44,22 @@ Soldul contului tău bancar nu e suma tuturor tranzacțiilor stocate — banca �
 
 ## Ideea centrală
 
-Multe prelucrări se pot face „din zbor" — citești un număr, îl procesezi imediat, apoi îl uiți. Nu ai nevoie să stochezi toată secvența.
+Multe prelucrări se pot face „din zbor" — citești un număr, îl procesezi imediat, apoi îl uiți. Nu ai nevoie de niciun vector care să stocheze toată secvența.
 
 **Ce poți calcula fără vector:**
 - Suma, produsul
 - Maximul, minimul
 - Numărul de elemente cu o proprietate
-- Media aritmetică (sum + contor)
+- Media aritmetică (sumă + contor)
 
 **Ce necesită stocarea tuturor valorilor:**
-- Mediana (trebuie sortare)
-- Al k-lea element în ordine
-- Operații care compară elemente non-adiacente
+- Mediana (necesită sortare — nu poți sorta fără toate valorile)
+- Al k-lea element în ordine crescătoare
+- Operații care compară elemente non-adiacente sau revin la valori anterioare
 
 ## Pattern-ul de bază
+
+Variabila `x` citește câte un element pe rând. Imediat după citire o procesezi — și la iterația următoare valoarea ei e suprascrisă. Nici nu ai unde stoca mai mult.
 
 ```cpp
 // Citim n numere si calculam suma si maximul simultan
@@ -79,6 +81,7 @@ for (int i = 0; i < n; i++) {
 ```cpp
 #include <iostream>
 #include <climits>
+#include <fstream>
 using namespace std;
 
 int main() {
@@ -111,7 +114,7 @@ int main() {
 **O singură parcurgere, O(1) memorie suplimentară** — calculăm 4 lucruri simultan.
 
 <ObservationBox>
-Aceasta e abordarea standard pentru secvențe de intrare la olimpiade. Dacă problema nu cere să „revii" la valori anterioare, aproape sigur poți procesa fără vector și economisești atât memorie cât și timp de implementare.
+Aceasta e abordarea standard la olimpiade pentru secvențe mari de intrare. Dacă problema nu cere să „revii" la valori anterioare sau să le reordonezi, aproape sigur poți procesa fără vector — economisești memorie și simplifici codul.
 </ObservationBox>
 
 ## Complexitate

@@ -6,7 +6,7 @@ chapter: fundamente
 difficulty: baza
 estimatedTime: 10
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["structura-liniara", "secventa", "instructiuni"]
 visualizers: []
@@ -19,7 +19,7 @@ quiz:
       - "Una câte una, în ordinea în care sunt scrise"
       - "De la ultima la prima"
     correctIndex: 2
-    explanation: "Structura liniară (secvențială) execută instrucțiunile strict în ordinea scrieri, de sus în jos, una câte una."
+    explanation: "Structura liniară (secvențială) execută instrucțiunile strict în ordinea scrierii, de sus în jos, una câte una."
   - question: "Dacă schimbi ordinea celor două linii de cod, rezultatul se schimbă?"
     options:
       - "Nu, niciodată"
@@ -39,7 +39,7 @@ quiz:
 ---
 
 <LessonHook>
-Dimineața faci mereu aceiași pași, în aceeași ordine: te trezești, te speli pe dinți, te îmbraci, iei micul dejun. Dacă le faci altfel, ceva nu iese bine — nu-ți iei micul dejun înainte să te îmbraci. Structura liniară în programare e exact asta: instrucțiunile se execută de sus în jos, fiecare după cealaltă.
+Dimineața faci mereu aceiași pași și în aceeași ordine: te trezești, te speli pe dinți, te îmbraci, iei micul dejun. Dacă le inversezi, rezultatul e greșit — nu poți lua micul dejun înainte să te îmbraci. Structura liniară în programare funcționează exact la fel: instrucțiunile se execută de sus în jos, una câte una, fiecare bazându-se pe ce a făcut cea anterioară.
 </LessonHook>
 
 ## Ce este structura liniară?
@@ -94,7 +94,7 @@ Acoladele grupează mai multe instrucțiuni ca un **bloc**:
 ```
 
 <ObservationBox>
-Variabilele declarate în interiorul unui bloc `{ }` există **doar în acel bloc**. Ies din existență când blocul se închide. Aceasta se numește **domeniu de vizibilitate** (scope).
+Variabilele declarate în interiorul unui bloc `{ }` există **doar în acel bloc** — dispar când acolada de închidere e atinsă. Aceasta se numește **domeniu de vizibilitate** (*scope*). Dacă încerci să folosești `x` după blocul în care l-ai declarat, compilatorul dă eroare.
 </ObservationBox>
 
 ## Ordinea instrucțiunilor contează
@@ -128,7 +128,7 @@ cout << a << " " << b; // 3 5
 ```
 
 <HintBox>
-Dacă încerci `a = b; b = a;` fără `temp`, pierzi valoarea lui `a` la primul pas. Variabila auxiliară e esențială — e cel mai simplu exemplu de „de ce ordinea contează".
+Dacă încerci `a = b; b = a;` fără `temp`, pierzi valoarea inițială a lui `a` la primul pas. Când execuți `b = a`, `a` are deja valoarea lui `b` — swapul nu a funcționat. Variabila auxiliară `temp` e esențială.
 </HintBox>
 
 <MistakeBox>

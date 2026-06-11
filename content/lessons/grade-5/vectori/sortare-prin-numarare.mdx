@@ -6,7 +6,7 @@ chapter: vectori
 difficulty: baza
 estimatedTime: 14
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["sortare", "numarare", "frecventa", "O-n"]
 visualizers: ["counting-sort"]
@@ -46,11 +46,11 @@ Ai 1.000 de bilete de loterie, fiecare cu un număr de la 1 la 100. Vrei să le 
 
 Sortarea prin numărare nu **compară** elemente — **numără** câte valori sunt de fiecare fel, apoi **reconstruiește** vectorul sortat din contoare.
 
-```
-Input:    4  2  2  8  3  3  1
-frec[1]=1, frec[2]=2, frec[3]=2, frec[4]=1, frec[8]=1
-Output:   1  2  2  3  3  4  8
-```
+**Exemplu:** pentru `4 2 2 8 3 3 1`:
+- frec[1]=1, frec[2]=2, frec[3]=2, frec[4]=1, frec[8]=1
+- Rezultat: `1 2 2 3 3 4 8`
+
+Observă: nici o comparație între elemente — doar numărare și reconstituire.
 
 ## Algoritmul
 
@@ -60,7 +60,7 @@ Pas 1: construim frec[]
 
 Pas 2: reconstruim vectorul sortat
        pentru val de la 0 la maxVal:
-           punem frec[val] copii ale lui val înapoi în vector
+           punem frec[val] copii ale lui val inapoi in vector
 ```
 
 ## Implementare C++

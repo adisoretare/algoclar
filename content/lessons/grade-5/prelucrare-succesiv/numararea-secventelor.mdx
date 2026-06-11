@@ -6,7 +6,7 @@ chapter: prelucrare-succesiv
 difficulty: mediu
 estimatedTime: 14
 free: true
-status: draft
+status: published
 isBridge: false
 tags: ["secvente", "numarare", "stare", "start-stop"]
 visualizers: []
@@ -39,22 +39,22 @@ quiz:
 ---
 
 <LessonHook>
-Numeri cuvintele dintr-o propoziție. Un cuvânt e o secvență de litere — numeri câte secvențe de litere există, nu câte litere. Același principiu: detectezi când „pornește" o nouă secvență (prima literă după un spațiu) și incrementezi contorul o singură dată per secvență.
+Numeri cuvintele dintr-o propoziție. Un cuvânt e o secvență de litere — numeri câte secvențe de litere există, nu câte litere sunt în total. Același principiu: detectezi când „pornește" un cuvânt nou (prima literă după spațiu) și incrementezi contorul o singură dată per cuvânt, nu la fiecare literă.
 </LessonHook>
 
 ## Diferența față de lungimea maximă
 
 | Ce vrei | Ce calculezi |
 |---|---|
-| Lungimea celui mai lung bloc | `lung_max` — actualizat în interiorul blocului |
+| Lungimea celui mai lung bloc | `lung_max` — actualizat la fiecare element din bloc |
 | Câte blocuri există | `nr_blocuri` — incrementat **o singură dată** la începutul fiecărui bloc |
 
 ## Algoritmul cu `in_bloc`
 
-Variabila booleană `in_bloc` reține dacă suntem activ într-un bloc:
+Variabila booleană `in_bloc` reține dacă suntem activ într-un bloc. Contorul crește doar la **tranziția** fals→adevărat, nu la fiecare element valid:
 
 ```
-Șir: 2 4 3 6 8 1 10   (proprietate: par)
+Sir: 2 4 3 6 8 1 10   (proprietate: par)
 nr_blocuri = 0, in_bloc = false
 
 x=2:  par,  !in_bloc → nr_blocuri=1, in_bloc=true
@@ -124,7 +124,7 @@ for (int i = 0; i < n; i++) {
 ```
 
 <ObservationBox>
-Tiparul `in_bloc` (sau `in_secventa`) e universal — funcționează pentru orice proprietate: valori pozitive, valori în interval [a,b], valori divisibile cu k, valori strict crescătoare față de precedenta. Schimbi doar condiția `if`.
+Tiparul `in_bloc` e universal: funcționează pentru orice proprietate — valori pozitive, valori în intervalul [a,b], valori divizibile cu k, valori mai mari decât precedenta. Schimbi doar condiția din `if`, restul codului rămâne identic.
 </ObservationBox>
 
 ## Complexitate
