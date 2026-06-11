@@ -1,0 +1,151 @@
+---
+title: "Scrierea rezultatelor în fișier"
+slug: scriere-in-fisier
+grade: 5
+chapter: fisiere-text
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["fisiere", "ofstream", "freopen", "output"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce clasă folosești pentru a scrie într-un fișier text?"
+    options:
+      - "ifstream"
+      - "ofstream"
+      - "fstream"
+      - "filestream"
+    correctIndex: 1
+    explanation: "ofstream = output file stream. Scrie în fișier. ifstream = input file stream. Citește din fișier."
+  - question: "Dacă fișierul suma.out nu există când deschizi cu ofstream, ce se întâmplă?"
+    options:
+      - "Eroare de compilare"
+      - "Eroare la rulare"
+      - "Fișierul e creat automat"
+      - "Programul se oprește"
+    correctIndex: 2
+    explanation: "ofstream creează fișierul dacă nu există. Dacă există, îl golește și rescrie de la zero."
+  - question: "Ce linie redirecționează cout spre fișierul suma.out?"
+    options:
+      - "freopen(\"suma.out\", \"r\", stdout);"
+      - "freopen(\"suma.out\", \"w\", stdout);"
+      - "ofstream cout(\"suma.out\");"
+      - "stdout.open(\"suma.out\");"
+    correctIndex: 1
+    explanation: "freopen cu \"w\" (write) și stdout redirecționează toate apelurile cout spre fișier. \"r\" e pentru citire — ar fi greșit."
+---
+
+<LessonHook>
+Ai rezolvat problema, ai calculat răspunsul — acum trebuie să-l „livrezi". La concurs, graderul nu citește ecranul, citește fișierul `.out`. Dacă scrii cu `cout` fără redirecționare, rezultatul se pierde și primești 0 puncte.
+</LessonHook>
+
+## Metoda 1 — `ofstream` (recomandată)
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    // ... citire si calcul ...
+    long long rezultat = 42;
+
+    ofstream fout("suma.out");  // deschide (sau creaza) fisierul
+    fout << rezultat << endl;   // scrie ca si cu cout
+    fout.close();               // optional: se inchide automat
+    return 0;
+}
+```
+
+Operatorul `<<` funcționează identic cu `cout <<` — poți scrie numere, șiruri, `endl`, spații.
+
+## Metoda 2 — `freopen` (mai scurtă)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    freopen("suma.out", "w", stdout);  // redirecteaza cout spre fisier
+
+    long long rezultat = 42;
+    cout << rezultat << endl;           // scrie in fisier automat
+    return 0;
+}
+```
+
+## Programul complet — citire și scriere din fișiere
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("suma.in");
+    ofstream fout("suma.out");
+
+    int n;
+    fin >> n;
+
+    long long suma = 0;
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        suma += x;
+    }
+
+    fout << suma << endl;
+
+    fin.close();
+    fout.close();
+    return 0;
+}
+```
+
+**Sau cu `freopen` (mai puțin cod):**
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    freopen("suma.in",  "r", stdin);
+    freopen("suma.out", "w", stdout);
+
+    int n;
+    cin >> n;
+
+    long long suma = 0;
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        suma += x;
+    }
+
+    cout << suma << endl;
+    return 0;
+}
+```
+
+<ObservationBox>
+Ambele metode produc exact același rezultat. `ifstream`/`ofstream` e mai explicită și mai sigură (fiecare variabilă are scopul clar). `freopen` e mai scurtă — ideală la concurs când vrei să scrii rapid. Alege una și folosește-o consistent.
+</ObservationBox>
+
+## Formatul output-ului
+
+Graderul compară fișierul tău `.out` cu cel de referință caracter cu caracter (sau linie cu linie). De obicei:
+- Un singur număr pe linie: `fout << rezultat << "\n";`
+- Mai multe numere pe linie: `fout << a << " " << b << "\n";`
+- Citește enunțul cu atenție — uneori câte un element pe linie, uneori toate pe un rând.
+
+<MistakeBox>
+**Greșeala 1:** Deschizi cu `"r"` (read) în loc de `"w"` (write) la `freopen` pentru output. Programul încearcă să citească din stdout — comportament nedefinit.
+
+**Greșeala 2:** Scrii spații sau newline-uri în plus. `fout << rezultat << " " << endl` lasă un spațiu după număr — unii graderi îl acceptă, alții nu. Preferă `"\n"` fără spații trailing.
+
+**Greșeala 3:** Uiți complet să scrii în fișier. Calculezi corect `rezultat` dar scrii `cout << rezultat` fără `freopen` sau `ofstream` — rezultatul merge la consolă, nu în `.out`.
+</MistakeBox>

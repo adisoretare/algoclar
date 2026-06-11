@@ -1,0 +1,133 @@
+---
+title: "Citirea datelor din fișier"
+slug: citire-din-fisier
+grade: 5
+chapter: fisiere-text
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["fisiere", "ifstream", "freopen", "input"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La OJI/ONI, datele de intrare vin din:"
+    options:
+      - "Tastatură (cin)"
+      - "Un fișier text cu extensia .in"
+      - "O bază de date"
+      - "Argumentele programului"
+    correctIndex: 1
+    explanation: "Olimpiadele folosesc fișiere text: datele de intrare din 'problema.in', rezultatele în 'problema.out'. Dacă citești de la tastatură, programul nu primește niciun punct."
+  - question: "Ce linie deschide fișierul suma.in pentru citire cu ifstream?"
+    options:
+      - "ifstream fin(\"suma.out\");"
+      - "ifstream fin(\"suma.in\");"
+      - "ofstream fin(\"suma.in\");"
+      - "cin.open(\"suma.in\");"
+    correctIndex: 1
+    explanation: "ifstream = input file stream. Numele fișierului ca string în constructor. Atenție: ofstream e pentru scriere, nu citire."
+  - question: "Care metodă redirecționează automat cin spre un fișier?"
+    options:
+      - "ifstream fin(...); fin >> x;"
+      - "freopen(\"suma.in\", \"r\", stdin);"
+      - "cin.redirect(\"suma.in\");"
+      - "open(\"suma.in\");"
+    correctIndex: 1
+    explanation: "freopen redirecționează stdin (sursa lui cin) spre fișierul dat. Restul codului poate folosi cin ca de obicei."
+---
+
+<LessonHook>
+La OJI sau ONI, programul tău nu vorbește cu un om — primește date dintr-un fișier text și trebuie să scrie rezultatul în alt fișier. Dacă citești de la tastatură în loc de fișier, obții 0 puncte chiar dacă algoritmul e perfect. Fișierele sunt regula numărul unu a concursului.
+</LessonHook>
+
+## De ce fișiere la concurs?
+
+Judecătorul automat (graderul) rulează programul tău cu date de test pregătite dinainte. Nu poate tasta de la tastatură — trimite datele printr-un fișier `.in` și citește rezultatul din `.out`. Fără fișiere, programul tău nu primește niciun input.
+
+**Convenție standard la olimpiadele românești:**
+
+```
+Date intrare:  problema.in
+Date ieșire:   problema.out
+```
+
+## Metoda 1 — `ifstream` (recomandată)
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("suma.in");   // deschide fisierul pentru citire
+
+    int n, x;
+    fin >> n;                  // citim n din fisier
+    long long suma = 0;
+    for (int i = 0; i < n; i++) {
+        fin >> x;
+        suma += x;
+    }
+
+    cout << suma << endl;      // scriem la consola (pentru acum)
+    fin.close();               // optional: se inchide automat la final
+    return 0;
+}
+```
+
+Operatorul `>>` funcționează identic cu `cin >>` — sare peste spații și newline-uri.
+
+## Metoda 2 — `freopen` (mai scurtă)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    freopen("suma.in", "r", stdin);  // redirecteaza cin spre fisier
+
+    int n, x;
+    cin >> n;                        // citim normal cu cin
+    long long suma = 0;
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        suma += x;
+    }
+
+    cout << suma << endl;
+    return 0;
+}
+```
+
+`freopen` redirecționează `stdin` — tot restul codului folosește `cin` ca de obicei. Avantaj: nu trebuie să schimbi `cin` în `fin` peste tot.
+
+<ObservationBox>
+La concurs, fișierul `.in` trebuie să fie în același director cu executabilul. Pe grader asta e automat. Local, pune `suma.in` lângă `suma.cpp` (sau în folderul unde rulezi programul).
+</ObservationBox>
+
+## Citire până la sfârșitul fișierului (EOF)
+
+Unele probleme nu specifică `n` — citești date până se termină fișierul:
+
+```cpp
+int x;
+while (fin >> x) {   // returneaza false la EOF
+    suma += x;
+}
+```
+
+## Complexitate
+
+Citirea din fișier are aceeași complexitate ca citirea de la tastatură — O(1) per valoare, O(n) pentru n valori.
+
+<MistakeBox>
+**Greșeala 1:** Deschizi fișierul cu `ofstream` în loc de `ifstream`. `ofstream` e pentru scriere — îl golește și crează un fișier gol. Datele tale dispar.
+
+**Greșeala 2:** Greșești numele fișierului (`"Suma.in"` vs `"suma.in"`). Linux (unde rulează graderul) e case-sensitive. Scrie exact cum specifică enunțul.
+
+**Greșeala 3:** Nu verifici dacă fișierul s-a deschis cu succes. `if (!fin) { ... }` îți spune dacă fișierul lipsește — util la debug local.
+
+**Greșeala 4:** Folosești `freopen` și uiți că `cin` e acum redirecționat — nu mai poți citi de la tastatură în același program.
+</MistakeBox>

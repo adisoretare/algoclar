@@ -1,0 +1,157 @@
+---
+title: "Organizarea datelor de intrare și ieșire"
+slug: organizare-date-io
+grade: 5
+chapter: fisiere-text
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["fisiere", "io", "format", "citire-multipla"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum citești o linie întreagă de text (cu spații) dintr-un ifstream fin?"
+    options:
+      - "fin >> linie;"
+      - "getline(fin, linie);"
+      - "fin.read(linie);"
+      - "scanf(\"%s\", linie);"
+    correctIndex: 1
+    explanation: "fin >> se oprește la primul spațiu. getline citește tot până la newline — inclusiv spațiile din mijloc."
+  - question: "Datele din fisier.in sunt: '5\\n3 7 1 9 2'. Câte valori sunt?"
+    options:
+      - "1 (numărul 5)"
+      - "5 (numerele 3 7 1 9 2)"
+      - "6 (5 plus cele 5 numere)"
+      - "2 (două linii)"
+    correctIndex: 2
+    explanation: "Prima linie conține 5 (câte numere urmează), a doua linie conține cele 5 numere: 3, 7, 1, 9, 2. Total 6 valori citite."
+  - question: "Cum citești perechi (a, b) până la sfârșitul fișierului?"
+    options:
+      - "while (fin >> a >> b)"
+      - "while (!fin.eof()) fin >> a >> b;"
+      - "for (;;) fin >> a >> b;"
+      - "while (fin != EOF) fin >> a >> b;"
+    correctIndex: 0
+    explanation: "while (fin >> a >> b) returnează false când nu mai sunt date. Varianta cu eof() e mai slabă — poate citi un rând gol în plus."
+---
+
+<LessonHook>
+Algoritmul tău e perfect, dar citești datele în ordinea greșită sau scrii rezultatul într-un format nepotrivit — și tot primești 0. Formatul datelor e jumătate din problemă. Înainte să scrii o linie de cod, citește enunțul de două ori și înțelege exact cum arată `problema.in`.
+</LessonHook>
+
+## Structura tipică a unui fișier `.in`
+
+Enunțurile românești au câteva formate standard:
+
+**Format 1 — n urmat de n valori:**
+```
+5
+3 7 1 9 2
+```
+```cpp
+int n; fin >> n;
+for (int i = 0; i < n; i++) { fin >> v[i]; }
+```
+
+**Format 2 — n și m pe prima linie, matrice pe liniile următoare:**
+```
+3 4
+1 2 3 4
+5 6 7 8
+9 0 1 2
+```
+```cpp
+int n, m; fin >> n >> m;
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+        fin >> a[i][j];
+```
+
+**Format 3 — perechi de valori până la EOF:**
+```
+1 5
+3 8
+2 7
+```
+```cpp
+int a, b;
+while (fin >> a >> b) {
+    // proceseaza perechea
+}
+```
+
+**Format 4 — o singură valoare pe linie:**
+```
+42
+17
+93
+```
+```cpp
+int x;
+while (fin >> x) { ... }
+```
+
+## Șablonul complet de concurs
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+ifstream fin("problema.in");
+ofstream fout("problema.out");
+
+int main() {
+    int n;
+    fin >> n;
+
+    // ... rezolva problema ...
+
+    fout << rezultat << "\n";
+    return 0;
+}
+```
+
+<ObservationBox>
+Declararea `fin` și `fout` global (în afara lui `main`) e o practică comună la concurs — le poți folosi din orice funcție fără să le transmiți ca parametri. Nu e obligatoriu, dar simplifică codul.
+</ObservationBox>
+
+## `ios::sync_with_stdio` — citire mai rapidă
+
+Pentru probleme cu foarte multe date (n = 10⁶+), adaugă la începutul lui `main`:
+
+```cpp
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+```
+
+Dezactivează sincronizarea cu `scanf`/`printf` și accelerează `cin`/`cout` de ~5–10×. **Nu combina cu `scanf`/`printf` dacă folosești acest trick.**
+
+## Greșeli de format frecvente
+
+```cpp
+// GRESIT: spatiu in plus la final
+fout << a << " " << b << " " << c << "\n";   // "1 2 3 "
+
+// CORECT: fara spatiu dupa ultimul element
+fout << a << " " << b << " " << c << "\n";   // daca enuntul cere asta
+// sau
+for (int i = 0; i < n; i++) {
+    if (i > 0) fout << " ";
+    fout << v[i];
+}
+fout << "\n";
+```
+
+<MistakeBox>
+**Greșeala 1:** Amesteci `fin >>` cu `getline(fin, ...)`. După `fin >> n`, cursorul e înainte de `\n`. Primul `getline` citește acel `\n` gol. Adaugă `fin.ignore()` între ele.
+
+**Greșeala 2:** Folosești `while (!fin.eof())` în loc de `while (fin >> x)`. Varianta cu `eof()` poate executa o iterație în plus cu date nedefinite după ultimul element.
+
+**Greșeala 3:** Citești cu indecși greșiți: `for (i=1; i<=n; i++)` dar declari `int v[n]` (indexat 0..n-1). Sau invers. Alege o convenție (0-based sau 1-based) și aplică-o consistent.
+
+**Greșeala 4:** Scrii `endl` în loc de `"\n"` în bucle mari. `endl` golește bufferul la fiecare apel — de 50–100× mai lent decât `"\n"` pentru output voluminos.
+</MistakeBox>
