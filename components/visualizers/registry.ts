@@ -16,6 +16,11 @@ function lazy(
 const registry: Record<string, Dyn> = {
   // Base
   'array-traversal': lazy(() => import('./ArrayVisualizer'), 'ArrayVisualizer'),
+  // Clasa 5 — variante de parcurgere
+  'max-min-scan': lazy(() => import('./MaxMinVisualizer'), 'MaxMinVisualizer'),
+  'doua-maxime': lazy(() => import('./DouaMaximeVisualizer'), 'DouaMaximeVisualizer'),
+  'streaming-stats': lazy(() => import('./StreamingStatsVisualizer'), 'StreamingStatsVisualizer'),
+  'acces-vector': lazy(() => import('./AccesVectorVisualizer'), 'AccesVectorVisualizer'),
   'binary-search': lazy(() => import('./BinarySearchVisualizer'), 'BinarySearchVisualizer'),
   'cautare-binara': lazy(() => import('./BinarySearchVisualizer'), 'BinarySearchVisualizer'),
   sorting: lazy(() => import('./SortingVisualizer'), 'SortingVisualizer'),
