@@ -1,0 +1,119 @@
+---
+title: "Sortare prin inserție"
+slug: sortare-prin-insertie
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["sortare", "insertie", "deplasare", "adaptiv"]
+visualizers: ["sorting"]
+relatedProblems: []
+quiz:
+  - question: "Pe un vector deja sortat, câte comparații face sortarea prin inserție?"
+    options:
+      - "O(n²)"
+      - "O(n)"
+      - "O(n log n)"
+      - "O(1)"
+    correctIndex: 1
+    explanation: "Fiecare element curent e deja ≥ predecesorul său, deci bucla interioară nu face nicio deplasare. Total: n-1 comparații = O(n)."
+  - question: "Cel mai rău caz al sortării prin inserție e:"
+    options:
+      - "Vectorul sortat crescător"
+      - "Vectorul sortat descrescător"
+      - "Vectorul cu toate elementele egale"
+      - "Vectorul cu un singur element"
+    correctIndex: 1
+    explanation: "Pe un vector sortat descrescător, fiecare element nou trebuie deplasat până la începutul zonei sortate — maximum de deplasări, O(n²)."
+  - question: "Sortarea prin inserție e stabilă?"
+    options:
+      - "Nu — schimbă pozițiile elementelor egale"
+      - "Da — elementele egale nu trec unul peste altul"
+      - "Doar pe vectori sortat invers"
+      - "Depinde de implementare"
+    correctIndex: 1
+    explanation: "Condiția de deplasare e `v[j-1] > cheie` (strict), deci elementele egale nu se trec reciproc. Sortarea prin inserție e stabilă."
+---
+
+<LessonHook>
+Joci cărți. Ridici câte o carte și o inserezi în mâna ta la locul corect — deplasezi cărțile mai mari spre dreapta pentru a face loc. La final, cărțile din mână sunt sortate. Asta e sortarea prin inserție.
+</LessonHook>
+
+## Algoritmul
+
+La fiecare pas `i` (de la 1 la n-1):
+1. Salvăm `cheie = v[i]` — elementul de inserat.
+2. Deplasăm spre dreapta elementele din `v[0..i-1]` care sunt mai mari decât `cheie`.
+3. Inserăm `cheie` în golul creat.
+
+Urmărire pe `v = {5, 3, 8, 1, 9}`:
+
+```
+Pas 1: cheie=3 | 5>3 → depl → {3, 5, 8, 1, 9}
+Pas 2: cheie=8 | 5<8 → stop → {3, 5, 8, 1, 9}
+Pas 3: cheie=1 | 8>1, 5>1, 3>1 → depl → {1, 3, 5, 8, 9}
+Pas 4: cheie=9 | 8<9 → stop → {1, 3, 5, 8, 9}
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    for (int i = 1; i < n; i++) {
+        int cheie = v[i];
+        int j = i - 1;
+        while (j >= 0 && v[j] > cheie) {
+            v[j + 1] = v[j];    // deplasare la dreapta
+            j--;
+        }
+        v[j + 1] = cheie;       // locul corect
+    }
+
+    for (int i = 0; i < n; i++) cout << v[i] << " ";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Cel mai bun (sortat) | O(n) | O(1) |
+| Mediu / Cel mai rău | O(n²) | O(1) |
+
+<ObservationBox>
+Sortarea prin inserție e **adaptivă**: pe date aproape sortate, e mult mai rapidă decât selecția sau bubble sort. Dacă știi că datele vin „aproape ordonate", inserția e alegerea bună dintre sortările pătratice.
+</ObservationBox>
+
+## Vizualizare
+
+<Visualizer name="sorting" />
+
+<HintBox>
+Urmărește zona sortată (stânga) cum crește. La fiecare pas, elementul curent se „strecoară" la stânga până ajunge la locul potrivit, împingând elementele mai mari spre dreapta.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** `v[j] = cheie` în loc de `v[j + 1] = cheie` — scrii cheia cu un index mai mic decât trebuie, suprascriind un element valid.
+
+**Greșeala 2:** Condiția `v[j] >= cheie` în loc de `v[j] > cheie` — deplasezi și elementele egale, sortarea devine instabilă.
+
+**Greșeala 3:** Uiți `j >= 0` în condiția `while` — dacă `cheie` e minimul global, `j` ajunge la -1 și `v[-1]` e acces invalid.
+</MistakeBox>
+
+## Recapitulare
+
+- Inserția „strecoară" fiecare element la stânga la locul corect, deplasând elementele mai mari.
+- Complexitate O(n²) general, O(n) pe date aproape sortate.
+- Sortare stabilă — elementele egale nu-și schimbă ordinea relativă.

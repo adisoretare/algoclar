@@ -1,0 +1,109 @@
+---
+title: "Lecție-punte: când folosim vector simplu și când vector de frecvență"
+slug: punte-vector-vs-frecventa
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 8
+free: true
+status: draft
+isBridge: true
+tags: ["vector", "frecventa", "alegere-tehnica", "punte"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "1.000 de elevi cu note de la 1 la 10. Vrei câți au nota 7. Ce folosești?"
+    options:
+      - "Vector simplu + căutare liniară"
+      - "Vector de frecvență — frec[7] direct"
+      - "Sortare, apoi căutare binară"
+      - "Două parcurgeri"
+    correctIndex: 1
+    explanation: "frec[7] îți dă răspunsul direct în O(1) după ce construiești frec[] în O(n). Căutarea liniară ar fi O(n) la fiecare interogare."
+  - question: "Ai n numere de la 1 la 10⁹. Poți folosi vector de frecvență?"
+    options:
+      - "Da, mereu"
+      - "Nu — frec[10⁹] ar ocupa ~4GB"
+      - "Da, dar doar cu int"
+      - "Da, dacă n > 10⁹"
+    correctIndex: 1
+    explanation: "Un `int frec[10^9+1]` ar ocupa ~4GB. Imposibil. Când valorile sunt mari, sunt necesare alte tehnici."
+  - question: "Când trebuie să păstrezi ORDINEA de apariție a elementelor, folosești:"
+    options:
+      - "Vector de frecvență — pierde ordinea"
+      - "Vector simplu — păstrează ordinea de inserție"
+      - "Oricare — sunt echivalenți"
+      - "Vectorul caracteristic"
+    correctIndex: 1
+    explanation: "Vectorul de frecvență numără valori dar pierde complet ordinea în care au apărut. Dacă ordinea contează, păstrezi vectorul original."
+---
+
+<LessonHook>
+Ai două unelte: un caiet cu liste (vectorul simplu) și o tabelă de bifare (vectorul de frecvență). Știi cum funcționează fiecare. Acum trebuie să știi *când* să deschizi caietul și *când* să folosești tabela — alegerea greșită costă timp sau memorie.
+</LessonHook>
+
+## Regula de decizie
+
+Gândește-te la ce informație ai nevoie din date:
+
+| Întrebare | Instrument |
+|-----------|-----------|
+| „Care e al k-lea element?" | Vector simplu |
+| „Câte valori de X sunt?" | Vector de frecvență |
+| „Apare X în colecție?" | Vector caracteristic |
+| „Care e al doilea maxim?" | Vector simplu (sau sortare) |
+| „Câte valori distincte?" | Frecvență — numeri câte `frec[i] > 0` |
+| Ordinea de apariție contează | Vector simplu |
+| Operații rapide cu mulțimi | Vector caracteristic |
+
+## Limitele vectorului de frecvență
+
+Vectorul de frecvență e rapid, dar cu cerințe stricte:
+
+- Valorile trebuie să fie **întregi** (nu reale, nu string-uri).
+- Intervalul valorilor trebuie să fie **mic și cunoscut** (de regulă sub 10⁵–10⁶).
+- Dacă valorile merg până la 10⁹, `frec[10^9]` nu încape în memorie.
+
+<ObservationBox>
+Regula practică: valori în 0..100.000 → vectorul de frecvență e ok. Valori în 0..10⁹ → ai nevoie de altceva (`std::map`, sortare cu coordonate comprimate etc.).
+</ObservationBox>
+
+## Ordinea originală se pierde
+
+Frecvența numără, nu memorizează ordinea:
+
+```
+Input: 3 1 4 1 5
+Vector original: {3, 1, 4, 1, 5}  → ordinea păstrată
+frec[1]=2, frec[3]=1, frec[4]=1, frec[5]=1 → ordinea pierdută
+```
+
+Dacă la ieșire ai nevoie de „al i-lea element citit", frecvența nu ajunge.
+
+<MistakeBox>
+**Greșeala 1:** Construiești frecvența și vrei după aceea „al câtelea element citit a fost egal cu X" — imposibil. Dacă ai nevoie de indici sau ordine, păstrează și vectorul original.
+
+**Greșeala 2:** `int frec[n]` unde n e numărul de elemente — confunzi numărul de elemente cu intervalul valorilor. Dimensiunea lui `frec[]` e dată de **valoarea maximă posibilă + 1**, nu de n.
+</MistakeBox>
+
+## Ghid rapid de alegere
+
+```
+Ai valori întregi în interval mic (< 10⁶)?
+  DA → consideră vectorul de frecvență / caracteristic
+  NU → folosește vectorul simplu + altă tehnică
+
+Ai nevoie de ordinea elementelor?
+  DA → vectorul simplu (păstrezi datele originale)
+  NU → frecvența poate fi suficientă
+
+Ai nevoie de câte apariții exact?
+  DA → frecvență
+  NU (doar prezent/absent) → caracteristic (mai simplu)
+```
+
+## Recapitulare
+
+- Vector simplu: păstrează valorile în ordine, accesare prin index.
+- Vector de frecvență: numără aparițiile în O(1) per interogare, pierde ordinea originală.
+- Alegerea depinde de ce întrebare trebuie să răspunzi și de intervalul valorilor.

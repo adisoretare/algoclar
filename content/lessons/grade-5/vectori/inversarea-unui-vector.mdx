@@ -1,0 +1,134 @@
+---
+title: "Inversarea unui vector"
+slug: inversarea-unui-vector
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["vector", "inversare", "swap", "indici"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câte swap-uri sunt necesare pentru a inversa un vector cu 6 elemente?"
+    options:
+      - "6"
+      - "5"
+      - "3"
+      - "2"
+    correctIndex: 2
+    explanation: "Inversăm prima jumătate cu a doua: n/2 = 3 swap-uri. Elementul din mijloc (dacă n e impar) rămâne pe loc."
+  - question: "De ce avem nevoie de variabila temporară `t` la swap?"
+    options:
+      - "Nu avem nevoie — e opțională"
+      - "`t` salvează prima valoare înainte să fie suprascrisă"
+      - "`t` e necesară doar pentru valori negative"
+      - "`t` controlează bucla"
+    correctIndex: 1
+    explanation: "`t = v[st]; v[st] = v[dr]; v[dr] = t;` — fără `t`, prima valoare s-ar pierde când scriem `v[st] = v[dr]`."
+  - question: "Vectorul {1, 2, 3, 4, 5} inversat este:"
+    options:
+      - "{5, 4, 3, 2, 1}"
+      - "{1, 2, 3, 4, 5}"
+      - "{2, 3, 4, 5, 1}"
+      - "{5, 3, 1, 2, 4}"
+    correctIndex: 0
+    explanation: "Inversarea oglindește vectorul: primul cu ultimul, al doilea cu penultimul, etc."
+---
+
+<LessonHook>
+Ai o linie de 6 elevi ordonați după înălțime, de la cel mai scund la cel mai înalt. Vrei să inversezi ordinea fără să-i muți pe toți — schimbi cel mai scund cu cel mai înalt, al doilea cu penultimul, și tot așa. Trei schimburi și gata.
+</LessonHook>
+
+## Algoritmul de inversare
+
+Menținem doi indici: `st` (stânga, de la 0) și `dr` (dreapta, de la n-1). La fiecare pas îi apropiem:
+
+```
+st ← 0, dr ← n-1
+cât timp st < dr:
+    swap(v[st], v[dr])
+    st ← st + 1
+    dr ← dr - 1
+```
+
+Urmărire pe `v = {1, 2, 3, 4, 5}`:
+
+```
+Pas 1: swap(v[0], v[4]) → {5, 2, 3, 4, 1}   st=1, dr=3
+Pas 2: swap(v[1], v[3]) → {5, 4, 3, 2, 1}   st=2, dr=2
+st = dr → stop (elementul din mijloc rămâne pe loc)
+Rezultat: {5, 4, 3, 2, 1}
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    int st = 0, dr = n - 1;
+    while (st < dr) {
+        int t = v[st];    // salveaza temporar
+        v[st] = v[dr];
+        v[dr] = t;
+        st++;
+        dr--;
+    }
+
+    for (int i = 0; i < n; i++) cout << v[i] << " ";
+    return 0;
+}
+```
+
+Alternativ, cu `swap` din STL (include `<algorithm>`):
+
+```cpp
+while (st < dr) {
+    swap(v[st], v[dr]);
+    st++; dr--;
+}
+```
+
+## Varianta cu copie
+
+```cpp
+int w[1001];
+for (int i = 0; i < n; i++) w[i] = v[n - 1 - i];
+// w e inversul lui v
+```
+
+Folosește O(n) spațiu suplimentar — corectă, dar varianta cu swap e preferabilă.
+
+## Complexitate
+
+| Variantă | Timp | Spațiu |
+|----------|------|--------|
+| Swap pe loc | O(n) | O(1) |
+| Cu copie | O(n) | O(n) |
+
+<ObservationBox>
+Swap-ul clasic necesită variabilă temporară `t`. C++ oferă `std::swap(a, b)` care face exact asta intern — poți folosi direct.
+</ObservationBox>
+
+<MistakeBox>
+**Greșeala 1:** `v[st] = v[dr]; v[dr] = v[st];` fără variabilă temporară — prima valoare se pierde înainte de a fi salvată.
+
+**Greșeala 2:** Bucla `for (int i = 0; i < n; i++)` face n swap-uri — vectorul se inversează și se re-inversează, rezultând originalul. Inversarea e completă după n/2 swap-uri.
+
+**Greșeala 3:** Condiția `st <= dr` e incorectă — când n e impar și `st == dr`, faci swap cu el însuși (inofensiv, dar inutil). Folosește `st < dr`.
+</MistakeBox>
+
+## Recapitulare
+
+- Inversarea folosește doi indici (st, dr) care se apropie spre mijloc.
+- La fiecare pas: swap(v[st], v[dr]), st++, dr--.
+- Complexitate O(n), fără memorie suplimentară.

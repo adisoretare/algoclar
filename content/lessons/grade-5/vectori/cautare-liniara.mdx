@@ -1,0 +1,130 @@
+---
+title: "Căutare liniară"
+slug: cautare-liniara
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 11
+free: true
+status: draft
+isBridge: false
+tags: ["vector", "cautare", "gasit", "pozitie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e complexitatea căutării liniare în cel mai rău caz?"
+    options:
+      - "O(1)"
+      - "O(log n)"
+      - "O(n)"
+      - "O(n²)"
+    correctIndex: 2
+    explanation: "În cel mai rău caz, verificăm toate n elemente (valoarea nu e în vector). Complexitate O(n)."
+  - question: "Căutarea liniară necesită vectorul sortat?"
+    options:
+      - "Da, altfel nu funcționează"
+      - "Nu, funcționează pe orice vector"
+      - "Doar dacă căutăm maximul"
+      - "Da, pentru ieșire timpurie"
+    correctIndex: 1
+    explanation: "Căutarea liniară nu face presupuneri despre ordinea elementelor — verifică fiecare element pe rând, fără sortare prealabilă."
+  - question: "Vrem TOATE pozițiile valorii 5 în vectorul {5, 2, 5, 8, 5}. Ce strategie e corectă?"
+    options:
+      - "Ne oprim la prima apariție"
+      - "Parcurgem complet și afișăm fiecare i cu v[i]=5"
+      - "Sortăm vectorul, apoi căutăm"
+      - "Scădem 1 din rezultat"
+    correctIndex: 1
+    explanation: "Pentru toate aparițiile, parcurgem fără `break` și afișăm fiecare index unde găsim valoarea căutată."
+---
+
+<LessonHook>
+Cauți un elev pe lista clasei și nu știi în ce ordine sunt scrisi: citești fiecare nume de sus în jos până îl găsești sau ajungi la final. Asta e căutarea liniară — simplă, directă, fără trucuri.
+</LessonHook>
+
+## Ce este căutarea liniară?
+
+**Căutarea liniară** parcurge vectorul de la stânga la dreapta și verifică fiecare element până îl găsește pe cel dorit (sau epuizează lista).
+
+Nu cere vector sortat. E cea mai simplă strategie de căutare.
+
+## Algoritmul
+
+```
+gasit ← fals, pozitie ← -1
+pentru i de la 0 la n-1:
+    dacă v[i] = valoare_cautata:
+        gasit ← adevărat
+        pozitie ← i
+        stop   ← prima apariție
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    int x;
+    cin >> x;           // valoarea de cautat
+
+    int pozitie = -1;   // -1 = negasit
+    for (int i = 0; i < n; i++) {
+        if (v[i] == x) {
+            pozitie = i;
+            break;      // prima aparitie
+        }
+    }
+
+    if (pozitie != -1)
+        cout << "Gasit la pozitia " << pozitie << "\n";
+    else
+        cout << "Nu exista\n";
+    return 0;
+}
+```
+
+## Toate aparițiile
+
+```cpp
+bool gasit = false;
+for (int i = 0; i < n; i++) {
+    if (v[i] == x) {
+        cout << i << " ";
+        gasit = true;
+    }
+}
+if (!gasit) cout << "Nu exista\n";
+```
+
+## Complexitate
+
+| Caz | Timp |
+|-----|------|
+| Cel mai bun (prima poziție) | O(1) |
+| Mediu | O(n/2) = O(n) |
+| Cel mai rău (absent) | O(n) |
+
+<ObservationBox>
+Dacă vectorul e **sortat**, poți folosi căutarea binară — O(log n). Pentru n = 1.000.000: liniară face 1.000.000 pași, binară face ~20. La concursuri, preferă căutarea binară când vectorul e deja sortat.
+</ObservationBox>
+
+<MistakeBox>
+**Greșeala 1:** Returnezi `pozitie = 0` ca „negăsit" — dar 0 e o poziție validă! Folosește `-1` pentru „negăsit".
+
+**Greșeala 2:** Vrei toate aparițiile dar ai `break` în buclă — te oprești la prima apariție.
+
+**Greșeala 3:** `if (v[i] = x)` în loc de `if (v[i] == x)` — `=` e atribuire, nu comparație. Compilatorul poate da un avertisment, dar codul compilează și produce rezultate greșite.
+</MistakeBox>
+
+## Recapitulare
+
+- Căutarea liniară parcurge vectorul element cu element până găsește valoarea.
+- Complexitate O(n); nu necesită vector sortat.
+- Returnează -1 (sau afișează mesaj) dacă valoarea lipsește.

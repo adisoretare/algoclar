@@ -1,0 +1,144 @@
+---
+title: "Sortare prin numărare"
+slug: sortare-prin-numarare
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["sortare", "numarare", "frecventa", "O-n"]
+visualizers: ["counting-sort"]
+relatedProblems: []
+quiz:
+  - question: "Care e complexitatea sortării prin numărare?"
+    options:
+      - "O(n²)"
+      - "O(n log n)"
+      - "O(n + maxVal)"
+      - "O(maxVal)"
+    correctIndex: 2
+    explanation: "Construim frec[] în O(n), apoi reconstruim vectorul parcurgând valorile 0..maxVal în O(maxVal). Total: O(n + maxVal)."
+  - question: "Sortarea prin numărare funcționează pentru valori negative?"
+    options:
+      - "Da, direct"
+      - "Nu — indexul unui array nu poate fi negativ"
+      - "Da, cu un offset: adăugăm valoarea minimă ca deplasament"
+      - "Depinde de compilator"
+    correctIndex: 2
+    explanation: "frec[x] necesită x ≥ 0. Dacă valorile sunt în [min, max], adăugăm |min| la fiecare valoare pentru a le aduce în [0, max-min]."
+  - question: "Când e mai rapidă decât std::sort?"
+    options:
+      - "Întotdeauna"
+      - "Niciodată"
+      - "Când valorile sunt întregi într-un interval mic față de n"
+      - "Când vectorul e aproape sortat"
+    correctIndex: 2
+    explanation: "O(n + maxVal) bate O(n log n) când maxVal e mic față de n. Ex: 1.000.000 note de la 1 la 10 — mult mai rapid decât std::sort."
+---
+
+<LessonHook>
+Ai 1.000 de bilete de loterie, fiecare cu un număr de la 1 la 100. Vrei să le sortezi. Soluția deșteaptă: faci 100 de grămezi (câte una per număr), numeri câte bilete sunt în fiecare grămadă, apoi le pui la loc în ordine crescătoare. Fără nicio comparație directă între bilete.
+</LessonHook>
+
+## Ideea cheie
+
+Sortarea prin numărare nu **compară** elemente — **numără** câte valori sunt de fiecare fel, apoi **reconstruiește** vectorul sortat din contoare.
+
+```
+Input:    4  2  2  8  3  3  1
+frec[1]=1, frec[2]=2, frec[3]=2, frec[4]=1, frec[8]=1
+Output:   1  2  2  3  3  4  8
+```
+
+## Algoritmul
+
+```
+Pas 1: construim frec[]
+       frec[v[i]]++ pentru fiecare i din 0..n-1
+
+Pas 2: reconstruim vectorul sortat
+       pentru val de la 0 la maxVal:
+           punem frec[val] copii ale lui val înapoi în vector
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int frec[1001];   // global = 0
+
+int main() {
+    int n;
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        frec[x]++;          // numaram fiecare valoare
+    }
+
+    // reconstruim vectorul sortat
+    for (int val = 0; val <= 1000; val++) {
+        for (int k = 0; k < frec[val]; k++) {
+            cout << val << " ";
+        }
+    }
+    return 0;
+}
+```
+
+**Exemplu:** Input `7` / `4 2 2 8 3 3 1` → `1 2 2 3 3 4 8`
+
+## Dacă trebuie să păstrăm vectorul
+
+```cpp
+int v[50001], poz = 0;
+for (int i = 0; i < n; i++) { cin >> v[i]; frec[v[i]]++; }
+
+for (int val = 0; val <= 1000; val++) {
+    for (int k = 0; k < frec[val]; k++) {
+        v[poz++] = val;
+    }
+}
+// v este acum sortat
+```
+
+## Complexitate
+
+| Pas | Timp |
+|-----|------|
+| Construire frec[] | O(n) |
+| Reconstruire vector | O(maxVal) |
+| **Total** | **O(n + maxVal)** |
+
+Spațiu: O(maxVal) pentru frec[].
+
+<ObservationBox>
+Limitele sortării prin numărare: valorile trebuie să fie **întregi** într-un interval cunoscut și nu prea mare. Nu funcționează pentru numere reale, string-uri sau valori cu interval uriaș (ex. până la 10⁹) — acolo `frec[]` nu încape în memorie.
+</ObservationBox>
+
+## Vizualizare
+
+<Visualizer name="counting-sort" />
+
+<HintBox>
+Vizualizatorul arată cele două etape: construcția vectorului de frecvență (faza de numărare) și reconstrucția vectorului sortat (faza de scriere în ordine).
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** `frec[]` prea mic — dacă valorile merg până la 1000 și ai `int frec[100]`, accesezi memorie invalidă la `frec[500]`. Dimensiunea trebuie să acopere **toate valorile posibile**.
+
+**Greșeala 2:** Bucla de reconstruire merge până la `val <= n` (numărul de elemente) în loc de `val <= maxVal` (valoarea maximă). Confunzi numărul de elemente cu intervalul valorilor.
+
+**Greșeala 3:** Uiți să resetezi `frec[]` între teste multiple. Declarat global e 0 la start; dacă rulezi mai mulți pași, resetează manual cu un `for`.
+</MistakeBox>
+
+## Recapitulare
+
+- Numărarea: `frec[v[i]]++` pentru fiecare element; reconstruire în ordine din contoare.
+- Complexitate O(n + maxVal) — mai rapid decât O(n log n) când maxVal e mic.
+- Limitare: valori întregi, interval cunoscut și rezonabil (sub ~10⁶).

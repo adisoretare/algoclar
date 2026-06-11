@@ -1,0 +1,138 @@
+---
+title: "Parcurgerea unui vector"
+slug: parcurgerea-unui-vector
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["vector", "parcurgere", "suma", "maxim"]
+visualizers: ["array-traversal"]
+relatedProblems: []
+quiz:
+  - question: "Cu ce valoare inițializăm acumulatorul pentru a calcula suma elementelor?"
+    options:
+      - "suma = v[0]"
+      - "suma = 1"
+      - "suma = 0"
+      - "suma = n"
+    correctIndex: 2
+    explanation: "Suma pornește de la 0 — elementul neutru al adunării. Adăugăm fiecare element la acumulator."
+  - question: "Cu ce inițializăm `maxim` înainte de parcurgere?"
+    options:
+      - "Cu 0"
+      - "Cu v[0]"
+      - "Cu n"
+      - "Cu INT_MAX"
+    correctIndex: 1
+    explanation: "Maximul unui vector este neapărat unul dintre elementele lui, deci v[0] e corect. Dacă am folosi 0 iar vectorul are doar valori negative, rezultatul ar fi greșit."
+  - question: "Câte parcurgeri sunt necesare pentru a calcula simultan suma și maximul?"
+    options:
+      - "Două — câte una pentru fiecare"
+      - "Una singură"
+      - "Depinde de n"
+      - "Trei"
+    correctIndex: 1
+    explanation: "La fiecare element actualizăm atât suma cât și maximul. O singură parcurgere O(n) este suficientă."
+---
+
+<LessonHook>
+Profesorul vrea suma notelor clasei și cea mai mare notă. Nu face două liste — trece o dată prin catalog, ține în minte „totalul de până acum" și „cel mai mare văzut". Exact asta înseamnă parcurgerea unui vector: o trecere, mai multe informații culese simultan.
+</LessonHook>
+
+## Cum parcurgem un vector
+
+**Parcurgerea** înseamnă să vizităm fiecare element exact o dată, de la stânga la dreapta (index 0 → n-1), acumulând informații pe parcurs.
+
+Tiparul de bază:
+
+```
+pentru i de la 0 la n-1:
+    prelucrează v[i]
+```
+
+## Algoritmul — sumă și maxim
+
+```
+sumă  ← 0
+maxim ← v[0]
+
+pentru i de la 0 la n-1:
+    sumă ← sumă + v[i]
+    dacă v[i] > maxim:
+        maxim ← v[i]
+```
+
+Urmărire pe `v = {4, 7, 2, 9, 3}`:
+
+| i | v[i] | sumă | maxim |
+|---|------|------|-------|
+| — |  —   |  0   |   4   |
+| 0 |  4   |  4   |   4   |
+| 1 |  7   | 11   |   7   |
+| 2 |  2   | 13   |   7   |
+| 3 |  9   | 22   |   9   |
+| 4 |  3   | 25   |   9   |
+
+Rezultat: sumă = 25, maxim = 9.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    int suma = 0;
+    int maxim = v[0];
+    for (int i = 0; i < n; i++) {
+        suma += v[i];
+        if (v[i] > maxim) maxim = v[i];
+    }
+
+    cout << "Suma: " << suma << "\n";
+    cout << "Maxim: " << maxim << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu suplimentar |
+|----------|------|-------------------|
+| Sumă + maxim | O(n) | O(1) |
+
+<ObservationBox>
+Poți calcula oricâte proprietăți într-o singură parcurgere: sumă, maxim, minim, număr de pare, produs parțial. Nu parcurgi vectorul de k ori pentru k proprietăți — o singură trecere e suficientă.
+</ObservationBox>
+
+## Vizualizare
+
+Urmărește cum se actualizează suma și maximul la fiecare pas:
+
+<Visualizer name="array-traversal" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau **Redă** pentru animație automată.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** `maxim = 0` când vectorul poate conține valori negative — vei returna 0 în loc de maximul real.
+
+**Greșeala 2:** Pornești bucla de la `i = 1` dar inițializezi `maxim = v[0]` — pentru maxim e corect, dar dacă și suma trebuie calculată, `v[0]` rămâne neadăugat.
+
+**Greșeala 3:** `suma = v[i]` în loc de `suma += v[i]` — suprascrii suma la fiecare pas în loc să acumulezi.
+</MistakeBox>
+
+## Recapitulare
+
+- Parcurgerea vizitează fiecare element o singură dată, de la 0 la n-1.
+- Suma pornește de la 0; maximul pornește de la v[0].
+- O singură parcurgere O(n) poate calcula simultan mai multe proprietăți.

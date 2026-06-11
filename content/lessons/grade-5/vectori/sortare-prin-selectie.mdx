@@ -1,0 +1,116 @@
+---
+title: "Sortare prin selecție"
+slug: sortare-prin-selectie
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["sortare", "selectie", "minim", "swap"]
+visualizers: ["sorting"]
+relatedProblems: []
+quiz:
+  - question: "Câte comparații face sortarea prin selecție pentru n=5 elemente?"
+    options:
+      - "5"
+      - "10"
+      - "25"
+      - "4"
+    correctIndex: 1
+    explanation: "4 + 3 + 2 + 1 = 10 comparații. La pasul i facem n-1-i comparații. Total: n(n-1)/2."
+  - question: "La pasul i al sortării prin selecție, ce garantăm după swap?"
+    options:
+      - "Primele i+1 elemente sunt sortate definitiv"
+      - "Ultimele i elemente sunt sortate definitiv"
+      - "Cel mai mare element e la sfârșit"
+      - "Vectorul e complet sortat"
+    correctIndex: 0
+    explanation: "La fiecare pas găsim minimul din zona nesortată și îl punem pe locul i. Primele i+1 elemente sunt pe pozițiile finale."
+  - question: "Câte swap-uri face sortarea prin selecție (cel mai rău caz)?"
+    options:
+      - "n²"
+      - "n(n-1)/2"
+      - "n-1"
+      - "n"
+    correctIndex: 2
+    explanation: "Exact n-1 swap-uri — câte unul per pas. Aceasta e un avantaj față de alte sortări pătratice care pot face mai multe schimbări."
+---
+
+<LessonHook>
+Trebuie să aranjezi cărțile de pe masă după număr. Cel mai simplu mod: cauți cea mai mică, o pui prima. Cauți cea mai mică din ce rămâne, o pui pe locul doi. Repeți. La fiecare pas, plasezi definitiv un element.
+</LessonHook>
+
+## Algoritmul
+
+La fiecare pas `i` (de la 0 la n-2):
+1. Găsim **minimul** din subvectorul `v[i..n-1]`.
+2. **Interschimbăm** minimul cu `v[i]`.
+
+Urmărire pe `v = {5, 3, 8, 1, 9}`:
+
+```
+Pas 0: min în [5,3,8,1,9] = 1 la poz 3 → swap v[0]↔v[3] → {1, 3, 8, 5, 9}
+Pas 1: min în [3,8,5,9]   = 3 la poz 1 → swap v[1]↔v[1] → {1, 3, 8, 5, 9}
+Pas 2: min în [8,5,9]     = 5 la poz 3 → swap v[2]↔v[3] → {1, 3, 5, 8, 9}
+Pas 3: min în [8,9]       = 8 la poz 3 → swap v[3]↔v[3] → {1, 3, 5, 8, 9}
+Sortat!
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    for (int i = 0; i < n - 1; i++) {
+        int poz_min = i;
+        for (int j = i + 1; j < n; j++) {
+            if (v[j] < v[poz_min]) poz_min = j;
+        }
+        int t = v[i]; v[i] = v[poz_min]; v[poz_min] = t;
+    }
+
+    for (int i = 0; i < n; i++) cout << v[i] << " ";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Orice caz | O(n²) | O(1) |
+
+<ObservationBox>
+Sortarea prin selecție face **întotdeauna** O(n²) comparații — chiar dacă vectorul e deja sortat. Avantajul: exact n-1 swap-uri, mai puțin decât alte sortări pătratice. Util când operația de schimb e costisitoare.
+</ObservationBox>
+
+## Vizualizare
+
+<Visualizer name="sorting" />
+
+<HintBox>
+Urmărește cum zona sortată (stânga) crește cu câte un element la fiecare pas. Elementul marcat e minimul din zona nesortată care se mută pe locul corect.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** `poz_min = 0` în loc de `poz_min = i` la inițializare — cauți minimul din tot vectorul la fiecare pas, nu din zona nesortată. Primele elemente (deja sortate) ar putea fi re-selectate greșit.
+
+**Greșeala 2:** Swap fără variabilă temporară: `v[i] = v[poz_min]; v[poz_min] = v[i];` — suprascrii `v[i]` înainte de a-l salva.
+
+**Greșeala 3:** Bucla exterioară merge până la `i < n` în loc de `i < n-1` — ultimul pas (un singur element) e inutil; nu strică corectitudinea, dar adaugă un ciclu.
+</MistakeBox>
+
+## Recapitulare
+
+- La fiecare pas, găsim minimul din zona nesortată și îl punem pe locul corespunzător.
+- Complexitate O(n²) timp, O(1) spațiu, exact n-1 swap-uri.
+- Folosit la concursuri doar pentru n ≤ 5.000.

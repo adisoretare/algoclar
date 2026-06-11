@@ -1,0 +1,146 @@
+---
+title: "Verificarea proprietăților unui vector"
+slug: verificarea-proprietatilor-vector
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["vector", "verificare", "sortat", "palindrom"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Vectorul {1, 2, 2, 3} este sortat crescător?"
+    options:
+      - "Nu, are duplicate"
+      - "Da, fiecare element e ≤ următorul"
+      - "Nu, trebuie strict crescător"
+      - "Depinde de definiție"
+    correctIndex: 1
+    explanation: "Crescător (non-strict) înseamnă v[i] ≤ v[i+1] pentru toți i. Duplicatele sunt permise."
+  - question: "Cum verifici eficient dacă toate elementele sunt pozitive?"
+    options:
+      - "Calculezi suma și verifici dacă e > 0"
+      - "Parcurgi și la primul v[i] ≤ 0 returnezi false"
+      - "Sortezi și verifici primul element"
+      - "Verifici doar primul și ultimul element"
+    correctIndex: 1
+    explanation: "Parcurgi vectorul; la primul element negativ sau zero returnezi imediat false (ieșire timpurie). Suma poate fi pozitivă chiar și cu elemente negative."
+  - question: "Vectorul {3, 1, 4, 1, 5} este palindrom?"
+    options:
+      - "Da"
+      - "Nu — v[0]=3 ≠ v[4]=5"
+      - "Nu — are duplicate"
+      - "Nu — nu e sortat"
+    correctIndex: 1
+    explanation: "Un palindrom cere v[i] = v[n-1-i]. Aici v[0]=3 și v[4]=5, deci nu e palindrom."
+---
+
+<LessonHook>
+Vrei să verifici dacă o serie de măsurători e mereu crescătoare, dacă un cod e format doar din cifre pozitive, sau dacă un șir se citește la fel de la stânga și de la dreapta. Toate sunt variante ale aceleiași idei: parcurgi vectorul și verifici o condiție, oprindu-te imediat ce găsești un element care nu o respectă.
+</LessonHook>
+
+## Tiparul general
+
+```
+ok ← adevărat
+pentru i de la 0 la n-1:
+    dacă v[i] nu respectă condiția:
+        ok ← fals
+        stop   ← ieșire timpurie
+dacă ok: proprietatea e îndeplinită
+```
+
+**Ieșirea timpurie** e importantă la concursuri: nu continuăm verificarea după ce am găsit prima „greșeală".
+
+## Sortat crescător
+
+```cpp
+bool sortat = true;
+for (int i = 0; i < n - 1; i++) {    // comparăm perechi consecutive
+    if (v[i] > v[i + 1]) {
+        sortat = false;
+        break;
+    }
+}
+```
+
+Comparăm n-1 perechi: `(v[0],v[1])`, `(v[1],v[2])`, ..., `(v[n-2],v[n-1])`.
+
+## Toate elementele pozitive
+
+```cpp
+bool toatePoziive = true;
+for (int i = 0; i < n; i++) {
+    if (v[i] <= 0) {
+        toatePoziive = false;
+        break;
+    }
+}
+```
+
+## Vector palindrom
+
+```cpp
+bool palindrom = true;
+for (int i = 0; i < n / 2; i++) {
+    if (v[i] != v[n - 1 - i]) {
+        palindrom = false;
+        break;
+    }
+}
+```
+
+## Implementare C++ completă
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int v[1001];
+    for (int i = 0; i < n; i++) cin >> v[i];
+
+    bool sortat = true;
+    for (int i = 0; i < n - 1; i++) {
+        if (v[i] > v[i + 1]) { sortat = false; break; }
+    }
+
+    bool palindrom = true;
+    for (int i = 0; i < n / 2; i++) {
+        if (v[i] != v[n - 1 - i]) { palindrom = false; break; }
+    }
+
+    cout << (sortat ? "sortat" : "nesortat") << "\n";
+    cout << (palindrom ? "palindrom" : "nu palindrom") << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Verificare | Timp | Observație |
+|-----------|------|-----------|
+| Orice proprietate | O(n) în cel mai rău caz | Ieșire timpurie: adesea mai rapid |
+
+<ObservationBox>
+Toate verificările urmează același tipar: `bool ok = true; for (...) { if (conditie_rea) { ok = false; break; } }`. Schimbi doar condiția, nu structura.
+</ObservationBox>
+
+<MistakeBox>
+**Greșeala 1:** Bucla pentru „sortat" merge până la `i < n` în loc de `i < n-1` — accesezi `v[n]`, care e în afara vectorului.
+
+**Greșeala 2:** Nu folosești `break` după `ok = false` — verificarea continuă inutil; la concurs pierzi timp prețios.
+
+**Greșeala 3:** Verifici palindromul cu bucla `i < n` în loc de `i < n/2` — compari fiecare pereche de două ori și ajungi la concluzia greșită că nu e palindrom.
+</MistakeBox>
+
+## Recapitulare
+
+- Toate verificările: parcurgi vectorul, la primul element „rău" setezi `ok=false` și faci `break`.
+- „Sortat" compară perechi consecutive: bucla merge până la `i < n-1`.
+- Palindromul compară simetric: bucla merge până la `i < n/2`.

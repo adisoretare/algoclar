@@ -1,0 +1,117 @@
+---
+title: "Noțiunea de vector"
+slug: notiunea-de-vector
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["vector", "tablou", "index", "declaratie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum accesezi al doilea element al vectorului v?"
+    options:
+      - "v[2]"
+      - "v[1]"
+      - "v[0]"
+      - "v(2)"
+    correctIndex: 1
+    explanation: "Indexarea începe de la 0. Al doilea element e v[1], nu v[2]."
+  - question: "Câte elemente are un vector declarat ca `int v[10]`?"
+    options:
+      - "9"
+      - "10"
+      - "11"
+      - "Depinde de input"
+    correctIndex: 1
+    explanation: "`int v[10]` rezervă 10 locații: v[0], v[1], ..., v[9]."
+  - question: "Ce valoare are v[3] după `int v[] = {2, 4, 6, 8, 10}`?"
+    options:
+      - "6"
+      - "8"
+      - "10"
+      - "4"
+    correctIndex: 1
+    explanation: "v[0]=2, v[1]=4, v[2]=6, v[3]=8, v[4]=10. Index 3 → valoare 8."
+---
+
+<LessonHook>
+Ai 10 cutii numerotate pe un raft, fiecare conținând câte un număr. Ca să iei numărul din cutia 3 nu deschizi toate cutiile — spui direct „cutia 3". Un vector funcționează exact la fel: o colecție de valori numerotate, accesate instant prin index.
+</LessonHook>
+
+## Ce este un vector?
+
+Un **vector** (sau *tablou unidimensional*) este o colecție de valori de același tip, stocate consecutiv în memorie și identificate printr-un **index**.
+
+```
+Index:   0    1    2    3    4
+         ┌────┬────┬────┬────┬────┐
+v =      │ 5  │ 3  │ 8  │ 1  │ 9  │
+         └────┴────┴────┴────┴────┘
+```
+
+Trei proprietăți esențiale:
+- Toate elementele au **același tip** (`int`, `long long` etc.).
+- Indexul începe de la **0**, nu de la 1.
+- Accesul la orice element e **O(1)** — instant, indiferent de poziție.
+
+## Declarație și citire în C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;           // numarul de elemente
+
+    int v[1001];        // rezerva spatiu pentru max 1000 elem (index 0..999)
+    for (int i = 0; i < n; i++) {
+        cin >> v[i];    // citim element cu element
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << v[i] << " ";
+    }
+    return 0;
+}
+```
+
+**Exemplu:** Input `5` / `5 3 8 1 9` → Output `5 3 8 1 9`
+
+<ObservationBox>
+`int v[1001]` declarat în afara lui `main` (variabilă globală) e inițializat automat cu 0. Declarat în `main`, are valori nedefinite. La OJI/ONI, vectorii mari se declară **global** pentru a evita stack overflow și pentru inițializare automată.
+</ObservationBox>
+
+## Inițializare directă
+
+```cpp
+int v[] = {5, 3, 8, 1, 9};   // n = 5, dedus automat
+int w[5] = {0};               // toate elementele = 0
+int a[5] = {1, 2};            // a[0]=1, a[1]=2, a[2]=a[3]=a[4]=0
+```
+
+## Accesul la elemente
+
+```cpp
+cout << v[0];   // primul element: 5
+cout << v[4];   // ultimul (din 5): 9
+v[2] = 100;     // modifica al treilea element
+```
+
+<MistakeBox>
+**Greșeala 1:** `v[n]` — accesezi elementul cu index `n`, care e în afara vectorului (indici valizi: 0..n-1). Provoacă comportament nedefinit sau crash.
+
+**Greșeala 2:** Declari `int v[n]` cu `n` citit din input — C++ standard nu permite tablouri cu dimensiune variabilă. Declară cu dimensiunea maximă din enunț: `int v[1001]`.
+
+**Greșeala 3:** Pornești bucla de la `i = 1` în loc de `i = 0` — ratezi primul element și citești unul în plus la sfârșit.
+</MistakeBox>
+
+## Recapitulare
+
+- Un vector stochează mai multe valori de același tip, accesate prin index (de la 0).
+- Declarația `int v[1001]` rezervă spațiu; citirea se face cu `cin >> v[i]` în buclă.
+- Indexul maxim valid este `n-1`, nu `n`.

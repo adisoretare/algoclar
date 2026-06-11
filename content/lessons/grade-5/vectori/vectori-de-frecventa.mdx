@@ -1,0 +1,148 @@
+---
+title: "Vectori de frecvență"
+slug: vectori-de-frecventa
+grade: 5
+chapter: vectori
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["frecventa", "numarare", "aparitii", "vector"]
+visualizers: ["frequency"]
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă `frec[v[i]]++`?"
+    options:
+      - "Numără câte valori sunt mai mici decât v[i]"
+      - "Înregistrează că valoarea v[i] a mai apărut o dată"
+      - "Numără câte elemente distincte există"
+      - "Calculează suma elementelor egale cu v[i]"
+    correctIndex: 1
+    explanation: "frec[x] = numărul de apariții ale valorii x. frec[v[i]]++ crește contorul pentru valoarea v[i] cu 1."
+  - question: "Care e dimensiunea minimă a lui `frec[]` dacă valorile sunt în intervalul 0..100?"
+    options:
+      - "100"
+      - "101"
+      - "n"
+      - "n+1"
+    correctIndex: 1
+    explanation: "Avem nevoie de indici 0..100, deci 101 poziții. Regula: dimensiunea = valoarea_maximă + 1."
+  - question: "Cum numeri câte valori distincte are vectorul?"
+    options:
+      - "Numeri câte poziții au frec[i] > 0"
+      - "Numeri câte poziții au frec[i] = 1"
+      - "Calculezi n - frec[maxim]"
+      - "Sortezi și numeri schimbările"
+    correctIndex: 0
+    explanation: "O valoare apare în vector dacă și numai dacă frec[ea] > 0. Numeri câte valori au frec > 0."
+---
+
+<LessonHook>
+Ai un borcan cu bile colorate și vrei să știi câte bile de fiecare culoare sunt, fără să le numeri de mai multe ori. Faci un tabel: „Roșu: 5, Albastru: 3, Verde: 8". Un vector de frecvență e exact acel tabel — indexul e valoarea, conținutul e de câte ori apare.
+</LessonHook>
+
+## Ce este vectorul de frecvență?
+
+Un **vector de frecvență** numără de câte ori apare fiecare valoare dintr-un set de date.
+
+```
+Date:    3  1  4  1  5  9  2  6  5  3
+frec:    0  2  1  2  1  2  1  0  0  1
+index:   0  1  2  3  4  5  6  7  8  9
+```
+
+`frec[x]` = de câte ori apare valoarea `x` în date.
+
+## Algoritmul
+
+```
+frec[] ← {0, 0, ..., 0}     // inițializare cu zerouri
+pentru i de la 0 la n-1:
+    frec[v[i]] ← frec[v[i]] + 1
+```
+
+Citim datele O(n), actualizăm contorul în O(1) — total O(n).
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int frec[1001];   // global = initializat automat cu 0
+
+int main() {
+    int n;
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        frec[x]++;    // inregistram aparitia lui x
+    }
+
+    // afisam frecventele valorilor cu aparitii
+    for (int val = 0; val <= 1000; val++) {
+        if (frec[val] > 0)
+            cout << val << " apare de " << frec[val] << " ori\n";
+    }
+    return 0;
+}
+```
+
+**Exemplu:** Input `6` / `3 1 4 1 5 9` → `1 apare de 2 ori` / `3 apare de 1 ori` / `4 apare de 1 ori` / `5 apare de 1 ori` / `9 apare de 1 ori`
+
+## Ce poți face cu un vector de frecvență
+
+```cpp
+// numara elementele distincte
+int distincte = 0;
+for (int val = 0; val <= 100; val++)
+    if (frec[val] > 0) distincte++;
+
+// verifica daca x apare in vector
+bool exista = (frec[x] > 0);
+
+// gaseste valoarea cu cele mai multe aparitii (moda)
+int maxFrec = 0, moda = -1;
+for (int val = 0; val <= 100; val++) {
+    if (frec[val] > maxFrec) {
+        maxFrec = frec[val];
+        moda = val;
+    }
+}
+```
+
+## Complexitate
+
+| Pas | Timp | Spațiu |
+|-----|------|--------|
+| Construire frec[] | O(n) | O(maxVal) |
+| Interogare frec[x] | O(1) | — |
+
+<ObservationBox>
+Vectorul de frecvență transformă o căutare O(n) într-o interogare O(1). Vrei să știi de câte ori apare 42? Nu parcurgi din nou — citești direct `frec[42]`.
+</ObservationBox>
+
+## Vizualizare
+
+<Visualizer name="frequency" />
+
+<HintBox>
+Urmărește cum cresc contoarele la fiecare element citit. `frec[x]` se incrementează de fiecare dată când valoarea `x` apare în input.
+</HintBox>
+
+<MistakeBox>
+**Greșeala 1:** `frec[]` declarat local în `main` fără inițializare — conține valori aleatorii. Declară global sau inițializează cu `= {0}`.
+
+**Greșeala 2:** Dimensiunea prea mică — dacă valorile pot fi până la 100, `frec[101]` e corect; `frec[100]` ratează valoarea 100.
+
+**Greșeala 3:** `frec[v[i]] = 1` în loc de `frec[v[i]]++` — resetezi contorul la 1 la fiecare apariție, nu îl incrementezi.
+</MistakeBox>
+
+## Recapitulare
+
+- `frec[x]` = numărul de apariții ale valorii `x`.
+- Construire în O(n); interogare directă în O(1).
+- Dimensiunea lui `frec[]` trebuie să acopere toate valorile posibile (valoare_maximă + 1).
