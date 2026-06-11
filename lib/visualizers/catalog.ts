@@ -129,6 +129,96 @@ export const VISUALIZER_CATALOG = [
     title: 'Geometrie de bază',
     description: 'Distanța dintre două puncte și aria unui triunghi în plan.',
   },
+  {
+    slug: 'graph-bfs',
+    title: 'BFS pe graf',
+    description: 'Parcurgere în lățime: unda se extinde inel cu inel din sursă.',
+  },
+  {
+    slug: 'graph-dfs',
+    title: 'DFS pe graf',
+    description: 'Parcurgere în adâncime, cu timpii de intrare/ieșire tin/tout.',
+  },
+  {
+    slug: 'connected-components',
+    title: 'Componente conexe',
+    description: 'Grupuri de noduri legate între ele, găsite prin parcurgeri repetate.',
+  },
+  {
+    slug: 'scc-kosaraju',
+    title: 'Componente tare conexe (Kosaraju)',
+    description: 'Două parcurgeri DFS — pe graf și pe transpus — separă CTC-urile.',
+  },
+  {
+    slug: 'topological-sort',
+    title: 'Sortare topologică',
+    description: 'Algoritmul lui Kahn: scoate pe rând nodurile fără dependențe.',
+  },
+  {
+    slug: 'dijkstra',
+    title: 'Dijkstra',
+    description: 'Drumuri minime cu coadă de priorități, pe ponderi nenegative.',
+  },
+  {
+    slug: 'bellman-ford',
+    title: 'Bellman-Ford',
+    description: 'Drumuri minime cu costuri negative, relaxând toate muchiile de n-1 ori.',
+  },
+  {
+    slug: 'floyd-warshall',
+    title: 'Floyd-Warshall (Roy-Floyd)',
+    description: 'Drumuri minime între toate perechile, cu noduri intermediare.',
+  },
+  {
+    slug: 'mst-kruskal',
+    title: 'Kruskal (MST)',
+    description: 'Arbore parțial de cost minim alegând muchii sortate, fără cicluri.',
+  },
+  {
+    slug: 'mst-prim',
+    title: 'Prim (MST)',
+    description: 'MST crescut dintr-un singur arbore, adăugând cea mai ieftină muchie.',
+  },
+  {
+    slug: 'dsu',
+    title: 'Union-Find (DSU)',
+    description: 'Mulțimi disjuncte cu uniune după rang și compresie de drum.',
+  },
+  {
+    slug: 'lca',
+    title: 'LCA',
+    description: 'Cel mai apropiat strămoș comun, prin aliniere de adâncime și urcare.',
+  },
+  {
+    slug: 'fenwick-tree',
+    title: 'Fenwick Tree (BIT)',
+    description: 'Sume de prefix și actualizări punctuale în O(log n), cu i & -i.',
+  },
+  {
+    slug: 'segment-tree',
+    title: 'Segment Tree',
+    description: 'Interogări și actualizări pe interval în O(log n), pe un arbore binar.',
+  },
+  {
+    slug: 'rmq',
+    title: 'RMQ (Sparse Table)',
+    description: 'Minim pe interval în O(1) cu blocuri de lungime putere a lui 2.',
+  },
+  {
+    slug: 'sqrt-decomposition',
+    title: 'Square Root Decomposition',
+    description: 'Interogări pe interval în O(√n) cu blocuri precalculate.',
+  },
+  {
+    slug: 'bitmask-dp',
+    title: 'DP pe biți (bitmask)',
+    description: 'Comis-voiajor (TSP) cu stări codificate ca măști de biți.',
+  },
+  {
+    slug: 'matrix-expo',
+    title: 'Exponențierea matricelor',
+    description: 'Mᵖ în O(log p) prin ridicare la pătrat — Fibonacci cu matrice.',
+  },
 ] as const
 
 export type VisualizerSlug = (typeof VISUALIZER_CATALOG)[number]['slug']
