@@ -766,22 +766,9 @@ export const CURRICULUM: Grade[] = [
     label: 'Clasele XI–XII',
     chapters: [
       {
-        id: 'dp-avansat',
-        title: 'Programare dinamică avansată',
-        order: 1,
-        lessons: [
-          { id: 'recapitulare-dp', title: 'Recapitulare DP' },
-          { id: 'dp-pe-arbori', title: 'DP pe arbori' },
-          { id: 'dp-pe-grafuri', title: 'DP pe grafuri' },
-          { id: 'dp-stari-exponentiale', title: 'DP pe stări exponențiale' },
-          { id: 'dp-bitmask', title: 'DP cu bitmask' },
-          { id: 'punte-modelare-dp', title: 'Lecție-punte: modelarea unei probleme ca DP', isBridge: true },
-        ],
-      },
-      {
         id: 'grafuri-notiuni',
         title: 'Grafuri — noțiuni de bază',
-        order: 2,
+        order: 1,
         lessons: [
           { id: 'graf-neorientat', title: 'Graf neorientat' },
           { id: 'graf-orientat', title: 'Graf orientat' },
@@ -804,7 +791,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'tipuri-grafuri',
         title: 'Tipuri speciale de grafuri',
-        order: 3,
+        order: 2,
         lessons: [
           { id: 'graf-complet', title: 'Graf complet' },
           { id: 'graf-hamiltonian', title: 'Graf hamiltonian' },
@@ -816,7 +803,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'reprezentare-grafuri',
         title: 'Reprezentarea grafurilor',
-        order: 4,
+        order: 3,
         lessons: [
           { id: 'matrice-adiacenta', title: 'Matrice de adiacență' },
           { id: 'liste-adiacenta', title: 'Liste de adiacență' },
@@ -831,7 +818,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'parcurgeri-grafuri',
         title: 'Parcurgeri și conectivitate',
-        order: 5,
+        order: 4,
         lessons: [
           { id: 'bfs', title: 'BFS' },
           { id: 'dfs', title: 'DFS' },
@@ -846,7 +833,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'drumuri-ordine',
         title: 'Drumuri și ordine în grafuri',
-        order: 6,
+        order: 5,
         lessons: [
           { id: 'roy-warshall', title: 'Roy-Warshall' },
           { id: 'sortare-topologica', title: 'Sortare topologică' },
@@ -863,7 +850,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'arbori-acm',
         title: 'Arbori și arbori de cost minim',
-        order: 7,
+        order: 6,
         lessons: [
           { id: 'proprietatile-arborilor', title: 'Proprietățile arborilor' },
           { id: 'arbori-partiali', title: 'Arbori parțiali' },
@@ -875,7 +862,7 @@ export const CURRICULUM: Grade[] = [
       {
         id: 'structuri-arborescente',
         title: 'Structuri de date arborescente',
-        order: 8,
+        order: 7,
         lessons: [
           { id: 'arbori-cu-radacina', title: 'Arbori cu rădăcină' },
           { id: 'arbori-binari', title: 'Arbori binari' },
@@ -888,6 +875,19 @@ export const CURRICULUM: Grade[] = [
           { id: 'actualizari', title: 'Actualizări' },
           { id: 'union-find', title: 'Union-Find / Disjoint Set Union' },
           { id: 'punte-structuri-interogari', title: 'Lecție-punte: structuri pentru interogări și actualizări rapide', isBridge: true },
+        ],
+      },
+      {
+        id: 'dp-avansat',
+        title: 'Programare dinamică avansată',
+        order: 8,
+        lessons: [
+          { id: 'recapitulare-dp', title: 'Recapitulare DP' },
+          { id: 'dp-pe-arbori', title: 'DP pe arbori' },
+          { id: 'dp-pe-grafuri', title: 'DP pe grafuri' },
+          { id: 'dp-stari-exponentiale', title: 'DP pe stări exponențiale' },
+          { id: 'dp-bitmask', title: 'DP cu bitmask' },
+          { id: 'punte-modelare-dp', title: 'Lecție-punte: modelarea unei probleme ca DP', isBridge: true },
         ],
       },
       {
