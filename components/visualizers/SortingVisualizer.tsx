@@ -94,8 +94,8 @@ export function SortingVisualizer() {
         labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
       >
         <div className="px-2">
-          {/* Bar chart — columns stretch to h-40; bar area wrapper gives definite height for % resolution */}
-          <div className="flex h-40 w-full gap-1">
+          {/* height% on the column resolves against h-40 (definite 160px); bar fills with flex-1 */}
+          <div className="flex h-40 w-full items-end gap-1">
             {currentArray.map((value, i) => {
               const isComparing =
                 comparing !== null &&
@@ -114,17 +114,15 @@ export function SortingVisualizer() {
                 <div
                   key={i}
                   className="flex flex-1 flex-col items-center gap-0.5"
+                  style={{ height: `${(value / max) * 100}%` }}
                 >
-                  <div className="flex w-full flex-1 items-end">
-                    <div
-                      className={cn(
-                        'w-full rounded-t-[4px] transition-colors duration-200',
-                        barClass,
-                      )}
-                      style={{ height: `${(value / max) * 100}%` }}
-                      aria-label={`v[${i}] = ${value}`}
-                    />
-                  </div>
+                  <div
+                    className={cn(
+                      'w-full flex-1 rounded-t-[4px] transition-colors duration-200',
+                      barClass,
+                    )}
+                    aria-label={`v[${i}] = ${value}`}
+                  />
                   {currentArray.length <= 8 && (
                     <span className="font-mono text-[10px] text-muted-foreground">
                       {value}
