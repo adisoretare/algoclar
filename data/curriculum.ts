@@ -293,7 +293,7 @@ export const CURRICULUM: Grade[] = [
         lessons: [
           { id: 'two-pointers', title: 'Two Pointers', visualizer: 'two-pointers' },
           { id: 'difference-arrays-1d', title: 'Difference Arrays 1D', visualizer: 'difference-array' },
-          { id: 'secventa-suma-maxima', title: 'Secvența de sumă maximă', visualizer: 'sliding-window' },
+          { id: 'secventa-suma-maxima', title: 'Secvența de sumă maximă', visualizer: 'kadane' },
           { id: 'elementul-majoritar', title: 'Elementul majoritar' },
           { id: 'sume-partiale-matrice', title: 'Sume parțiale în matrice', visualizer: 'prefix-sums-2d' },
           { id: 'prefixe-sufixe-matrice', title: 'Prefixe și sufixe pe linii și coloane' },
@@ -555,7 +555,7 @@ export const CURRICULUM: Grade[] = [
           { id: 'secvente-de-valori', title: 'Secvențe de valori', visualizer: 'sliding-window' },
           { id: 'two-pointers-9', title: 'Two Pointers', visualizer: 'two-pointers' },
           { id: 'difference-arrays-1d-9', title: 'Difference Arrays 1D', visualizer: 'difference-array' },
-          { id: 'secventa-suma-maxima-9', title: 'Secvența de sumă maximă', visualizer: 'sliding-window' },
+          { id: 'secventa-suma-maxima-9', title: 'Secvența de sumă maximă', visualizer: 'kadane' },
           { id: 'punte-tehnica-vectori', title: 'Lecție-punte: alegerea tehnicii potrivite pentru vectori', isBridge: true },
         ],
       },

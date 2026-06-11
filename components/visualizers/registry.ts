@@ -138,6 +138,20 @@ const registry: Record<string, ComponentType<any>> = {
       })),
     { ssr: false },
   ),
+  kadane: dynamic(
+    () =>
+      import('./KadaneVisualizer').then(m => ({
+        default: m.KadaneVisualizer,
+      })),
+    { ssr: false },
+  ),
+  'secventa-suma-maxima': dynamic(
+    () =>
+      import('./KadaneVisualizer').then(m => ({
+        default: m.KadaneVisualizer,
+      })),
+    { ssr: false },
+  ),
 }
 
 export function getVisualizer(name: string): ComponentType<unknown> | null {

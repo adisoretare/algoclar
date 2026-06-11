@@ -49,6 +49,11 @@ export const VISUALIZER_CATALOG = [
     title: 'Vector de diferențe',
     description: 'Aplică update-uri pe intervale în O(1), apoi reconstruiește vectorul.',
   },
+  {
+    slug: 'kadane',
+    title: 'Secvența de sumă maximă (Kadane)',
+    description: 'Găsește subsecvența cu suma cea mai mare în O(n): extinde sau repornește.',
+  },
 ] as const
 
 export type VisualizerSlug = (typeof VISUALIZER_CATALOG)[number]['slug']
