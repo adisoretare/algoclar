@@ -92,22 +92,31 @@ export async function getLessonsForChapter(
   chapterId: string,
 ): Promise<LessonMeta[]> {
   const all = await getAllLessons()
-  return all.filter((l) => l.grade === grade && l.chapter === chapterId)
+  const filtered = all.filter((l) => l.grade === grade && l.chapter === chapterId)
+  return sortLessonsByCurriculum(filtered)
 }
 
-const UNKNOWN_CHAPTER_ORDER = 99
+const UNKNOWN_ORDER = 99
 
 function getChapterOrderInGrade(grade: number, chapterId: string): number {
-  return getGradeData(grade)?.chapters.find((c) => c.id === chapterId)?.order ?? UNKNOWN_CHAPTER_ORDER
+  return getGradeData(grade)?.chapters.find((c) => c.id === chapterId)?.order ?? UNKNOWN_ORDER
+}
+
+function getLessonOrderInChapter(grade: number, chapterId: string, slug: string): number {
+  const chapter = getGradeData(grade)?.chapters.find((c) => c.id === chapterId)
+  if (!chapter) return UNKNOWN_ORDER
+  const idx = chapter.lessons.findIndex((l) => l.id === slug)
+  return idx === -1 ? UNKNOWN_ORDER : idx
 }
 
 function sortLessonsByCurriculum(lessons: LessonMeta[]): LessonMeta[] {
   return [...lessons].sort((a, b) => {
     if (a.grade !== b.grade) return a.grade - b.grade
-    const aOrder = getChapterOrderInGrade(a.grade, a.chapter)
-    const bOrder = getChapterOrderInGrade(b.grade, b.chapter)
-    if (aOrder !== bOrder) return aOrder - bOrder
-    return a.slug.localeCompare(b.slug)
+    const aChapter = getChapterOrderInGrade(a.grade, a.chapter)
+    const bChapter = getChapterOrderInGrade(b.grade, b.chapter)
+    if (aChapter !== bChapter) return aChapter - bChapter
+    return getLessonOrderInChapter(a.grade, a.chapter, a.slug) -
+           getLessonOrderInChapter(b.grade, b.chapter, b.slug)
   })
 }
 
