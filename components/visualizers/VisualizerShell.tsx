@@ -115,7 +115,14 @@ export function VisualizerShell<T>({
             />
             Încearcă cu datele tale
           </button>
-          {labOpen && <div className="mt-3">{labZone}</div>}
+          <div
+            className="grid transition-[grid-template-rows] duration-300 ease-out"
+            style={{ gridTemplateRows: labOpen ? '1fr' : '0fr' }}
+          >
+            <div className="overflow-hidden">
+              <div className="mt-3">{labZone}</div>
+            </div>
+          </div>
         </div>
       )}
     </div>

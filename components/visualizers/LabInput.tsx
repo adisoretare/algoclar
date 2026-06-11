@@ -9,6 +9,7 @@ export interface LabField {
   placeholder: string
   validate: (raw: string) => string | null
   defaultValue?: string
+  hint?: string
 }
 
 interface LabInputProps {
@@ -74,11 +75,15 @@ export function LabInput({ fields, onSubmit }: LabInputProps) {
                 : 'border-border focus:border-primary focus:ring-primary',
             )}
           />
-          {errors[field.id] && (
+          {errors[field.id] ? (
             <span role="alert" className="font-mono text-xs text-destructive">
               {errors[field.id]}
             </span>
-          )}
+          ) : field.hint ? (
+            <span className="font-mono text-[10px] text-muted-foreground/60">
+              {field.hint}
+            </span>
+          ) : null}
         </div>
       ))}
       <button

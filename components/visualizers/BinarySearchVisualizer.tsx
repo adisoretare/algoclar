@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău (va fi sortat automat)',
     placeholder: 'ex: 2 5 8 12 16 23',
+    hint: 'Numere întregi separate prin spațiu · min 2 · max 15 valori · între -9999 și 9999',
     validate: raw => {
       const nums = parseIntegers(raw)
       if (!nums) return 'Introdu numere întregi separate prin spațiu.'
@@ -23,17 +24,6 @@ const LAB_FIELDS: LabField[] = [
       if (nums.length > 15) return 'Maximum 15 valori.'
       if (nums.some(n => n < -9999 || n > 9999))
         return 'Valorile trebuie să fie între -9999 și 9999.'
-      return null
-    },
-  },
-  {
-    id: 'target',
-    label: 'Numărul căutat',
-    placeholder: 'ex: 12',
-    validate: raw => {
-      const n = parseInt(raw.trim(), 10)
-      if (isNaN(n)) return 'Introdu un număr întreg.'
-      if (n < -9999 || n > 9999) return 'Valoarea trebuie să fie între -9999 și 9999.'
       return null
     },
   },
@@ -76,12 +66,9 @@ export function BinarySearchVisualizer({
 
   function handleLabSubmit(values: Record<string, string>) {
     const nums = parseIntegers(values.array ?? '')
-    const t = parseInt((values.target ?? '').trim(), 10)
-    if (nums && !isNaN(t)) {
+    if (nums) {
       const sorted = [...nums].sort((a, b) => a - b)
       setLabArray(sorted)
-      setTarget(t)
-      setTargetInput(String(t))
     }
   }
 
