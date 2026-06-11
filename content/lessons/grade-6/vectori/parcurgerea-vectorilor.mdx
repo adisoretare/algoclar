@@ -9,6 +9,31 @@ free: true
 tags: ["vectori", "parcurgere", "maxim", "sumă"]
 visualizers: ["array-traversal"]
 relatedProblems: []
+quiz:
+  - question: "Care este maximul vectorului [3, 7, 2, 9, 5]?"
+    options:
+      - "3"
+      - "7"
+      - "5"
+      - "9"
+    correctIndex: 3
+    explanation: "Maximul este 9 — cel mai mare element din vector. Algoritmul parcurge fiecare element și actualizează maximul când găsește unul mai mare."
+  - question: "Cu ce valoare inițializăm variabila `max` înainte de parcurgere?"
+    options:
+      - "Cu 0"
+      - "Cu primul element al vectorului"
+      - "Cu lungimea vectorului"
+      - "Cu cel mai mic număr posibil"
+    correctIndex: 1
+    explanation: "Inițializăm `max` cu v[0] (primul element) pentru a avea un punct de referință corect, indiferent de valorile din vector."
+  - question: "Câte comparații face algoritmul de maxim pentru un vector cu n elemente?"
+    options:
+      - "1"
+      - "n"
+      - "n-1"
+      - "n×n"
+    correctIndex: 2
+    explanation: "Primul element devine valoarea inițială, deci comparăm celelalte n-1 elemente cu maximul curent — n-1 comparații în total."
 ---
 
 <LessonHook>

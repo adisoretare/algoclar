@@ -1,5 +1,14 @@
 import { z } from 'zod'
 
+export const QuizQuestionSchema = z.object({
+  question: z.string().min(1),
+  options: z.array(z.string()).min(2).max(4),
+  correctIndex: z.number().int().min(0),
+  explanation: z.string().min(1),
+})
+
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>
+
 export const LessonFrontmatterSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
@@ -11,6 +20,7 @@ export const LessonFrontmatterSchema = z.object({
   tags: z.array(z.string()).default([]),
   visualizers: z.array(z.string()).default([]),
   relatedProblems: z.array(z.string()).default([]),
+  quiz: z.array(QuizQuestionSchema).max(3).optional(),
 })
 
 export type LessonFrontmatter = z.infer<typeof LessonFrontmatterSchema>

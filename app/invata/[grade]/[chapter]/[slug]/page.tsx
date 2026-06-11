@@ -14,6 +14,7 @@ import { MDX_COMPONENTS } from '@/components/mdx'
 import { DifficultyBadge } from '@/components/shared/DifficultyBadge'
 import { getChapterTitle, getGradeData } from '@/data/curriculum'
 import { ChapterSidebar } from '@/components/lesson/ChapterSidebar'
+import { LessonQuiz } from '@/components/lesson/LessonQuiz'
 import type { Difficulty } from '@/components/shared/DifficultyBadge'
 
 interface Params {
@@ -141,6 +142,21 @@ export default async function LessonPage({
 
           {/* MDX content */}
           <article className="prose">{content}</article>
+
+          {/* Quiz */}
+          {lesson.quiz && lesson.quiz.length > 0 && (
+            <LessonQuiz
+              questions={lesson.quiz}
+              nextLesson={
+                prevNext.next
+                  ? {
+                      href: `/invata/${prevNext.next.grade}/${prevNext.next.chapter}/${prevNext.next.slug}`,
+                      title: prevNext.next.title,
+                    }
+                  : null
+              }
+            />
+          )}
 
           {/* Prev / Next navigation */}
           <nav
