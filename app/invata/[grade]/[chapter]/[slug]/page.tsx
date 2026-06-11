@@ -12,7 +12,7 @@ import {
 } from '@/lib/content/lessons'
 import { MDX_COMPONENTS } from '@/components/mdx'
 import { DifficultyBadge } from '@/components/shared/DifficultyBadge'
-import { getChapterTitle, getGradeData } from '@/data/curriculum'
+import { getChapterTitle, getGradeData, gradeIdFromNumber, gradeNumbers } from '@/data/curriculum'
 import { ChapterSidebar } from '@/components/lesson/ChapterSidebar'
 import { LessonQuiz } from '@/components/lesson/LessonQuiz'
 import type { Difficulty } from '@/components/shared/DifficultyBadge'
@@ -26,7 +26,7 @@ interface Params {
 export async function generateStaticParams() {
   const lessons = await getAllLessons()
   return lessons.map((l) => ({
-    grade: String(l.grade),
+    grade: gradeIdFromNumber(l.grade),
     chapter: l.chapter,
     slug: l.slug,
   }))
@@ -54,7 +54,7 @@ export default async function LessonPage({
   const { grade, chapter, slug } = await params
   const lesson = await getLessonBySlug(slug)
 
-  if (!lesson || lesson.grade !== Number(grade) || lesson.chapter !== chapter) {
+  if (!lesson || !gradeNumbers(grade).includes(lesson.grade) || lesson.chapter !== chapter) {
     notFound()
   }
 
@@ -84,7 +84,7 @@ export default async function LessonPage({
         lessons={chapterLessons.map((l) => ({
           slug: l.slug,
           title: l.title,
-          grade: l.grade,
+          gradeId: gradeIdFromNumber(l.grade),
           chapter: l.chapter,
         }))}
         currentSlug={slug}
@@ -105,14 +105,14 @@ export default async function LessonPage({
             </Link>
             <span className="text-muted-foreground/40">›</span>
             <Link
-              href={`/invata/${lesson.grade}`}
+              href={`/invata/${gradeIdFromNumber(lesson.grade)}`}
               className="transition-colors hover:text-primary"
             >
               Clasa {lesson.grade}
             </Link>
             <span className="text-muted-foreground/40">›</span>
             <Link
-              href={`/invata/${lesson.grade}`}
+              href={`/invata/${gradeIdFromNumber(lesson.grade)}`}
               className="transition-colors hover:text-primary"
             >
               {chapterTitle}
@@ -150,7 +150,7 @@ export default async function LessonPage({
               nextLesson={
                 prevNext.next
                   ? {
-                      href: `/invata/${prevNext.next.grade}/${prevNext.next.chapter}/${prevNext.next.slug}`,
+                      href: `/invata/${gradeIdFromNumber(prevNext.next.grade)}/${prevNext.next.chapter}/${prevNext.next.slug}`,
                       title: prevNext.next.title,
                     }
                   : null
@@ -165,7 +165,7 @@ export default async function LessonPage({
           >
             {prevNext.prev ? (
               <Link
-                href={`/invata/${prevNext.prev.grade}/${prevNext.prev.chapter}/${prevNext.prev.slug}`}
+                href={`/invata/${gradeIdFromNumber(prevNext.prev.grade)}/${prevNext.prev.chapter}/${prevNext.prev.slug}`}
                 className="group flex flex-col gap-1 rounded-[12px] border border-border p-4 transition-all hover:-translate-y-[2px] hover:border-primary hover:shadow-md"
               >
                 <span className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
@@ -182,7 +182,7 @@ export default async function LessonPage({
 
             {prevNext.next ? (
               <Link
-                href={`/invata/${prevNext.next.grade}/${prevNext.next.chapter}/${prevNext.next.slug}`}
+                href={`/invata/${gradeIdFromNumber(prevNext.next.grade)}/${prevNext.next.chapter}/${prevNext.next.slug}`}
                 className="group flex flex-col items-end gap-1 rounded-[12px] border border-border p-4 text-right transition-all hover:-translate-y-[2px] hover:border-primary hover:shadow-md"
               >
                 <span className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">

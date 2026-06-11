@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import { CURRICULUM, getGradeData } from '@/data/curriculum'
+import { getGradeData } from '@/data/curriculum'
 import { LessonFrontmatterSchema } from './types'
 import type { LessonMeta, LessonWithContent } from './types'
 
@@ -77,7 +77,7 @@ export async function getChaptersByGrade(grade: number): Promise<string[]> {
   const lessons = await getLessonsByGrade(grade)
   const lessonChapters = new Set(lessons.map((l) => l.chapter))
 
-  const gradeData = CURRICULUM.find((g) => g.grade === grade)
+  const gradeData = getGradeData(grade)
   if (gradeData) {
     return gradeData.chapters
       .filter((c) => lessonChapters.has(c.id))

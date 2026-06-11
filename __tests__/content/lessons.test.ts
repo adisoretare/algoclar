@@ -138,7 +138,7 @@ describe('getLessonsByGrade()', () => {
 describe('getChaptersByGrade()', () => {
   it('returns chapters for grade 9', async () => {
     const chapters = await getChaptersByGrade(9)
-    expect(chapters).toContain('sortare')
+    expect(chapters).toContain('vectori-9')
   })
 
   it('returns unique chapters only', async () => {
@@ -149,29 +149,29 @@ describe('getChaptersByGrade()', () => {
 
   it('returns chapters in curriculum order for grade 7', async () => {
     const chapters = await getChaptersByGrade(7)
-    // grade-7 has only recursivitate/factorial.mdx → first chapter is 'recursivitate'
-    expect(chapters[0]).toBe('recursivitate')
+    // grade-7 has only recursivitate/factorial.mdx → first chapter is 'functii'
+    expect(chapters[0]).toBe('functii')
   })
 
   it('returns chapters in curriculum order for grade 9', async () => {
     const chapters = await getChaptersByGrade(9)
-    // grade-9 has only sortare/bubble-sort.mdx → first chapter is 'sortare'
-    expect(chapters[0]).toBe('sortare')
+    // grade-9 has only sortare/bubble-sort.mdx → first chapter is 'vectori-9'
+    expect(chapters[0]).toBe('vectori-9')
   })
 })
 
 describe('getLessonsForChapter()', () => {
   it('returns lessons matching grade + chapter', async () => {
-    const lessons = await getLessonsForChapter(9, 'cautare-binara')
+    const lessons = await getLessonsForChapter(9, 'vectori-9')
     expect(lessons.length).toBeGreaterThan(0)
     for (const l of lessons) {
       expect(l.grade).toBe(9)
-      expect(l.chapter).toBe('cautare-binara')
+      expect(l.chapter).toBe('vectori-9')
     }
   })
 
   it('returns empty array for chapter with no content', async () => {
-    const lessons = await getLessonsForChapter(12, 'algoritmi-avansati')
+    const lessons = await getLessonsForChapter(12, 'dp-avansat')
     expect(lessons).toEqual([])
   })
 })

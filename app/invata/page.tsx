@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getAllLessons } from '@/lib/content/lessons'
-import { CURRICULUM } from '@/data/curriculum'
+import { CURRICULUM, gradeNumbers, gradeSubtitle } from '@/data/curriculum'
 import { GradeCard } from '@/components/lesson/GradeCard'
 
 export const metadata: Metadata = {
@@ -24,18 +24,17 @@ export default async function InvataPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {CURRICULUM.map((gradeData) => {
-          const lessonCount = allLessons.filter(
-            (l) => l.grade === gradeData.grade,
-          ).length
+          const nums = gradeNumbers(gradeData.id)
+          const lessonCount = allLessons.filter((l) => nums.includes(l.grade)).length
 
           return (
             <GradeCard
-              key={gradeData.grade}
-              grade={gradeData.grade}
+              key={gradeData.id}
+              subtitle={gradeSubtitle(gradeData.id)}
               label={gradeData.label}
               chapterCount={gradeData.chapters.length}
               lessonCount={lessonCount}
-              href={`/invata/${gradeData.grade}`}
+              href={`/invata/${gradeData.id}`}
             />
           )
         })}

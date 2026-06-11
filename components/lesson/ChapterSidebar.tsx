@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 export interface ChapterLesson {
   slug: string
   title: string
-  grade: number
+  gradeId: string
   chapter: string
 }
 
@@ -121,7 +121,7 @@ export function ChapterSidebar({
               return (
                 <Link
                   key={lesson.slug}
-                  href={`/invata/${lesson.grade}/${lesson.chapter}/${lesson.slug}`}
+                  href={`/invata/${lesson.gradeId}/${lesson.chapter}/${lesson.slug}`}
                   onClick={() => isMobile && setOpen(false)}
                   className={cn(
                     'flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm transition-colors',

@@ -3,7 +3,7 @@ import { BookOpen, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface GradeCardProps {
-  grade: number
+  subtitle: string
   label: string
   chapterCount: number
   lessonCount: number
@@ -11,7 +11,7 @@ interface GradeCardProps {
 }
 
 export function GradeCard({
-  grade,
+  subtitle,
   label,
   chapterCount,
   lessonCount,
@@ -31,7 +31,7 @@ export function GradeCard({
     >
       <div className="flex items-start justify-between gap-2">
         <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-muted-foreground">
-          Clasa {grade}
+          {subtitle}
         </span>
         <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
       </div>
