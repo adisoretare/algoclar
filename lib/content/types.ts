@@ -21,6 +21,11 @@ export const LessonFrontmatterSchema = z.object({
   visualizers: z.array(z.string()).default([]),
   relatedProblems: z.array(z.string()).default([]),
   quiz: z.array(QuizQuestionSchema).max(3).optional(),
+  // Lecție-punte (face legătura între capitole). Implicit false.
+  isBridge: z.boolean().default(false),
+  // Stadiul redacțional. Lecțiile scaffold-ate pornesc ca "draft";
+  // lecțiile fără câmp explicit sunt considerate "published" (demo-urile de aur).
+  status: z.enum(['draft', 'review', 'published']).default('published'),
 })
 
 export type LessonFrontmatter = z.infer<typeof LessonFrontmatterSchema>

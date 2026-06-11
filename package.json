@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "scaffold": "pnpm dlx tsx tools/scaffold-lessons.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
