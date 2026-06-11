@@ -1,0 +1,98 @@
+---
+title: "Lecție-punte: cum recunoști regula unui șir"
+slug: punte-regula-sir
+grade: 5
+chapter: siruri-generate
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["siruri", "recunoastere", "diferente", "rapoarte"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Șirul 2, 6, 18, 54 este:"
+    options:
+      - "Aritmetic cu d = 4"
+      - "Geometric cu r = 3"
+      - "Recurent de ordin 2"
+      - "Nu urmează nicio regulă"
+    correctIndex: 1
+    explanation: "6/2 = 3, 18/6 = 3, 54/18 = 3. Raportul este constant → șir geometric cu r = 3."
+  - question: "Cum verifici dacă un șir este aritmetic?"
+    options:
+      - "Calculezi a[i] * a[i-1] la fiecare pas"
+      - "Calculezi a[i] - a[i-1] la fiecare pas și verifici dacă diferența e constantă"
+      - "Verifici dacă toți termenii sunt egali"
+      - "Calculezi suma tuturor termenilor"
+    correctIndex: 1
+    explanation: "Diferențele consecutive constante → aritmetic. Rapoartele consecutive constante → geometric."
+  - question: "Șirul 1, 1, 2, 3, 5, 8 — cum recunoști că e Fibonacci?"
+    options:
+      - "Toți termenii sunt impari"
+      - "Fiecare termen e suma celor doi anteriori"
+      - "Diferența crește cu 1 la fiecare pas"
+      - "Raportul față de precedent e constant"
+    correctIndex: 1
+    explanation: "1+1=2, 1+2=3, 2+3=5, 3+5=8. Dacă a[i] = a[i-1] + a[i-2] pentru toți termenii, e un șir recurent de ordin 2 de tip Fibonacci."
+---
+
+<LessonHook>
+La olimpiadă primești un șir de numere și trebuie să continui sau să generezi. Jumătate din muncă e să recunoști tipul: aritmetic, geometric, recurent? Câteva secunde de analiză economisesc ore de cod greșit.
+</LessonHook>
+
+## Diagnosticul în 3 pași
+
+### Pasul 1 — calculezi diferențele consecutive
+
+```
+a[i] - a[i-1] pentru fiecare i
+```
+
+- Dacă diferențele sunt **toate egale** → **șir aritmetic**. Gata.
+- Dacă diferențele variază, treci la pasul 2.
+
+### Pasul 2 — calculezi rapoartele consecutive
+
+```
+a[i] / a[i-1] pentru fiecare i
+```
+
+- Dacă rapoartele sunt **toate egale** → **șir geometric**. Gata.
+- Dacă și rapoartele variază, treci la pasul 3.
+
+### Pasul 3 — cauți o recurență
+
+Verifici dacă `a[i] = a[i-1] + a[i-2]` (Fibonacci) sau alte combinații ale termenilor anteriori. Uneori apare o constantă adăugată sau înmulțită.
+
+<ObservationBox>
+Dacă nici una din cele trei nu funcționează, caută o formulă care depinde direct de index: `a[i] = i²`, `a[i] = 2^i + i`, etc. Testează cu 3–4 perechi (index, valoare) înainte să scrii cod.
+</ObservationBox>
+
+## Tabel rapid de recunoaștere
+
+| Ce calculezi | Ce obții | Tipul șirului |
+|---|---|---|
+| `a[i] - a[i-1]` | Constantă `d` | Aritmetic |
+| `a[i] / a[i-1]` | Constantă `r` | Geometric |
+| `a[i] - a[i-1] - a[i-2]` | Constant 0 | Fibonacci-like |
+| Altceva | Depinde | Recurent / formulă directă |
+
+## Exemplu pas cu pas
+
+Șirul: `3, 5, 9, 15, 23, 33`
+
+**Diferențe:** 2, 4, 6, 8, 10 — nu constante → nu e aritmetic
+
+**Diferențele diferențelor:** 2, 2, 2, 2 — constante!
+
+Asta înseamnă că diferența crește aritmetic → **a[n] = a[n-1] + 2n** sau altă formulă pătratică. Verifici cu `a[i] = i² + i + 3`: i=0: 3 ✓, i=1: 5 ✓, i=2: 9 ✓.
+
+<MistakeBox>
+**Greșeala 1:** Te grăbești și presupui că orice șir care crește e aritmetic. Verifică mereu cu cel puțin 3-4 perechi consecutive.
+
+**Greșeala 2:** Împarți la zero când calculezi rapoarte. Dacă orice termen e 0, raportul e nedefinit — tratează separat.
+
+**Greșeala 3:** Găsești o regulă care funcționează pentru primii 3 termeni și presupui că e corectă. Verifică mereu cu toți termenii dați, nu doar cu primii.
+</MistakeBox>

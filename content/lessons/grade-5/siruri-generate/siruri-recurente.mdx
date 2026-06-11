@@ -1,0 +1,139 @@
+---
+title: "Șiruri recurente simple"
+slug: siruri-recurente
+grade: 5
+chapter: siruri-generate
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["recurenta", "siruri", "for", "predecesori"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Șirul a[0]=1, a[1]=2, a[n]=a[n-1]+a[n-2]+1. Care e a[4]?"
+    options:
+      - "10"
+      - "11"
+      - "12"
+      - "9"
+    correctIndex: 2
+    explanation: "a[2]=1+2+1=4, a[3]=2+4+1=7, a[4]=4+7+1=12."
+  - question: "Câte valori inițiale (condiții de start) are nevoie un șir recurent de ordin 2?"
+    options:
+      - "Una"
+      - "Două"
+      - "Trei"
+      - "Nicio"
+    correctIndex: 1
+    explanation: "Un șir de ordin 2 (a[n] depinde de a[n-1] și a[n-2]) are nevoie de exact 2 condiții inițiale — altfel nu știm de unde să pornim."
+  - question: "Care din acestea NU este o recurență de ordin 1?"
+    options:
+      - "a[n] = 2 * a[n-1]"
+      - "a[n] = a[n-1] + 3"
+      - "a[n] = a[n-1] * a[n-2]"
+      - "a[n] = a[n-1] - n"
+    correctIndex: 2
+    explanation: "a[n] = a[n-1] * a[n-2] depinde de doi predecesori — e de ordin 2, nu 1."
+---
+
+<LessonHook>
+Fiecare domino dintr-un lanț cade pentru că cel dinainte l-a împins. Dacă știi starea celor 1–2 dominouri anterioare, poți prezice orice termen următor. Asta e esența unui șir recurent: fiecare termen e calculat din câțiva predecesori, după o regulă fixă.
+</LessonHook>
+
+## Ce este o recurență?
+
+O **recurență** este o regulă care exprimă termenul `a[n]` în funcție de termenii anteriori. Spre deosebire de un șir aritmetic sau geometric, nu există o formulă directă — calculezi termenul n pornind de la cei de dinainte.
+
+**Ordin 1** (depinde de un singur predecesor):
+```
+a[n] = a[n-1] * 2,  a[0] = 1  → 1, 2, 4, 8, 16, ...
+```
+
+**Ordin 2** (depinde de doi predecesori — ca Fibonacci):
+```
+a[n] = a[n-1] + a[n-2] + 1,  a[0]=1, a[1]=2  → 1, 2, 4, 7, 12, 20, ...
+```
+
+## Algoritmul general
+
+```cpp
+// Ordin k: a[n] depinde de a[n-1], ..., a[n-k]
+// Stocam toti termenii intr-un vector
+a[0] = valoare_initiala_0;
+a[1] = valoare_initiala_1;  // daca ordin >= 2
+// ...
+for (int i = k; i < n; i++) {
+    a[i] = f(a[i-1], a[i-2], ...);  // aplica regula
+}
+```
+
+## Implementare C++ — recurență de ordin 2
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    long long a[1000];
+    a[0] = 1;
+    a[1] = 2;
+
+    for (int i = 2; i < n; i++) {
+        a[i] = a[i-1] + a[i-2] + 1;  // regula sirului
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i] << " ";
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `6` → `1 2 4 7 12 20`
+
+## Recurență de ordin 1 — fără vector
+
+Dacă termenul depinde doar de precedentul, nu ai nevoie de vector:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    long long termen = 1;         // a[0] = 1
+    for (int i = 0; i < n; i++) {
+        cout << termen << " ";
+        termen = termen * 2 + i;  // regula: a[i+1] = 2*a[i] + i
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+<ObservationBox>
+Un șir recurent de ordin k are nevoie de exact k valori inițiale. Fibonacci e de ordin 2: ai nevoie de F(0) și F(1). Un șir de ordin 3 (de exemplu tribonacci: a[n] = a[n-1]+a[n-2]+a[n-3]) are nevoie de a[0], a[1], a[2].
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Ordin 1 (2 variabile) | O(n) | O(1) |
+| Ordin k (vector) | O(n) | O(n) |
+
+<MistakeBox>
+**Greșeala 1:** Accesezi `a[i-2]` când `i = 0` sau `i = 1`. Bucla trebuie să înceapă de la indexul `k` (ordinul recurenței), nu de la 0.
+
+**Greșeala 2:** Uiți câte valori inițiale are nevoie recurența. Un șir de ordin 2 cu o singură valoare inițială va accesa `a[-1]` — comportament nedefinit.
+
+**Greșeala 3:** Overflow silențios la recurențe care cresc rapid. Un șir de tipul `a[n] = a[n-1]^2` explodează după câțiva pași. Verifică ce tip de date e necesar pentru n-ul maxim din problemă.
+</MistakeBox>

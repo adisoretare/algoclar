@@ -1,0 +1,143 @@
+---
+title: "Generarea șirurilor după reguli"
+slug: generarea-sirurilor
+grade: 5
+chapter: siruri-generate
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["siruri", "regula", "for", "aritmetica", "geometrica"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Primii 5 termeni ai șirului a[i] = 2*i + 1 (i de la 0) sunt:"
+    options:
+      - "1, 3, 5, 7, 9"
+      - "2, 4, 6, 8, 10"
+      - "1, 2, 3, 4, 5"
+      - "0, 2, 4, 6, 8"
+    correctIndex: 0
+    explanation: "i=0: 1, i=1: 3, i=2: 5, i=3: 7, i=4: 9. Sunt numerele impare — formula 2*i+1 generează exact asta."
+  - question: "Care este diferența dintre un șir aritmetic și unul geometric?"
+    options:
+      - "Aritmetic: termenii cresc prin adunare. Geometric: termenii cresc prin înmulțire."
+      - "Aritmetic: termenii sunt negativi. Geometric: termenii sunt pozitivi."
+      - "Aritmetic: are infinit de mulți termeni. Geometric: are finit."
+      - "Nu există diferență practică."
+    correctIndex: 0
+    explanation: "Aritmetic: fiecare termen = precedentul + o constantă d (rație). Geometric: fiecare termen = precedentul × o constantă r."
+  - question: "Șirul 3, 6, 12, 24, 48 are rația geometrică:"
+    options:
+      - "3"
+      - "2"
+      - "6"
+      - "4"
+    correctIndex: 1
+    explanation: "6/3 = 2, 12/6 = 2, 24/12 = 2. Fiecare termen se înmulțește cu 2."
+---
+
+<LessonHook>
+O rețetă de gătit: adaugi un ingredient nou la fiecare pas, mereu după aceeași regulă. Temperatura crește cu 10°C la fiecare 5 minute. Dobânda se dublează în fiecare an. Orice șir de numere cu o regulă poate fi generat de un calculator cu câteva linii de cod.
+</LessonHook>
+
+## Ce este un șir generat după o regulă?
+
+Un **șir** este o succesiune de numere. „Generat după o regulă" înseamnă că există o formulă care determină orice termen din șir.
+
+Două tipuri fundamentale:
+
+### Șir aritmetic
+
+Fiecare termen = precedentul + o valoare fixă `d` (rația):
+
+```
+a[0], a[0]+d, a[0]+2d, a[0]+3d, ...
+```
+
+**Exemplu:** 2, 5, 8, 11, 14 (primul termen 2, rație d = 3)
+
+### Șir geometric
+
+Fiecare termen = precedentul × o valoare fixă `r` (rația):
+
+```
+a[0], a[0]*r, a[0]*r², a[0]*r³, ...
+```
+
+**Exemplu:** 3, 6, 12, 24, 48 (primul termen 3, rație r = 2)
+
+## Algoritmul de generare
+
+Indiferent de tip, structura e aceeași — o buclă care calculează fiecare termen:
+
+```cpp
+for (int i = 0; i < n; i++) {
+    // calculeaza a[i] dupa regula
+    cout << a[i] << " ";
+}
+```
+
+## Implementare C++ — șiruri aritmetice și geometrice
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, a0, d, r;
+    cin >> n;
+
+    // sir aritmetic: primul termen a0, ratie d
+    cin >> a0 >> d;
+    cout << "Aritmetic: ";
+    int termen = a0;
+    for (int i = 0; i < n; i++) {
+        cout << termen << " ";
+        termen += d;             // fiecare termen = precedentul + d
+    }
+    cout << endl;
+
+    // sir geometric: primul termen a0, ratie r
+    cin >> a0 >> r;
+    cout << "Geometric: ";
+    termen = a0;
+    for (int i = 0; i < n; i++) {
+        cout << termen << " ";
+        termen *= r;             // fiecare termen = precedentul * r
+    }
+    cout << endl;
+
+    return 0;
+}
+```
+
+**Exemplu:** n=5, aritmetic (2, d=3) → `2 5 8 11 14`; geometric (3, r=2) → `3 6 12 24 48`
+
+## Formula termenului general
+
+Dacă vrei direct al n-lea termen fără să calculezi toți cei dinaintea lui:
+
+| Tip | Formula termenului de pe poziția i (de la 0) |
+|---|---|
+| Aritmetic | `a[i] = a[0] + i * d` |
+| Geometric | `a[i] = a[0] * pow(r, i)` |
+
+<ObservationBox>
+Formula directă e mai rapidă (O(1) per termen) față de varianta iterativă (O(n) pentru toate). Dar pentru șiruri recurente (Fibonacci, de exemplu) nu există formulă simplă — trebuie să calculezi pas cu pas.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Generare n termeni | O(n) | O(1) dacă afișezi direct |
+
+<MistakeBox>
+**Greșeala 1:** Confunzi rația aritmetică (se adaugă) cu cea geometrică (se înmulțește). Verifică cu 2-3 perechi consecutive: dacă diferența e constantă → aritmetic; dacă raportul e constant → geometric.
+
+**Greșeala 2:** Overflow la șiruri geometrice cu rație mare. `3 * 2^30 > 3 miliarde` — depășește `int`. Folosește `long long` pentru orice șir geometric cu mai mulți termeni.
+
+**Greșeala 3:** Folosești `pow(r, i)` din `<cmath>` pentru numere întregi — returnează `double` și poate da rezultate incorecte (ex. `pow(2, 10)` poate fi `1023.9999...` trunchiat la 1023). Calculează puteri întregi cu înmulțiri, nu cu `pow`.
+</MistakeBox>

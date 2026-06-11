@@ -1,0 +1,139 @@
+---
+title: "Șirul lui Fibonacci"
+slug: sirul-fibonacci
+grade: 5
+chapter: siruri-generate
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["fibonacci", "siruri-recurente", "for", "doi-predecesori"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care sunt primii 8 termeni ai șirului Fibonacci (începând cu 0, 1)?"
+    options:
+      - "0, 1, 1, 2, 3, 5, 8, 13"
+      - "1, 1, 2, 3, 5, 8, 13, 21"
+      - "0, 1, 2, 3, 5, 8, 13, 21"
+      - "0, 1, 1, 2, 4, 7, 11, 18"
+    correctIndex: 0
+    explanation: "F(0)=0, F(1)=1, F(2)=1, F(3)=2, F(4)=3, F(5)=5, F(6)=8, F(7)=13. Fiecare termen = suma celor doi anteriori."
+  - question: "Câți termeni anteriori are nevoie fiecare termen Fibonacci?"
+    options:
+      - "Unul"
+      - "Doi"
+      - "Trei"
+      - "Toți cei anteriori"
+    correctIndex: 1
+    explanation: "F(n) = F(n-1) + F(n-2). Exact doi predecesori — de aceea menținem mereu ultimii doi termeni calculați."
+  - question: "F(10) = ?"
+    options:
+      - "34"
+      - "55"
+      - "89"
+      - "21"
+    correctIndex: 1
+    explanation: "Continuând șirul: ..., F(8)=21, F(9)=34, F(10)=55."
+---
+
+<LessonHook>
+Un iepure devine adult după o lună. O pereche de adulți produce o pereche de pui în fiecare lună. Câte perechi ai după 12 luni? Răspunsul urmează șirul lui Fibonacci — observat de Fibonacci în 1202, dar prezent în natură cu mult înaintea lui: în spiralele floarea-soarelui, în cochiliile melcilor, în ramificările copacilor.
+</LessonHook>
+
+## Definiția șirului Fibonacci
+
+```
+F(0) = 0
+F(1) = 1
+F(n) = F(n-1) + F(n-2)  pentru n ≥ 2
+```
+
+Primii termeni: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+
+<ObservationBox>
+Fiecare termen este suma exactă a celor doi dinaintea lui. Asta face Fibonacci diferit de un șir aritmetic sau geometric — nu există o formulă simplă pentru termenul n (există formula lui Binet cu numere iraționale, dar la concurs calculezi iterativ).
+</ObservationBox>
+
+## Algoritmul iterativ
+
+Nu avem nevoie să stocăm toți termenii anteriori — doar ultimii doi:
+
+```
+a = 0, b = 1  (F(0) și F(1))
+Pasul 1: c = a + b = 1  → a=1, b=1
+Pasul 2: c = a + b = 2  → a=1, b=2
+Pasul 3: c = a + b = 3  → a=2, b=3
+...
+```
+
+La fiecare pas: `c = a + b`, apoi `a = b`, `b = c`.
+
+## Implementare C++ — primii n termeni
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    long long a = 0, b = 1;
+
+    if (n >= 1) cout << a << " ";  // F(0) = 0
+    if (n >= 2) cout << b << " ";  // F(1) = 1
+
+    for (int i = 2; i < n; i++) {
+        long long c = a + b;       // urmatorul termen
+        cout << c << " ";
+        a = b;                     // deplasam fereastra cu un pas
+        b = c;
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+**Exemplu:** Input `8` → `0 1 1 2 3 5 8 13`
+
+## Varianta cu vector (mai clară, mai multă memorie)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    long long f[100];       // suficient pentru n <= 100
+    f[0] = 0;
+    f[1] = 1;
+    for (int i = 2; i < n; i++) {
+        f[i] = f[i-1] + f[i-2];
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << f[i] << " ";
+    }
+    cout << endl;
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Generare n termeni (2 variabile) | O(n) | O(1) |
+| Generare n termeni (vector) | O(n) | O(n) |
+
+<MistakeBox>
+**Greșeala 1:** Suprascrii `a` înainte să calculezi `c`. Ordinea corectă: `c = a + b`, apoi `a = b`, apoi `b = c`. Dacă faci `a = b; b = a + b`, al doilea `a` e deja suprascris.
+
+**Greșeala 2:** Folosești `int` pentru n mare. F(47) = 2.971.215.073 depășește `int`. Folosește `long long`. F(93) depășește și `long long` — pentru n mai mare ai nevoie de numere mari sau modulo.
+
+**Greșeala 3:** Pornești șirul de la F(1) = 1, F(2) = 1 în loc de F(0) = 0, F(1) = 1. Ambele convenții există — verifică ce convenție cere problema înainte de a scrie codul.
+</MistakeBox>
