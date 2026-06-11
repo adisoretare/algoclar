@@ -33,6 +33,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'edges',
     label: 'Arce „u v cost" (separate prin ;)',
     placeholder: 'ex: 0 1 6 ; 1 4 -4',
+    defaultValue: '0 1 6 ; 0 2 7 ; 1 2 8 ; 1 3 5 ; 1 4 -4 ; 2 3 -3 ; 2 4 9 ; 3 1 -2 ; 4 0 2 ; 4 3 7',
     hint: 'Graf orientat · ponderile pot fi negative · noduri de la 0',
     validate: raw => {
       // allow negative weights: parse manually tolerant to '-'

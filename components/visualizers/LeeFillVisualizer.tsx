@@ -36,6 +36,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'grid',
     label: 'Grila (0 = liber, 1 = perete; linii separate prin ;)',
     placeholder: 'ex: 0 0 0 ; 0 1 0 ; 0 0 0',
+    defaultValue: '0 0 0 0 0 0 ; 0 1 1 1 1 0 ; 0 0 0 0 1 0 ; 1 1 1 0 1 0 ; 0 0 0 0 0 0',
     hint: 'Colțul stânga-sus și dreapta-jos trebuie libere · max 7×7',
     validate: raw => {
       const grid = parseGrid(raw)

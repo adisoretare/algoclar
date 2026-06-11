@@ -19,6 +19,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 3 1 4 1 5 9 2 6',
+    defaultValue: '3 1 4 1 5 9 2 6',
     hint: 'Întregi separați prin spațiu · min 2 · max 8 valori',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -31,6 +32,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'range',
     label: 'Intervalul [l, r] (0-indexat)',
     placeholder: 'ex: 2 6',
+    defaultValue: '2 6',
     hint: 'Două numere: l și r',
     validate: raw => {
       const n = parseIntegers(raw)
@@ -40,6 +42,15 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidateRange(values: Record<string, string>): string | null {
+  const nums = parseIntegers(values.array ?? '')
+  const rng = parseIntegers(values.range ?? '')
+  if (!nums || !rng || rng.length !== 2) return null
+  if (rng[1] >= nums.length)
+    return `Intervalul iese din vector: r ≤ ${nums.length - 1}.`
+  return null
+}
 
 export function SegmentTreeVisualizer() {
   const [array, setArray] = useState(DEFAULT_ARRAY)
@@ -105,7 +116,13 @@ export function SegmentTreeVisualizer() {
       title="Segment Tree — sume pe interval"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidateRange}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-2 py-2">
         <span className="font-mono text-xs font-semibold text-primary">

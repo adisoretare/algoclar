@@ -24,6 +24,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'set',
     label: 'Valori pentru mulțime',
     placeholder: 'ex: 5 1 8 3',
+    defaultValue: '5 1 8 3 1 5 9',
     hint: 'Întregi separați prin spațiu · duplicatele se ignoră · max 12',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -36,6 +37,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'contains',
     label: 'Valoare căutată (contains)',
     placeholder: 'ex: 8',
+    defaultValue: '8',
     hint: 'Un singur număr',
     validate: raw => {
       const n = parseIntegers(raw)

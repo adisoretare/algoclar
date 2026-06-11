@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'values',
     label: 'Valorile nodurilor',
     placeholder: 'ex: 4 8 15 16 23',
+    defaultValue: '4 8 15 16 23',
     hint: 'Numere întregi separate prin spațiu · min 3 · max 8 valori',
     validate: raw => {
       const nums = parseIntegers(raw)

@@ -20,6 +20,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'numbers',
     label: 'Două numere (separate prin spațiu)',
     placeholder: 'ex: 4825 1996',
+    defaultValue: '4825 1996',
     hint: 'Doar cifre · max 18 cifre fiecare',
     validate: raw => {
       const parts = raw.trim().split(/\s+/)

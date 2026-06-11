@@ -15,6 +15,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'n',
     label: 'Calculează Fibonacci până la n',
     placeholder: 'ex: 10',
+    defaultValue: '10',
     hint: 'Un întreg între 2 și 20',
     validate: raw => {
       const n = parseIntegers(raw)

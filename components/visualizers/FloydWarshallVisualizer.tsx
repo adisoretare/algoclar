@@ -29,6 +29,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'edges',
     label: 'Arce „u v cost" (separate prin ;)',
     placeholder: 'ex: 0 1 3 ; 1 2 2',
+    defaultValue: '0 1 3 ; 0 3 7 ; 1 0 8 ; 1 2 2 ; 2 0 5 ; 2 3 1 ; 3 0 2',
     hint: 'Graf orientat · maximum 7 noduri · noduri de la 0',
     validate: raw => {
       const g = parseEdgeList(raw, { weighted: true, directed: true })

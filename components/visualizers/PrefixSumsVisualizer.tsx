@@ -17,6 +17,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 3 1 4 1 5 9 2',
+    defaultValue: '3 1 4 1 5 9 2 6',
     hint: 'Numere întregi separate prin spațiu · min 2 · max 12 valori',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -32,6 +33,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'interval',
     label: 'Intervalul [l, r] (0-indexat)',
     placeholder: 'ex: 2 5',
+    defaultValue: '2 5',
     hint: 'Două numere: l și r, cu 0 ≤ l ≤ r < lungime',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -41,6 +43,15 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidatePrefix(values: Record<string, string>): string | null {
+  const nums = parseIntegers(values.array ?? '')
+  const iv = parseIntegers(values.interval ?? '')
+  if (!nums || !iv || iv.length !== 2) return null
+  if (iv[1] >= nums.length)
+    return `Intervalul iese din vector: r ≤ ${nums.length - 1}.`
+  return null
+}
 
 export function PrefixSumsVisualizer() {
   const [array, setArray] = useState(DEFAULT_ARRAY)
@@ -84,7 +95,13 @@ export function PrefixSumsVisualizer() {
       title="Sume parțiale — sumă pe interval în O(1)"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidatePrefix}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-7 py-2">
         {/* Source array */}

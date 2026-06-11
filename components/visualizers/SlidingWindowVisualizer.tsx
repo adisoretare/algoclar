@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 2 1 5 1 3 2 4',
+    defaultValue: '2 1 5 1 3 2 4 6 1',
     hint: 'Numere întregi separate prin spațiu · min 2 · max 14 valori',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -29,6 +30,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'k',
     label: 'Lungimea ferestrei k',
     placeholder: 'ex: 3',
+    defaultValue: '3',
     hint: 'Un număr între 1 și lungimea vectorului',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -38,6 +40,15 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidateWindow(values: Record<string, string>): string | null {
+  const nums = parseIntegers(values.array ?? '')
+  const kv = parseIntegers(values.k ?? '')
+  if (!nums || !kv || kv.length !== 1) return null
+  if (kv[0] > nums.length)
+    return `Fereastra k = ${kv[0]} depășește lungimea vectorului (${nums.length}).`
+  return null
+}
 
 export function SlidingWindowVisualizer() {
   const [array, setArray] = useState(DEFAULT_ARRAY)
@@ -78,7 +89,13 @@ export function SlidingWindowVisualizer() {
       title="Fereastră glisantă — sumă maximă pe k elemente"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidateWindow}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-6 py-2">
         {/* Stats */}

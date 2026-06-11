@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'exp',
     label: 'Exponentul (M^p, M = matricea Fibonacci)',
     placeholder: 'ex: 10',
+    defaultValue: '10',
     hint: 'Un întreg între 1 și 40',
     validate: raw => {
       const n = parseIntegers(raw)

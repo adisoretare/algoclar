@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'items',
     label: 'Mulțimea de numere',
     placeholder: 'ex: 3 1 4 2',
+    defaultValue: '3 1 4 2',
     hint: 'Întregi ≥ 0 separați prin spațiu · min 1 · max 6',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -29,6 +30,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'target',
     label: 'Suma căutată',
     placeholder: 'ex: 5',
+    defaultValue: '5',
     hint: 'Un singur număr',
     validate: raw => {
       const n = parseIntegers(raw)

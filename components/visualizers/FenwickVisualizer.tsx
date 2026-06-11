@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 3 1 4 1 5 9',
+    defaultValue: '3 1 4 1 5 9 2 6',
     hint: 'Întregi separați prin spațiu · min 2 · max 12',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -28,6 +29,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'prefix',
     label: 'Lungimea prefixului interogat',
     placeholder: 'ex: 7',
+    defaultValue: '7',
     hint: 'Un număr între 1 și lungimea vectorului',
     validate: raw => {
       const n = parseIntegers(raw)
@@ -36,6 +38,15 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidateFenwick(values: Record<string, string>): string | null {
+  const nums = parseIntegers(values.array ?? '')
+  const p = parseIntegers(values.prefix ?? '')
+  if (!nums || !p || p.length !== 1) return null
+  if (p[0] > nums.length)
+    return `Prefixul depășește lungimea vectorului (${nums.length}).`
+  return null
+}
 
 function FenwickRow({
   label,
@@ -112,7 +123,13 @@ export function FenwickVisualizer() {
       title="Fenwick Tree (BIT) — sume de prefix în O(log n)"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidateFenwick}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-4 py-2">
         <span className="rounded-[8px] bg-primary/10 px-3 py-1 font-mono text-xs font-semibold text-primary">

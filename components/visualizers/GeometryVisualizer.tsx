@@ -34,6 +34,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'points',
     label: 'Trei puncte: x y (separate prin ;)',
     placeholder: 'ex: 1 1 ; 6 3 ; 2 5',
+    defaultValue: '1 1 ; 6 3 ; 2 5',
     hint: 'Coordonate întregi între 0 și 12',
     validate: raw => {
       const p = parsePoints(raw)

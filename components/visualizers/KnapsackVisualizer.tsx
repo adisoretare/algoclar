@@ -34,6 +34,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'items',
     label: 'Obiecte: greutate valoare (separate prin ;)',
     placeholder: 'ex: 1 1 ; 3 4 ; 4 5 ; 5 7',
+    defaultValue: '1 1 ; 3 4 ; 4 5 ; 5 7',
     hint: 'Fiecare obiect: greutate și valoare · max 6 obiecte',
     validate: raw => {
       const items = parseItems(raw)
@@ -46,6 +47,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'capacity',
     label: 'Capacitatea rucsacului',
     placeholder: 'ex: 7',
+    defaultValue: '7',
     hint: 'Un întreg între 1 și 14',
     validate: raw => {
       const n = parseIntegers(raw)

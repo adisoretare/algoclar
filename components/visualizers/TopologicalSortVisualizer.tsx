@@ -30,6 +30,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'edges',
     label: 'Arce „u v" orientate (separate prin ;)',
     placeholder: 'ex: 5 2 ; 5 0 ; 2 3',
+    defaultValue: '5 2 ; 5 0 ; 4 0 ; 4 1 ; 2 3 ; 3 1',
     hint: 'Graf orientat aciclic (DAG) · noduri de la 0',
     validate: raw => {
       const g = parseEdgeList(raw, { weighted: false, directed: true })

@@ -15,6 +15,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'n',
     label: 'Calculează factorial(n)',
     placeholder: 'ex: 5',
+    defaultValue: '5',
     hint: 'Un întreg între 1 și 9',
     validate: raw => {
       const n = parseIntegers(raw)

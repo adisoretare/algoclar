@@ -28,6 +28,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'query',
     label: 'Două noduri u v',
     placeholder: 'ex: 6 3',
+    defaultValue: '6 3',
     hint: `Noduri între 0 și ${PARENT.length - 1}`,
     validate: raw => {
       const nums = parseIntegers(raw)

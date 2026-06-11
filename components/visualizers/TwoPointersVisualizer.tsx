@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 2 3 5 7 8 11',
+    defaultValue: '2 3 5 7 8 11 14 18',
     hint: 'Se sortează automat · min 2 · max 14 valori',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -29,6 +30,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'target',
     label: 'Suma căutată',
     placeholder: 'ex: 16',
+    defaultValue: '16',
     hint: 'Un singur număr întreg',
     validate: raw => {
       const nums = parseIntegers(raw)

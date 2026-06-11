@@ -17,6 +17,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: 3 1 4 1 5 9 2 6 5',
+    defaultValue: '3 1 4 1 5 9 2 6 5 3 5 8',
     hint: 'Întregi separați prin spațiu · min 4 · max 16',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -29,6 +30,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'range',
     label: 'Intervalul [l, r] (0-indexat)',
     placeholder: 'ex: 2 9',
+    defaultValue: '2 9',
     hint: 'Două numere cu 0 ≤ l ≤ r',
     validate: raw => {
       const n = parseIntegers(raw)
@@ -38,6 +40,15 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidateRange(values: Record<string, string>): string | null {
+  const nums = parseIntegers(values.array ?? '')
+  const rng = parseIntegers(values.range ?? '')
+  if (!nums || !rng || rng.length !== 2) return null
+  if (rng[1] >= nums.length)
+    return `Intervalul iese din vector: r ≤ ${nums.length - 1}.`
+  return null
+}
 
 export function SqrtDecompositionVisualizer() {
   const [array, setArray] = useState(DEFAULT_ARRAY)
@@ -81,7 +92,13 @@ export function SqrtDecompositionVisualizer() {
       title="Square Root Decomposition — interogări în O(√n)"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidateRange}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-3 py-2">
         {/* array grouped by block */}

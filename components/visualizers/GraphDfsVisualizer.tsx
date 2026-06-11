@@ -31,6 +31,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'edges',
     label: 'Muchii „u v" (separate prin ;)',
     placeholder: 'ex: 0 1 ; 0 2 ; 1 3',
+    defaultValue: '0 1 ; 0 2 ; 1 3 ; 2 4 ; 3 5 ; 4 5 ; 5 6',
     hint: 'Graf neorientat · noduri de la 0',
     validate: raw => {
       const g = parseEdgeList(raw, { weighted: false, directed: false })

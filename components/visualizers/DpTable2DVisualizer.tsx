@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'strings',
     label: 'Două șiruri (separate prin spațiu)',
     placeholder: 'ex: ABCBDAB BDCAB',
+    defaultValue: 'ABCBDAB BDCAB',
     hint: 'Doar litere · max 10 caractere fiecare',
     validate: raw => {
       const parts = raw.trim().split(/\s+/)

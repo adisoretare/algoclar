@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'values',
     label: 'Valori de inserat în heap',
     placeholder: 'ex: 5 3 8 1 9 2',
+    defaultValue: '5 3 8 1 9 2 7',
     hint: 'Întregi separați prin spațiu · min 1 · max 12 valori',
     validate: raw => {
       const nums = parseIntegers(raw)

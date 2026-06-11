@@ -15,6 +15,12 @@ export interface LabField {
 interface LabInputProps {
   fields: LabField[]
   onSubmit: (values: Record<string, string>) => void
+  /**
+   * Optional cross-field check run after every per-field validator passes.
+   * Return an error message to block the submit and show it to the user
+   * (e.g. "intervalul depășește lungimea vectorului"), or null to allow.
+   */
+  crossValidate?: (values: Record<string, string>) => string | null
 }
 
 export function parseIntegers(raw: string): number[] | null {
@@ -26,11 +32,12 @@ export function parseIntegers(raw: string): number[] | null {
   return nums
 }
 
-export function LabInput({ fields, onSubmit }: LabInputProps) {
+export function LabInput({ fields, onSubmit, crossValidate }: LabInputProps) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(fields.map(f => [f.id, f.defaultValue ?? ''])),
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [formError, setFormError] = useState<string | null>(null)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -41,9 +48,17 @@ export function LabInput({ fields, onSubmit }: LabInputProps) {
     }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      setFormError(null)
+      return
+    }
+    const cross = crossValidate?.(values) ?? null
+    if (cross) {
+      setErrors({})
+      setFormError(cross)
       return
     }
     setErrors({})
+    setFormError(null)
     onSubmit(values)
   }
 
@@ -90,6 +105,11 @@ export function LabInput({ fields, onSubmit }: LabInputProps) {
           ) : null}
         </div>
       ))}
+      {formError && (
+        <span role="alert" className="font-mono text-xs text-destructive">
+          {formError}
+        </span>
+      )}
       <button
         type="submit"
         className="self-start rounded-[8px] bg-primary px-4 py-2 font-mono text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-95"

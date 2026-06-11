@@ -41,6 +41,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'grid',
     label: 'Grila ta (linii separate prin ;)',
     placeholder: 'ex: 3 1 4 ; 1 5 2 ; 2 3 1',
+    defaultValue: '3 1 4 2 ; 1 5 2 6 ; 2 3 1 0 ; 4 2 7 1',
     hint: 'Fiecare linie cu același număr de valori · max 5×5 · valori între -99 și 99',
     validate: raw => {
       const grid = parseGrid(raw)
@@ -55,6 +56,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'query',
     label: 'Dreptunghiul: r1 c1 r2 c2 (0-indexat)',
     placeholder: 'ex: 1 1 2 3',
+    defaultValue: '1 1 2 3',
     hint: 'Patru numere: colț stânga-sus și colț dreapta-jos',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -65,6 +67,16 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidate2D(values: Record<string, string>): string | null {
+  const g = parseGrid(values.grid ?? '')
+  const nums = parseIntegers(values.query ?? '')
+  if (!g || !nums || nums.length !== 4) return null
+  const [, , r2, c2] = nums
+  if (r2 >= g.length || c2 >= g[0].length)
+    return `Dreptunghiul iese din grilă: r ≤ ${g.length - 1}, c ≤ ${g[0].length - 1}.`
+  return null
+}
 
 export function PrefixSums2DVisualizer() {
   const [grid, setGrid] = useState<number[][]>(DEFAULT_GRID)
@@ -120,7 +132,13 @@ export function PrefixSums2DVisualizer() {
       title="Sume parțiale 2D — sumă pe dreptunghi în O(1)"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidate2D}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-6 py-2 sm:flex-row sm:items-start sm:justify-center sm:gap-10">
         {/* Grid */}

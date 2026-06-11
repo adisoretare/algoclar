@@ -16,6 +16,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'array',
     label: 'Vectorul tău',
     placeholder: 'ex: -2 1 -3 4 -1 2 1',
+    defaultValue: '-2 1 -3 4 -1 2 1 -5 4',
     hint: 'Numere întregi (și negative!) separate prin spațiu · min 2 · max 16 · între -99 și 99',
     validate: raw => {
       const nums = parseIntegers(raw)

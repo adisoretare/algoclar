@@ -33,6 +33,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'dist',
     label: 'Matricea distanțelor (linii separate prin ;)',
     placeholder: 'ex: 0 10 15 ; 10 0 35 ; 15 35 0',
+    defaultValue: '0 10 15 20 ; 10 0 35 25 ; 15 35 0 30 ; 20 25 30 0',
     hint: 'Matrice pătratică · 2–6 orașe · valori ≥ 0',
     validate: raw => {
       const m = parseMatrix(raw)

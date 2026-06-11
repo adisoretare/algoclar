@@ -33,6 +33,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'edges',
     label: 'Muchii „u v" (separate prin ;)',
     placeholder: 'ex: 0 1 ; 1 2 ; 3 4',
+    defaultValue: '0 1 ; 1 2 ; 0 2 ; 3 4 ; 5 6 ; 6 7',
     hint: 'Graf neorientat · nodurile fără muchii sunt componente separate',
     validate: raw => {
       const g = parseEdgeList(raw, { weighted: false, directed: false })

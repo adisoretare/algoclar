@@ -39,6 +39,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'n',
     label: 'Lungimea vectorului (n)',
     placeholder: 'ex: 9',
+    defaultValue: '9',
     hint: 'Un număr între 2 și 16',
     validate: raw => {
       const nums = parseIntegers(raw)
@@ -51,6 +52,7 @@ const LAB_FIELDS: LabField[] = [
     id: 'updates',
     label: 'Update-uri: l r val (separate prin ;)',
     placeholder: 'ex: 1 4 3 ; 2 6 2 ; 0 3 -1',
+    defaultValue: '1 4 3 ; 2 6 2 ; 0 3 -1',
     hint: 'Fiecare update: poziția de start, de final și valoarea adăugată',
     validate: raw => {
       const ups = parseUpdates(raw)
@@ -59,6 +61,16 @@ const LAB_FIELDS: LabField[] = [
     },
   },
 ]
+
+function crossValidateDiff(values: Record<string, string>): string | null {
+  const nv = parseIntegers(values.n ?? '')
+  const ups = parseUpdates(values.updates ?? '')
+  if (!nv || nv.length !== 1 || !ups) return null
+  const n = nv[0]
+  if (ups.some(u => u.l < 0 || u.r >= n))
+    return `Un update iese din vector: pozițiile trebuie să fie între 0 și ${n - 1}.`
+  return null
+}
 
 export function DifferenceArrayVisualizer() {
   const [n, setN] = useState(DEFAULT_N)
@@ -101,7 +113,13 @@ export function DifferenceArrayVisualizer() {
       title="Vector de diferențe — update pe interval în O(1)"
       player={player}
       frameCount={frames.length}
-      labZone={<LabInput fields={LAB_FIELDS} onSubmit={handleLabSubmit} />}
+      labZone={
+        <LabInput
+          fields={LAB_FIELDS}
+          onSubmit={handleLabSubmit}
+          crossValidate={crossValidateDiff}
+        />
+      }
     >
       <div className="flex flex-col items-center gap-6 py-2">
         {/* Updates list */}
