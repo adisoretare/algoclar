@@ -1,0 +1,130 @@
+---
+title: "Stocarea ultimului element"
+slug: stocarea-ultimului-element
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["precedent", "prev", "tranzitii", "schimbari"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce avem nevoie de variabila `prev` (elementul anterior)?"
+    options:
+      - "Ca să putem sorta șirul"
+      - "Ca să detectăm când se schimbă ceva față de pasul anterior"
+      - "Ca să calculăm suma mai repede"
+      - "Nu e niciodată necesară"
+    correctIndex: 1
+    explanation: "prev ține valoarea de la iterația precedentă. O folosim când trebuie să comparăm elementul curent cu cel de dinainte — de exemplu, să numărăm schimbările de valoare sau să detectăm tranziții."
+  - question: "Cu ce inițializezi `prev` înainte de a citi primul element?"
+    options:
+      - "Cu 0 întotdeauna"
+      - "Cu prima valoare citită (citești primul element separat)"
+      - "Cu INT_MIN"
+      - "Nu contează"
+    correctIndex: 1
+    explanation: "Cel mai sigur e să citești primul element separat și să-l pui în prev. Astfel la prima iterație a buclei (de la i=1) comparația x vs prev e mereu validă."
+  - question: "Șirul 3, 3, 5, 5, 5, 2 are câte tranziții (momente când valoarea se schimbă)?"
+    options:
+      - "2"
+      - "3"
+      - "5"
+      - "1"
+    correctIndex: 0
+    explanation: "3→3 (nu), 3→5 (da), 5→5 (nu), 5→5 (nu), 5→2 (da). Două tranziții."
+---
+
+<LessonHook>
+Semaforul se schimbă din roșu în verde. Temperatura de ieri era 20°C, azi e 25°C — s-a schimbat. Mulți algoritmi nu depind doar de valoarea curentă, ci de raportul ei față de cea anterioară. Variabila `prev` (precedentul) îți dă memoria unui singur pas înapoi.
+</LessonHook>
+
+## Când ai nevoie de `prev`?
+
+Ori de câte ori logica depinde de **compararea elementului curent cu cel anterior**:
+- Numărul de schimbări de valoare
+- Dacă șirul e strict crescător
+- Detectarea momentului când ceva „pornește" sau „se oprește"
+- Lungimea unui bloc de valori egale
+
+## Algoritmul
+
+```
+Șir: 3 3 5 5 5 2
+tranzitii = 0
+prev = 3  (primul element)
+
+x=3: 3 == prev → nimic
+x=5: 5 != prev → tranzitii++, prev = 5
+x=5: 5 == prev → nimic
+x=5: 5 == prev → nimic
+x=2: 2 != prev → tranzitii++, prev = 2
+Rezultat: tranzitii = 2
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("tranzitii.in");
+    ofstream fout("tranzitii.out");
+
+    int n;
+    fin >> n;
+
+    int prev;
+    fin >> prev;          // primul element devine prev initial
+    int tranzitii = 0;
+
+    for (int i = 1; i < n; i++) {   // incepem de la al doilea element
+        int x;
+        fin >> x;
+        if (x != prev) {
+            tranzitii++;
+            prev = x;    // actualizeaza prev la fiecare pas
+        }
+    }
+
+    fout << tranzitii << "\n";
+    return 0;
+}
+```
+
+**Exemplu:** `6` / `3 3 5 5 5 2` → `2`
+
+## Verificarea unui șir strict crescător
+
+```cpp
+fin >> prev;
+bool crescator = true;
+for (int i = 1; i < n; i++) {
+    int x; fin >> x;
+    if (x <= prev) { crescator = false; break; }
+    prev = x;
+}
+```
+
+<ObservationBox>
+Actualizează `prev = x` la **fiecare** iterație, nu doar când detectezi o schimbare. Dacă actualizezi doar la schimbare, `prev` rămâne la vechea valoare și nu mai reflectă elementul imediat anterior.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Procesare cu prev | O(n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Inițializezi `prev = 0` în loc să citești primul element separat. Dacă primul element e 0, funcționează întâmplător. Dacă e altceva, prima comparație e greșită.
+
+**Greșeala 2:** Uiți `prev = x` la sfârșitul buclei. `prev` trebuie actualizat la **fiecare** iterație, altfel compari mereu cu primul element.
+
+**Greșeala 3:** Pornești bucla de la `i = 0` în loc de `i = 1` după ce ai citit primul element separat. Vei citi primul element de două ori.
+</MistakeBox>

@@ -1,0 +1,130 @@
+---
+title: "Stocarea ultimelor p elemente"
+slug: stocarea-ultimelor-p-elemente
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["buffer-circular", "fereastrafenestrat", "ultimele-p", "modulo"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Vrei să păstrezi ultimele 3 elemente dintr-un șir. La pasul i, ce index din buffer suprascrii?"
+    options:
+      - "i"
+      - "i % 3"
+      - "i / 3"
+      - "i - 3"
+    correctIndex: 1
+    explanation: "i % 3 ciclează prin 0, 1, 2, 0, 1, 2... — suprascrie mereu cel mai vechi element din buffer-ul de 3."
+  - question: "Suma ultimelor p elemente se poate calcula în O(1) dacă:"
+    options:
+      - "Sortezi buffer-ul la fiecare pas"
+      - "Menții o variabilă sumă pe care o actualizezi: adaugi noul element, scazi pe cel care iese"
+      - "Nu se poate în O(1)"
+      - "Recalculezi suma buffer-ului la fiecare pas"
+    correctIndex: 1
+    explanation: "suma += x_nou - x_vechi (cel care iese din fereastra). Actualizare O(1) per pas."
+  - question: "Buffer-ul circular de dimensiune p e plin după cel puțin câte elemente citite?"
+    options:
+      - "p - 1"
+      - "p"
+      - "p + 1"
+      - "2p"
+    correctIndex: 1
+    explanation: "După ce citești p elemente, toate cele p poziții din buffer sunt ocupate cu valori valide."
+---
+
+<LessonHook>
+Prognoza meteo folosește media temperaturilor din ultimele 7 zile. Nu ține minte toată istoria — când vine ziua 8, uită ziua 1. Un buffer circular de 7 poziții face exact asta: ține mereu ultimele 7 valori, suprascrierind cele mai vechi.
+</LessonHook>
+
+## Ideea de buffer circular
+
+Folosim un array de dimensiune `p`. La pasul `i`, scriem în poziția `i % p` — când ajungem la capăt, continuăm de la 0, suprascriind cele mai vechi valori.
+
+```
+p = 3, șir: 5 2 8 1 9 4
+
+i=0: buf[0]=5  → [5, -, -]
+i=1: buf[1]=2  → [5, 2, -]
+i=2: buf[2]=8  → [5, 2, 8]  ← plin
+i=3: buf[0]=1  → [1, 2, 8]  (suprascrie cel mai vechi: 5)
+i=4: buf[1]=9  → [1, 9, 8]  (suprascrie 2)
+i=5: buf[2]=4  → [1, 9, 4]  (suprascrie 8)
+```
+
+## Implementare C++ — buffer circular
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("buf.in");
+    ofstream fout("buf.out");
+
+    int n, p;
+    fin >> n >> p;
+
+    int buf[1000];    // buffer de dimensiune p
+    long long suma = 0;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+
+        if (i >= p) {
+            suma -= buf[i % p];   // scoate cel mai vechi element
+        }
+        buf[i % p] = x;           // pune noul element
+        suma += x;
+
+        if (i >= p - 1) {
+            // avem p elemente in buffer — putem raporta
+            fout << "Suma ultimelor " << p << ": " << suma << "\n";
+        }
+    }
+    return 0;
+}
+```
+
+**Exemplu:** n=6, p=3, șir `5 2 8 1 9 4` → suma la i=2: 15, i=3: 11, i=4: 18, i=5: 14
+
+<ObservationBox>
+Trucul cheie: la pasul `i`, elementul care iese din fereastra de p este chiar `buf[i % p]` — același slot pe care urmează să-l suprascrii. Citești-l înainte de suprascriere.
+</ObservationBox>
+
+## Varianta simplă (fără suma curentă)
+
+Dacă vrei doar să afișezi ultimele p elemente la final:
+
+```cpp
+for (int i = 0; i < n; i++) {
+    fin >> buf[i % p];
+}
+// ultimele p: de la ((n-1)%p + 1) % p, in ordine circulara
+// sau mai simplu: afisezi buf in doua bucle
+int start = n % p;
+for (int i = 0; i < p; i++) {
+    fout << buf[(start + i) % p] << " ";
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Buffer circular | O(n) | O(p) |
+
+<MistakeBox>
+**Greșeala 1:** Citești `buf[i % p]` (cel care iese) **după** suprascriere. Îl suprascrii înainte să-l scazi din sumă — valoarea veche e pierdută. Ordinea: scade `buf[i % p]`, suprascrie, adaugă.
+
+**Greșeala 2:** Raportezi suma înainte ca buffer-ul să fie plin (`i < p - 1`). Suma primelor `i+1 < p` elemente nu e suma ultimelor p.
+
+**Greșeala 3:** Declari `buf[p]` unde `p` e citit la runtime — în C++ clasic, dimensiunea array-ului static trebuie să fie o constantă la compilare. Folosește o constantă mare (`int buf[1000]`) sau un `vector<int> buf(p)`.
+</MistakeBox>

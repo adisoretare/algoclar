@@ -1,0 +1,130 @@
+---
+title: "Prelucrări fără memorarea tuturor valorilor"
+slug: prelucrari-fara-memorare
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["streaming", "acumulator", "online", "memorie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce procesăm uneori numerele fără să le stocăm pe toate?"
+    options:
+      - "E mai greu de implementat cu vector"
+      - "Când n e foarte mare, nu avem suficientă memorie pentru toate valorile"
+      - "Citirea din fișier e mai lentă cu vector"
+      - "Nu există niciun motiv — e același lucru"
+    correctIndex: 1
+    explanation: "Pentru n = 10⁷ sau mai mult, un vector de int ocupă 40 MB+ — peste limita multor probleme. Prelucrând pe loc economisim memorie."
+  - question: "Care dintre acestea NU se poate calcula fără să stochezi toate valorile?"
+    options:
+      - "Suma tuturor valorilor"
+      - "Maximul tuturor valorilor"
+      - "Mediana (valoarea din mijloc după sortare)"
+      - "Numărul de valori pare"
+    correctIndex: 2
+    explanation: "Mediana necesită sortare — nu poți sorta fără să ai toate valorile. Suma, maximul și contorizarea se pot calcula pe loc, valoare cu valoare."
+  - question: "Care e spațiul folosit de un acumulator de sumă procesând n valori?"
+    options:
+      - "O(n)"
+      - "O(log n)"
+      - "O(1)"
+      - "O(n²)"
+    correctIndex: 2
+    explanation: "Acumulatorul e o singură variabilă — O(1) indiferent de n. Asta e puterea procesării fără memorare."
+---
+
+<LessonHook>
+Soldul contului tău bancar nu e suma tuturor tranzacțiilor stocate — banca ține un singur număr curent și îl actualizează la fiecare tranzacție. Tu faci la fel: citești numerele pe rând și actualizezi ce ai nevoie, fără să ții minte toată lista.
+</LessonHook>
+
+## Ideea centrală
+
+Multe prelucrări se pot face „din zbor" — citești un număr, îl procesezi imediat, apoi îl uiți. Nu ai nevoie să stochezi toată secvența.
+
+**Ce poți calcula fără vector:**
+- Suma, produsul
+- Maximul, minimul
+- Numărul de elemente cu o proprietate
+- Media aritmetică (sum + contor)
+
+**Ce necesită stocarea tuturor valorilor:**
+- Mediana (trebuie sortare)
+- Al k-lea element în ordine
+- Operații care compară elemente non-adiacente
+
+## Pattern-ul de bază
+
+```cpp
+// Citim n numere si calculam suma si maximul simultan
+int n; cin >> n;
+long long suma = 0;
+int maxim = INT_MIN;   // sau citim primul element separat
+
+for (int i = 0; i < n; i++) {
+    int x;
+    cin >> x;          // citim valoarea
+    suma += x;         // procesam imediat
+    if (x > maxim) maxim = x;
+    // x nu mai e necesar — urmatoarea iteratie il suprascrie
+}
+```
+
+## Implementare C++ — mai multe calcule simultan
+
+```cpp
+#include <iostream>
+#include <climits>
+using namespace std;
+
+int main() {
+    ifstream fin("date.in");
+    ofstream fout("date.out");
+
+    int n;
+    fin >> n;
+
+    long long suma = 0;
+    int maxim = INT_MIN, minim = INT_MAX;
+    int nr_pare = 0;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        suma += x;
+        if (x > maxim) maxim = x;
+        if (x < minim) minim = x;
+        if (x % 2 == 0) nr_pare++;
+    }
+
+    fout << "Suma: " << suma << "\n";
+    fout << "Max: " << maxim << ", Min: " << minim << "\n";
+    fout << "Pare: " << nr_pare << "\n";
+    return 0;
+}
+```
+
+**O singură parcurgere, O(1) memorie suplimentară** — calculăm 4 lucruri simultan.
+
+<ObservationBox>
+Aceasta e abordarea standard pentru secvențe de intrare la olimpiade. Dacă problema nu cere să „revii" la valori anterioare, aproape sigur poți procesa fără vector și economisești atât memorie cât și timp de implementare.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Orice calcul streaming | O(n) | O(1) |
+| Cu vector | O(n) | O(n) |
+
+<MistakeBox>
+**Greșeala 1:** Declari `int x` în afara buclei din reflex. Nu e greșit, dar nu e necesar — variabila se poate declara în interiorul buclei (`int x; cin >> x;`).
+
+**Greșeala 2:** Inițializezi `maxim = 0`. Dacă toate valorile sunt negative, maximul rămâne 0 — incorect. Folosește `INT_MIN` (din `<climits>`) sau citește primul element separat ca valoare inițială.
+
+**Greșeala 3:** Crezi că „fără vector" e mereu mai bun. Dacă problema cere să afișezi elementele sortate sau să faci căutare, vei avea nevoie de vector. Alege în funcție de ce cere problema.
+</MistakeBox>

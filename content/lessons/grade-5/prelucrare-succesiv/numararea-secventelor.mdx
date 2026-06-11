@@ -1,0 +1,142 @@
+---
+title: "Numărarea secvențelor cu proprietăți"
+slug: numararea-secventelor
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["secvente", "numarare", "stare", "start-stop"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câte blocuri de valori pare există în șirul 2, 4, 3, 6, 8, 1, 10?"
+    options:
+      - "4"
+      - "3"
+      - "2"
+      - "5"
+    correctIndex: 1
+    explanation: "[2,4], [6,8], [10] — 3 blocuri distincte de valori pare."
+  - question: "Când incrementezi contorul de secvențe?"
+    options:
+      - "La fiecare element care satisface proprietatea"
+      - "Când proprietatea devine adevărată pentru prima oară într-un bloc nou (tranziție fals→adevărat)"
+      - "La fiecare element care nu satisface proprietatea"
+      - "O dată la final"
+    correctIndex: 1
+    explanation: "O nouă secvență începe exact când trecem de la 'în afara blocului' la 'în bloc'. Dacă numeri la fiecare element, vei număra de câte ori e satisfăcută proprietatea, nu numărul de blocuri."
+  - question: "Variabila booleană `in_bloc` ce valoare are când suntem în mijlocul unui bloc valid?"
+    options:
+      - "false"
+      - "true"
+      - "0"
+      - "Depinde de index"
+    correctIndex: 1
+    explanation: "in_bloc = true înseamnă că procesăm un bloc activ. La primul element valid după o pauză, setăm in_bloc = true și incrementăm contorul."
+---
+
+<LessonHook>
+Numeri cuvintele dintr-o propoziție. Un cuvânt e o secvență de litere — numeri câte secvențe de litere există, nu câte litere. Același principiu: detectezi când „pornește" o nouă secvență (prima literă după un spațiu) și incrementezi contorul o singură dată per secvență.
+</LessonHook>
+
+## Diferența față de lungimea maximă
+
+| Ce vrei | Ce calculezi |
+|---|---|
+| Lungimea celui mai lung bloc | `lung_max` — actualizat în interiorul blocului |
+| Câte blocuri există | `nr_blocuri` — incrementat **o singură dată** la începutul fiecărui bloc |
+
+## Algoritmul cu `in_bloc`
+
+Variabila booleană `in_bloc` reține dacă suntem activ într-un bloc:
+
+```
+Șir: 2 4 3 6 8 1 10   (proprietate: par)
+nr_blocuri = 0, in_bloc = false
+
+x=2:  par,  !in_bloc → nr_blocuri=1, in_bloc=true
+x=4:  par,  in_bloc  → nimic (suntem deja in bloc)
+x=3:  impar          → in_bloc=false
+x=6:  par,  !in_bloc → nr_blocuri=2, in_bloc=true
+x=8:  par,  in_bloc  → nimic
+x=1:  impar          → in_bloc=false
+x=10: par,  !in_bloc → nr_blocuri=3, in_bloc=true
+Rezultat: 3
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("nr_secv.in");
+    ofstream fout("nr_secv.out");
+
+    int n;
+    fin >> n;
+
+    int nr_blocuri = 0;
+    bool in_bloc = false;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        if (x % 2 == 0) {            // proprietatea: par
+            if (!in_bloc) {
+                nr_blocuri++;        // inceput de bloc nou
+                in_bloc = true;
+            }
+        } else {
+            in_bloc = false;         // iesire din bloc
+        }
+    }
+
+    fout << nr_blocuri << "\n";
+    return 0;
+}
+```
+
+**Exemplu:** `7` / `2 4 3 6 8 1 10` → `3`
+
+## Combinat — număr și lungime maximă simultan
+
+```cpp
+int nr_blocuri = 0, lung_cur = 0, lung_max = 0;
+bool in_bloc = false;
+
+for (int i = 0; i < n; i++) {
+    int x; fin >> x;
+    if (x % 2 == 0) {
+        if (!in_bloc) { nr_blocuri++; in_bloc = true; }
+        lung_cur++;
+        if (lung_cur > lung_max) lung_max = lung_cur;
+    } else {
+        in_bloc = false;
+        lung_cur = 0;
+    }
+}
+```
+
+<ObservationBox>
+Tiparul `in_bloc` (sau `in_secventa`) e universal — funcționează pentru orice proprietate: valori pozitive, valori în interval [a,b], valori divisibile cu k, valori strict crescătoare față de precedenta. Schimbi doar condiția `if`.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Numărarea blocurilor | O(n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Incrementezi `nr_blocuri` la **fiecare** element valid, nu doar la primul. Numeri 4 în loc de 3 pentru `2 4 3 6 8 1 10`.
+
+**Greșeala 2:** Uiți să resetezi `in_bloc = false` când proprietatea nu e satisfăcută. Blocurile par contopite — un singur bloc mare în loc de mai multe.
+
+**Greșeala 3:** Confunzi numărarea blocurilor cu numărarea elementelor valide. `nr_blocuri` ≠ `nr_elemente_valide`. Prima numără grupuri, a doua numără individual.
+</MistakeBox>

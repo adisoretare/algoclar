@@ -1,0 +1,131 @@
+---
+title: "Primele două maxime sau minime"
+slug: primele-doua-maxime
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["maxim", "minim", "doua-maxime", "podium"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "În șirul 3, 7, 5, 7, 2 — care sunt max1 și max2 (permite duplicate)?"
+    options:
+      - "max1=7, max2=5"
+      - "max1=7, max2=7"
+      - "max1=7, max2=3"
+      - "max1=5, max2=7"
+    correctIndex: 1
+    explanation: "Dacă problema permite ca max1 și max2 să fie egale (valori din poziții diferite), atunci max1=7 și max2=7 (apar la pozițiile 1 și 3)."
+  - question: "Ordinea corectă de actualizare când x > max1 este:"
+    options:
+      - "max1 = x, max2 = max1"
+      - "max2 = max1, max1 = x"
+      - "max1 = max2, max2 = x"
+      - "max2 = x, max1 = max2"
+    correctIndex: 1
+    explanation: "Mai întâi salvezi vechiul max1 în max2, apoi setezi max1 = x. Dacă faci invers, pierzi valoarea lui max1."
+  - question: "Ce se întâmplă dacă x < max1 dar x > max2?"
+    options:
+      - "Actualizezi max1"
+      - "Nu actualizezi nimic"
+      - "Actualizezi max2 = x"
+      - "Interschimbi max1 și max2"
+    correctIndex: 2
+    explanation: "x nu e maximul absolut, dar e mai mare decât al doilea maxim curent. Îl înlocuiești pe max2."
+---
+
+<LessonHook>
+La olimpiadele sportive se acordă aur, argint și bronz. Ca să găsești câștigătorul de argint, nu sortezi toți participanții — îl ții pe „campionul curent" și „cel mai bun perdant". La fiecare nou concurent actualizezi cu grijă ambele.
+</LessonHook>
+
+## Algoritmul
+
+Menținem `max1` (cel mai mare) și `max2` (al doilea). Trei cazuri la fiecare element nou `x`:
+
+1. `x > max1` → `x` e noul maxim absolut. Vechiul `max1` devine `max2`.
+2. `x == max1` → depinde dacă vrem duplicate (vezi mai jos).
+3. `max2 < x < max1` → `x` e noul `max2`.
+4. `x <= max2` → nimic de actualizat.
+
+```
+Șir: 3, 7, 5, 2, 9, 4
+max1=INT_MIN, max2=INT_MIN
+
+x=3: 3>INT_MIN → max2=INT_MIN, max1=3
+x=7: 7>3       → max2=3,       max1=7
+x=5: 5<7, 5>3  → max2=5,       max1=7
+x=2: 2<5       → nimic
+x=9: 9>7       → max2=7,       max1=9
+x=4: 4<9, 4<7  → nimic
+Rezultat: max1=9, max2=7
+```
+
+## Implementare C++ — valori distincte
+
+```cpp
+#include <iostream>
+#include <climits>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("maxime.in");
+    ofstream fout("maxime.out");
+
+    int n;
+    fin >> n;
+
+    int max1 = INT_MIN, max2 = INT_MIN;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        if (x > max1) {
+            max2 = max1;   // vechiul max1 coboara
+            max1 = x;
+        } else if (x > max2) {
+            max2 = x;      // actualizeaza doar max2
+        }
+    }
+
+    fout << max1 << " " << max2 << "\n";
+    return 0;
+}
+```
+
+**Exemplu:** `6` / `3 7 5 2 9 4` → `9 7`
+
+## Varianta cu duplicate permise
+
+Dacă `7, 7` sunt două valori diferite (din poziții diferite) și vrei `max1=7, max2=7`:
+
+```cpp
+if (x >= max1) {          // >= in loc de >
+    max2 = max1;
+    max1 = x;
+} else if (x > max2) {
+    max2 = x;
+}
+```
+
+<ObservationBox>
+Extinderea la top-3 (sau top-k) urmează același tipar: verifici de la `max1` în jos și actualizezi prima variabilă care e mai mică decât `x`. Dar pentru k mare, un vector sortat e mai practic.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Primele două maxime | O(n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Scrii `max1 = x; max2 = max1;` — suprascrii `max1` înainte să-l salvezi în `max2`. Vechea valoare a lui `max1` se pierde. Ordinea corectă: `max2 = max1; max1 = x;`.
+
+**Greșeala 2:** Uiți ramura `else if (x > max2)`. Fără ea, un element mai mic decât `max1` dar mai mare decât `max2` nu actualizează nimic.
+
+**Greșeala 3:** Inițializezi `max2 = max1 = 0`. Dacă toate valorile sunt negative, obții `max1=0` și `max2=0` — ambele greșite. Inițializează cu `INT_MIN`.
+</MistakeBox>

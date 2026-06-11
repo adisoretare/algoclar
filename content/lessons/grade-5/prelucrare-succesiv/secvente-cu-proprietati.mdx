@@ -1,0 +1,137 @@
+---
+title: "Secvențe cu proprietăți"
+slug: secvente-cu-proprietati
+grade: 5
+chapter: prelucrare-succesiv
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["secvente", "lungime-maxima", "run", "contor"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Lungimea maximă a unui bloc de valori pare din șirul 2, 4, 3, 6, 8, 10, 1 este:"
+    options:
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+    correctIndex: 1
+    explanation: "Blocuri de pare: [2,4] lungime 2, [6,8,10] lungime 3. Maximul e 3."
+  - question: "Variabila `lung_curenta` ce valoare ia când proprietatea nu mai e satisfăcută?"
+    options:
+      - "Se lasă neschimbată"
+      - "Se resetează la 0"
+      - "Se resetează la 1"
+      - "Se copiază în lung_max"
+    correctIndex: 1
+    explanation: "Când proprietatea se întrerupe, blocul curent s-a terminat. Resetăm la 0 (sau 1 dacă noul element satisface proprietatea, depinde de implementare)."
+  - question: "Când actualizezi `lung_max`?"
+    options:
+      - "Doar la final, după buclă"
+      - "La fiecare pas, indiferent de proprietate"
+      - "La fiecare pas când proprietatea e satisfăcută: lung_max = max(lung_max, lung_curenta)"
+      - "Numai când lung_curenta > lung_max + 1"
+    correctIndex: 2
+    explanation: "Actualizezi lung_max la fiecare pas în care lungimea curentă crește — altfel poți rata maximul dacă șirul se termină în mijlocul unui bloc lung."
+---
+
+<LessonHook>
+Metereologul vrea să știe cel mai lung șir de zile consecutive cu ploaie. Nu numără toate zilele cu ploaie — numără ziua curentă a unui bloc continuu și ține minte cel mai lung bloc văzut. Când soarele apare, resetează contorul.
+</LessonHook>
+
+## Structura algoritmului
+
+Menținem două variabile:
+- `lung_curenta` — lungimea blocului curent (elementele consecutive cu proprietatea)
+- `lung_max` — cel mai lung bloc văzut până acum
+
+La fiecare element:
+- Dacă satisface proprietatea: `lung_curenta++`, actualizează `lung_max`
+- Dacă nu: resetează `lung_curenta = 0`
+
+```
+Șir: 2 4 3 6 8 10 1   (proprietate: par)
+lung_curenta = 0, lung_max = 0
+
+x=2:  par  → lung_cur=1, lung_max=1
+x=4:  par  → lung_cur=2, lung_max=2
+x=3:  impar → lung_cur=0
+x=6:  par  → lung_cur=1, lung_max=2
+x=8:  par  → lung_cur=2, lung_max=2
+x=10: par  → lung_cur=3, lung_max=3
+x=1:  impar → lung_cur=0
+Rezultat: 3
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    ifstream fin("secvente.in");
+    ofstream fout("secvente.out");
+
+    int n;
+    fin >> n;
+
+    int lung_cur = 0, lung_max = 0;
+
+    for (int i = 0; i < n; i++) {
+        int x;
+        fin >> x;
+        if (x % 2 == 0) {          // proprietatea: par
+            lung_cur++;
+            if (lung_cur > lung_max) lung_max = lung_cur;
+        } else {
+            lung_cur = 0;           // reset la intrerupere
+        }
+    }
+
+    fout << lung_max << "\n";
+    return 0;
+}
+```
+
+**Exemplu:** `7` / `2 4 3 6 8 10 1` → `3`
+
+## Varianta cu prev — secvențe de valori egale
+
+```cpp
+fin >> prev;
+int lung_cur = 1, lung_max = 1;
+
+for (int i = 1; i < n; i++) {
+    int x; fin >> x;
+    if (x == prev) {
+        lung_cur++;
+        if (lung_cur > lung_max) lung_max = lung_cur;
+    } else {
+        lung_cur = 1;    // noul bloc incepe cu x
+    }
+    prev = x;
+}
+```
+
+<ObservationBox>
+Actualizează `lung_max` **în interiorul** blocului valid, nu doar la final sau la resetare. Dacă șirul se termină în mijlocul celui mai lung bloc, nu mai ajungi la instrucțiunea de după buclă cu valoarea corectă.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Lungimea maximă a unui bloc | O(n) | O(1) |
+
+<MistakeBox>
+**Greșeala 1:** Actualizezi `lung_max` doar la resetare (`lung_cur = 0`), în `else`. Dacă șirul se termină cu cel mai lung bloc, niciodată nu dai reset — `lung_max` rămâne la valoarea mai mică.
+
+**Greșeala 2:** La resetare pui `lung_cur = 1` (presupunând că noul element satisface proprietatea) fără să verifici. Dacă nu satisface, începi cu 1 în loc de 0.
+
+**Greșeala 3:** Confunzi „cel mai lung bloc" cu „cel mai lung sufix" sau „numărul total de elemente cu proprietatea". Sunt trei lucruri diferite — citește enunțul cu atenție.
+</MistakeBox>
