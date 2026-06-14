@@ -1,0 +1,168 @@
+---
+title: "Operații cu mulțimi — reuniune, intersecție, diferență"
+slug: operatii-cu-multimi
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["multimi", "vector-caracteristic", "intersectie"]
+visualizers: ["set-map"]
+relatedProblems: []
+quiz:
+  - question: "Ce reprezintă vectorul caracteristic `c` al unei mulțimi de numere din {0..N}?"
+    options:
+      - "c[x] = de câte ori apare x"
+      - "c[x] = 1 dacă x e în mulțime, 0 altfel"
+      - "c[x] = poziția lui x în vector"
+      - "c[x] = suma elementelor până la x"
+    correctIndex: 1
+    explanation: "Vectorul caracteristic marchează apartenența: 1 = prezent, 0 = absent. E un vector de frecvență în care nu ne interesează decât „există / nu există”."
+  - question: "Folosind doi vectori caracteristici `a` și `b`, cum afli intersecția?"
+    options:
+      - "Numere x cu a[x] == 1 SAU b[x] == 1"
+      - "Numere x cu a[x] == 1 ȘI b[x] == 1"
+      - "Numere x cu a[x] != b[x]"
+      - "Numere x cu a[x] + b[x] == 0"
+    correctIndex: 1
+    explanation: "Un element e în intersecție doar dacă apare în ambele mulțimi, adică a[x] == 1 și b[x] == 1 simultan."
+  - question: "Când NU e bună metoda cu vector caracteristic?"
+    options:
+      - "Când mulțimile au multe elemente"
+      - "Când valorile pot fi foarte mari (ex. până la 1.000.000.000)"
+      - "Când vrei reuniunea"
+      - "Când elementele sunt distincte"
+    correctIndex: 1
+    explanation: "Vectorul caracteristic are nevoie de o căsuță pentru fiecare valoare posibilă. Dacă valorile ajung la un miliard, vectorul nu încape în memorie — atunci folosești mulțimi sortate."
+---
+
+<LessonHook>
+Ai două playlisturi: unul al tău, unul al unui prieten. Vrei să știi ce melodii aveți amândoi (ca să le ascultați împreună), ce melodii are măcar unul dintre voi, și ce melodii ai doar tu. Astea sunt exact intersecția, reuniunea și diferența a două mulțimi.
+</LessonHook>
+
+## Ce este o mulțime
+
+O **mulțime** e o colecție de valori **distincte** — fără duplicate, fără să conteze ordinea. `{3, 7, 1}` și `{1, 3, 7}` sunt aceeași mulțime.
+
+Trei operații apar des în probleme:
+
+- **Reuniune** `A ∪ B` — elementele care apar în A **sau** în B.
+- **Intersecție** `A ∩ B` — elementele care apar în A **și** în B.
+- **Diferență** `A \ B` — elementele din A care **nu** sunt în B.
+
+## Ideea-cheie: vectorul caracteristic
+
+Dacă valorile sunt mici (de exemplu între `0` și `N = 1000`), poți reprezenta o mulțime printr-un **vector caracteristic**: `c[x] = 1` dacă `x` e în mulțime, `0` altfel.
+
+<ObservationBox>
+Vectorul caracteristic transformă întrebarea „e `x` în mulțime?” dintr-o căutare (lentă) într-o simplă citire `c[x]` (instantanee). Asta e puterea lui.
+</ObservationBox>
+
+Cu doi vectori caracteristici `a` și `b`, operațiile devin reguli simple pe fiecare valoare `x`:
+
+| Operație | Condiția ca `x` să fie în rezultat |
+|---|---|
+| Reuniune | `a[x] == 1` **sau** `b[x] == 1` |
+| Intersecție | `a[x] == 1` **și** `b[x] == 1` |
+| Diferență `A \ B` | `a[x] == 1` **și** `b[x] == 0` |
+
+## Algoritmul pas cu pas
+
+Fie `A = {2, 5, 7}` și `B = {5, 6, 7, 9}`, valori până la `N = 9`.
+
+Construim vectorii caracteristici:
+
+<ArrayDiagram
+  values="0 0 1 0 0 1 0 1 0 0"
+  valueLabel="a" index="0 1 2 3 4 5 6 7 8 9"
+  highlight="2 5 7"
+  caption="a[x] = 1 pentru x din A = {2, 5, 7}" />
+
+<ArrayDiagram
+  values="0 0 0 0 0 1 1 1 0 1"
+  valueLabel="b" index="0 1 2 3 4 5 6 7 8 9"
+  highlight="5 6 7 9"
+  caption="b[x] = 1 pentru x din B = {5, 6, 7, 9}" />
+
+Acum parcurgem `x` de la `0` la `9` și aplicăm regulile:
+
+- Intersecția: `5` și `7` (ambii au 1 în a și b) → `{5, 7}`
+- Reuniunea: `{2, 5, 6, 7, 9}`
+- Diferența `A \ B`: `2` (e în A, nu în B) → `{2}`
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 1000; // valoarea maxima posibila
+
+int a[N + 1], b[N + 1]; // vectori caracteristici, initializati cu 0 global
+
+int main() {
+    int na, nb, x;
+    cin >> na;
+    for (int i = 0; i < na; i++) { cin >> x; a[x] = 1; }
+    cin >> nb;
+    for (int i = 0; i < nb; i++) { cin >> x; b[x] = 1; }
+
+    cout << "Intersectie: ";
+    for (int x = 0; x <= N; x++)
+        if (a[x] == 1 && b[x] == 1) cout << x << " ";
+    cout << "\n";
+
+    cout << "Reuniune: ";
+    for (int x = 0; x <= N; x++)
+        if (a[x] == 1 || b[x] == 1) cout << x << " ";
+    cout << "\n";
+
+    cout << "Diferenta A\\B: ";
+    for (int x = 0; x <= N; x++)
+        if (a[x] == 1 && b[x] == 0) cout << x << " ";
+    cout << "\n";
+    return 0;
+}
+// pentru A={2,5,7}, B={5,6,7,9}:
+// Intersectie: 5 7
+// Reuniune: 2 5 6 7 9
+// Diferenta A\B: 2
+```
+
+Rezultatele ies **automat în ordine crescătoare**, pentru că parcurgem `x` de la mic la mare. Bonus gratuit al metodei.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|---|---|---|
+| Vector caracteristic | O(N) | O(N) |
+| Mulțimi sortate (interclasare) | O(n + m) | O(n + m) |
+
+Aici `N` = valoarea maximă, iar `n, m` = câte elemente au mulțimile. Dacă valorile sunt mici, vectorul caracteristic e cel mai simplu.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Valori prea mari pentru vector.** Dacă numerele pot ajunge la `10^9`, `int a[1000000000]` nu încape în memorie. Atunci sortezi mulțimile și le interclasezi (vezi lecția următoare).
+- **Numeri elementul de două ori la reuniune.** Cu `a[x] == 1 || b[x] == 1` fiecare `x` e tratat o singură dată — corect. Dacă ai folosi două bucle separate, ai duplica valorile comune.
+- **Uiți că mulțimea n-are duplicate.** Dacă citești `5` de două ori, `a[5] = 1` rămâne `1` — bine. Dar dacă ai folosi un contor `a[5]++`, ai pierde proprietatea de mulțime.
+- **Indici negativi.** Dacă apar valori negative, `a[x]` cu `x < 0` iese din vector. Tratează-le separat sau deplasează valorile (`x + offset`).
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum apartenența unui element decide dacă intră în rezultat:
+
+<Visualizer name="set-map" />
+
+<HintBox>
+Gândește fiecare operație ca pe o întrebare pusă pentru **fiecare valoare posibilă**: „apare în A? apare în B?”. Răspunsul (1/0) decide totul.
+</HintBox>
+
+## Recapitulare
+
+- O **mulțime** are elemente distincte; reuniune = „sau”, intersecție = „și”, diferență = „în A, nu în B”.
+- **Vectorul caracteristic** `c[x] ∈ {0, 1}` face apartenența instantanee și dă rezultatul deja sortat.
+- Funcționează doar dacă valorile sunt **mici**; pentru valori mari folosești mulțimi sortate și interclasare.

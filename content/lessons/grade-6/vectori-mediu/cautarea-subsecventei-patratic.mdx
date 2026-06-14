@@ -1,0 +1,131 @@
+---
+title: "Căutarea unei subsecvențe în timp pătratic — potrivire fereastră cu fereastră"
+slug: cautarea-subsecventei-patratic
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["cautare", "potrivire", "subsecventa"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce căutăm aici: ca tiparul P să apară în V drept..."
+    options:
+      - "O submulțime oarecare de elemente"
+      - "Un bloc de elemente consecutive identice cu P, în aceeași ordine"
+      - "Cele mai mari m elemente"
+      - "Elemente împrăștiate în ordine"
+    correctIndex: 1
+    explanation: "O subsecvență (în sensul de bloc contiguu) înseamnă elemente pe poziții consecutive, identice cu tiparul, în aceeași ordine."
+  - question: "Câte poziții de start posibile are tiparul P (lungime m) în vectorul V (lungime n)?"
+    options:
+      - "n"
+      - "n - m + 1"
+      - "m"
+      - "n × m"
+    correctIndex: 1
+    explanation: "P poate începe de la poziția 1 până la n - m + 1, altfel ar ieși din V. Sunt n - m + 1 poziții de start."
+  - question: "De ce algoritmul naiv e O(n × m) în cazul cel mai rău?"
+    options:
+      - "Pentru fiecare din cele ~n poziții de start comparăm până la m elemente"
+      - "Pentru că sortăm vectorul"
+      - "Pentru că folosim recursivitate"
+      - "Nu e O(n×m), e O(n)"
+    correctIndex: 0
+    explanation: "Sunt ~n poziții de start, iar fiecare verificare poate compara până la m elemente înainte să dea greș. n × m în total."
+---
+
+<LessonHook>
+Cauți o melodie într-o înregistrare lungă știind primele câteva note. Pui degetul pe început și verifici nota cu nota; dacă una nu se potrivește, te muți cu o poziție mai la dreapta și o iei de la capăt. Asta e căutarea unei subsecvențe.
+</LessonHook>
+
+## Problema
+
+Ai un vector mare `V` (lungime `n`) și un **tipar** `P` (lungime `m`). Vrei să afli dacă `P` apare în `V` ca **bloc de elemente consecutive**, în aceeași ordine — și, dacă da, la ce poziție.
+
+Exemplu: `V = {5, 1, 2, 3, 1, 2, 4}`, `P = {1, 2}`. Tiparul apare la pozițiile `2` și `5`.
+
+<ObservationBox>
+Tiparul nu poate începe oriunde: ultima poziție de start e `n - m + 1`, altfel `P` ar depăși capătul lui `V`. Deci sunt `n - m + 1` poziții de încercat.
+</ObservationBox>
+
+## Algoritmul naiv
+
+Pentru fiecare poziție de start `i` din `V`:
+
+1. Compari `P[1]` cu `V[i]`, `P[2]` cu `V[i+1]`, ... element cu element.
+2. Dacă toate `m` se potrivesc → tiparul începe la `i`.
+3. La prima nepotrivire, abandonezi și treci la `i + 1`.
+
+## Pas cu pas pe numere
+
+`V = {5, 1, 2, 3, 1, 2, 4}`, `P = {1, 2}` (`n = 7`, `m = 2`).
+
+<ArrayDiagram
+  values="5 1 2 3 1 2 4"
+  valueLabel="V" index="1 2 3 4 5 6 7"
+  highlight="0"
+  caption="Start i=1: V[1]=5 ≠ P[1]=1 → nepotrivire imediată, avansăm." />
+
+<ArrayDiagram
+  values="5 1 2 3 1 2 4"
+  valueLabel="V" index="1 2 3 4 5 6 7"
+  range="1-2"
+  caption="Start i=2: V[2]=1=P[1], V[3]=2=P[2] → potrivire! Tiparul începe la poziția 2." />
+
+Continuând, mai apare o potrivire la `i = 5` (`V[5]=1, V[6]=2`).
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int V[] = {0, 5, 1, 2, 3, 1, 2, 4}; // index de la 1
+    int P[] = {0, 1, 2};
+    int n = 7, m = 2;
+
+    for (int i = 1; i <= n - m + 1; i++) {
+        bool gasit = true;
+        for (int j = 1; j <= m; j++) {
+            if (V[i + j - 1] != P[j]) { // comparam element cu element
+                gasit = false;
+                break;                  // prima nepotrivire opreste verificarea
+            }
+        }
+        if (gasit) cout << "Tipar gasit la pozitia " << i << "\n";
+    }
+    // afiseaza: pozitia 2 si pozitia 5
+    return 0;
+}
+```
+
+`break`-ul e important: oprește verificarea la prima nepotrivire, nu compari degeaba restul.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|---|---|---|
+| Cel mai rău | O(n·m) | O(1) |
+| Tipic (nepotriviri rapide) | aproape O(n) | O(1) |
+
+Pentru clasele de gimnaziu, O(n·m) e perfect acceptabil când `n` și `m` sunt mici. Există algoritmi mai rapizi (O(n+m), de pildă KMP), dar îi vei învăța mai târziu.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Ieși din vector.** Bucla de start trebuie să meargă doar până la `n - m + 1`. Dacă o duci până la `n`, accesezi `V[i+j-1]` în afara vectorului.
+- **Uiți `break`-ul.** Fără el continui comparațiile după prima nepotrivire — corect ca rezultat, dar mai lent și ușor de încurcat la indici.
+- **Off-by-one la indexare.** Cu indexare de la 1, elementul comparat e `V[i + j - 1]`. O greșeală aici deplasează tot tiparul cu o poziție.
+- **`m > n`.** Dacă tiparul e mai lung decât vectorul, nu poate apărea — bucla nici nu trebuie să pornească (`n - m + 1 ≤ 0`).
+</MistakeBox>
+
+## Recapitulare
+
+- Cauți tiparul `P` ca **bloc consecutiv** în `V`; sunt `n - m + 1` poziții de start posibile.
+- Pentru fiecare start, compari **element cu element** și abandonezi la prima nepotrivire (`break`).
+- Cazul cel mai rău e **O(n·m)** — suficient la gimnaziu; atenție la marginea `n - m + 1`.

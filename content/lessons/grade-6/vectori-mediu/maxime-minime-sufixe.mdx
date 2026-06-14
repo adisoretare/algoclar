@@ -1,0 +1,134 @@
+---
+title: "Maxime și minime pe sufixe — cel mai bun „de aici încolo”"
+slug: maxime-minime-sufixe
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["sufixe", "maxim", "precalculare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce reprezintă `smax[i]` (maximul pe sufix)?"
+    options:
+      - "Maximul primelor i elemente"
+      - "Cel mai mare element dintre v[i], v[i+1], ..., v[n]"
+      - "Maximul întregului vector"
+      - "Al i-lea cel mai mare element"
+    correctIndex: 1
+    explanation: "smax[i] e maximul elementelor de la poziția i până la final — adică „de aici încolo”."
+  - question: "În ce sens parcurgi vectorul ca să calculezi sufixele?"
+    options:
+      - "De la stânga la dreapta (1 → n)"
+      - "De la dreapta la stânga (n → 1)"
+      - "Nu contează sensul"
+      - "De la mijloc spre capete"
+    correctIndex: 1
+    explanation: "smax[i] depinde de smax[i+1], care e în dreapta. Deci pornești de la capătul drept (n) și mergi spre stânga."
+  - question: "Cum afli maximul de pe intervalul [i, j] combinând doar prefixe și sufixe?"
+    options:
+      - "Nu poți doar cu prefixe și sufixe pentru un interval oarecare"
+      - "smax[i] - pmax[j]"
+      - "max(smax[i], pmax[j])"
+      - "pmax[j] + smax[i]"
+    correctIndex: 0
+    explanation: "Prefixele și sufixele dau maxime care încep/termină la capete, nu pe un interval intern arbitrar. Pentru intervale generale ai nevoie de alte structuri."
+---
+
+<LessonHook>
+Te uiți la traseul unei drumeții și vrei să știi, din fiecare punct, cât de sus se mai urcă „de aici încolo”. Pornești de la capăt, de la ultimul punct, și mergi înapoi, ținând minte cel mai înalt vârf văzut. Asta e maximul pe sufix.
+</LessonHook>
+
+## Ce este maximul pe sufix
+
+Un **sufix** sunt elementele de la poziția `i` până la final. **Maximul pe sufix** `smax[i]` e cel mai mare dintre ele:
+
+`smax[i] = max(v[i], v[i+1], ..., v[n])`.
+
+E imaginea în oglindă a maximului pe prefix. Singura diferență: îl construiești parcurgând **de la dreapta la stânga**.
+
+<ObservationBox>
+Recurența merge invers: cel mai bun „de la `i` încolo” e fie `v[i]`, fie cel mai bun „de la `i+1` încolo”. Deci `smax[i] = max(v[i], smax[i+1])` — și pornești de la `i = n`.
+</ObservationBox>
+
+## Pas cu pas pe numere
+
+Fie `v = {4, 2, 7, 3, 9, 5}` (indici 1..6).
+
+<ArrayDiagram
+  values="4 2 7 3 9 5"
+  valueLabel="v" index="1 2 3 4 5 6"
+  caption="Vectorul original." />
+
+Pornim din dreapta: `smax[6] = 5`. Apoi spre stânga, comparând fiecare element cu recordul din dreapta lui:
+
+<ArrayDiagram
+  values="9 9 9 9 9 5"
+  valueLabel="smax" index="1 2 3 4 5 6"
+  caption="smax[i] = max(v[i], smax[i+1]). Cel mai mare element (9) domină tot ce e la stânga lui." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[] = {0, 4, 2, 7, 3, 9, 5}; // v[0] nefolosit
+    int n = 6;
+    int smax[102], smin[102];
+
+    smax[n] = smin[n] = v[n];
+    for (int i = n - 1; i >= 1; i--) {       // de la dreapta la stanga
+        smax[i] = max(v[i], smax[i + 1]);
+        smin[i] = min(v[i], smin[i + 1]);
+    }
+
+    for (int i = 1; i <= n; i++) cout << smax[i] << " ";
+    cout << "\n"; // 9 9 9 9 9 5
+    return 0;
+}
+```
+
+## Prefix + sufix = răspuns „în afară de poziția i”
+
+Acum ai ambele jumătăți. Maximul tuturor elementelor, **ignorându-l pe `v[i]`**, e:
+
+```
+maxFaraI = max(pmax[i-1], smax[i+1])
+```
+
+`pmax[i-1]` acoperă tot ce e în stânga lui `i`, `smax[i+1]` tot ce e în dreapta. Le combini și ai răspunsul în O(1), pentru orice `i`.
+
+<ArrayDiagram
+  values="4 2 7 3 9 5"
+  valueLabel="v" index="1 2 3 4 5 6"
+  dim="4"
+  range="0-2"
+  highlight="4"
+  caption="Pentru i=4: stânga = pmax[3]=7, dreapta = smax[5]=9 → max în afară de v[4] este 9." />
+
+## Complexitate
+
+| Etapă | Timp | Spațiu |
+|---|---|---|
+| Construire sufixe | O(n) | O(n) |
+| Interogare „în afară de i” | O(1) | — |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Parcurgi în sensul greșit.** Sufixele se calculează de la `n` spre `1`. Dacă mergi de la stânga, `smax[i+1]` nu e încă gata și obții gunoi.
+- **Acces în afara vectorului.** La `i = n`, `smax[i+1]` nu există. Inițializează separat `smax[n] = v[n]` și pornește bucla de la `n-1`.
+- **Inițializare cu 0.** Ca la prefixe, pe valori negative un start cu `0` dă maxim fals. Pornește cu `v[n]`.
+- **Crezi că prefix+sufix rezolvă orice interval.** Ele dau doar maxime care ating un capăt. Pentru maximul pe un interval intern oarecare `[i, j]` ai nevoie de alte tehnici (vei învăța mai târziu).
+</MistakeBox>
+
+## Recapitulare
+
+- `smax[i]` = **cel mai bun element de la `i` până la final**, construit cu `max(v[i], smax[i+1])`.
+- Se calculează parcurgând vectorul **de la dreapta la stânga**.
+- Prefix + sufix răspund în O(1) la „cel mai bun element **în afară de** poziția `i`”.

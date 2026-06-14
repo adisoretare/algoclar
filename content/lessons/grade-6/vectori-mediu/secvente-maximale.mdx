@@ -1,0 +1,160 @@
+---
+title: "Secvențe maximale cu proprietăți — fereastra care se întinde și se strânge"
+slug: secvente-maximale
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["doi-indici", "fereastra-variabila", "secvente"]
+visualizers: ["two-pointers"]
+relatedProblems: []
+quiz:
+  - question: "Prin ce diferă o secvență maximală de una de lungime fixă?"
+    options:
+      - "Maximala are mereu exact k elemente"
+      - "Maximala are lungimea variabilă — cât de lungă poate fi păstrând proprietatea"
+      - "Maximala conține doar elemente egale"
+      - "Nu există nicio diferență"
+    correctIndex: 1
+    explanation: "La secvențe maximale căutăm cea mai lungă secvență contiguă care respectă o proprietate. Lungimea nu e dată, o descoperim."
+  - question: "În tehnica celor doi indici (fereastră variabilă), când micșorezi fereastra?"
+    options:
+      - "Niciodată"
+      - "Când proprietatea e încălcată — avansezi capătul din stânga"
+      - "La fiecare pas, indiferent de proprietate"
+      - "Doar la final"
+    correctIndex: 1
+    explanation: "Extinzi în dreapta cât timp proprietatea ține. Când se strică (ex. suma depășește S), avansezi stânga ca s-o restabilești."
+  - question: "De ce funcționează tehnica în O(n) deși are două capete care se mișcă?"
+    options:
+      - "Pentru că vectorul e sortat"
+      - "Pentru că fiecare capăt avansează doar înainte, deci în total cel mult 2n pași"
+      - "Pentru că folosim căutare binară"
+      - "Nu e O(n), e O(n²)"
+    correctIndex: 1
+    explanation: "Nici stânga, nici dreapta nu dau înapoi. Fiecare parcurge vectorul cel mult o dată, deci în total O(n)."
+---
+
+<LessonHook>
+Strângi cărți pe un raft până se umple. Când nu mai încape una nouă, scoți câteva de la celălalt capăt ca să faci loc. Capătul din dreapta tot adaugă, capătul din stânga eliberează doar cât e nevoie. Așa găsești cea mai lungă „felie” care respectă o regulă.
+</LessonHook>
+
+## Problema
+
+Vrei cea mai **lungă** secvență contiguă care respectă o proprietate. Exemplu concret: cel mai lung interval de elemente consecutive a căror **sumă nu depășește `S`** (toate elementele pozitive).
+
+Spre deosebire de lungimea fixă, aici lungimea **nu e dată** — o căutăm. De-asta fereastra trebuie să se poată și **întinde**, și **strânge**.
+
+<ObservationBox>
+Cheia: dacă o secvență respectă proprietatea, vrem s-o extindem; dacă o încalcă, o strângem din stânga până redevine validă. Niciun capăt nu dă vreodată înapoi.
+</ObservationBox>
+
+## Tehnica celor doi indici
+
+Ținem `st` (stânga) și `dr` (dreapta), plus suma ferestrei curente:
+
+1. Avansează `dr`, adăugând `v[dr]` la sumă.
+2. Cât timp suma `> S`, avansează `st` și scade `v[st]` (strângi fereastra).
+3. Fereastra `[st, dr]` e acum validă — actualizează lungimea maximă.
+
+## Pas cu pas pe numere
+
+Fie `v = {2, 1, 3, 2, 1, 1}` și `S = 5`. Căutăm cea mai lungă secvență cu sumă ≤ 5.
+
+<ArrayDiagram
+  values="2 1 3 2 1 1"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="0-2"
+  pointers="0:st:success 2:dr:primary"
+  caption="[2,1,3] sumă=6 > 5 → invalid. Strângem stânga." />
+
+<ArrayDiagram
+  values="2 1 3 2 1 1"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="1-2"
+  dim="0"
+  pointers="1:st:success 2:dr:primary"
+  caption="Scoatem 2: [1,3] sumă=4 ≤ 5 → valid, lungime 2." />
+
+<ArrayDiagram
+  values="2 1 3 2 1 1"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="3-5"
+  dim="0 1 2"
+  pointers="3:st:success 5:dr:primary"
+  caption="Mai târziu: [2,1,1] sumă=4 ≤ 5 → lungime 3, noul maxim." />
+
+Urmărind pas cu pas mișcarea capetelor:
+
+```
+dr=1: suma=2        valid  -> lung=1
+dr=2: suma=3        valid  -> lung=2
+dr=3: suma=6 >5 -> st=2, suma=4  valid -> lung=2
+dr=4: suma=6 >5 -> st=3, suma=5  valid -> lung=2
+dr=5: suma=6 >5 -> st=4, suma=4  valid -> lung=2
+dr=6: suma=5        valid  -> lung=3  (secventa {2,1,1})
+raspuns: lungime maxima = 3
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[] = {0, 2, 1, 3, 2, 1, 1}; // v[0] nefolosit
+    int n = 6, S = 5;
+
+    int st = 1, suma = 0, lungMax = 0;
+    for (int dr = 1; dr <= n; dr++) {
+        suma += v[dr];                 // extindem in dreapta
+        while (suma > S) {             // cat timp e invalid, strangem stanga
+            suma -= v[st];
+            st++;
+        }
+        int lung = dr - st + 1;        // fereastra valida curenta
+        if (lung > lungMax) lungMax = lung;
+    }
+
+    cout << lungMax << "\n"; // 3
+    return 0;
+}
+```
+
+Deși există un `while` în interiorul lui `for`, `st` avansează în total cel mult de `n` ori pe tot parcursul — de-aici O(n).
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|---|---|---|
+| Naiv (toate secvențele) | O(n²) | O(1) |
+| Doi indici (fereastră variabilă) | O(n) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Crezi că e O(n²) din cauza `while`-ului.** `st` nu dă niciodată înapoi, deci suma pașilor lui e ≤ n. Bucla interioară nu repornește de la zero.
+- **Tehnica cere proprietate monotonă.** Fereastra variabilă cu doi indici merge când extinderea „strică” și strângerea „repară”. Pe elemente negative, suma nu mai e monotonă și metoda pică.
+- **Lungimea calculată greșit.** Fereastra `[st, dr]` are `dr - st + 1` elemente. Uitarea lui `+1` dă răspuns mai mic cu 1.
+- **Nu actualizezi suma la strângere.** Dacă avansezi `st` fără să scazi `v[st]`, suma rămâne umflată și fereastra pare mereu invalidă.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cele două capete cum se mișcă — dreapta extinde, stânga repară:
+
+<Visualizer name="two-pointers" />
+
+<HintBox>
+Gândește cele două capete ca pe o regulă: **dreapta merge mereu înainte**, **stânga sare doar cât trebuie** ca să restabilească proprietatea.
+</HintBox>
+
+## Recapitulare
+
+- O **secvență maximală** are lungime variabilă: căutăm cea mai lungă care respectă o proprietate.
+- Cu **doi indici**: extinzi în dreapta, strângi în stânga când proprietatea se strică.
+- Total **O(n)** pentru că niciun capăt nu dă înapoi; merge doar pentru proprietăți monotone.

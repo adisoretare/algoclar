@@ -1,0 +1,149 @@
+---
+title: "Căutare binară — găsești în 20 de pași, nu în un milion"
+slug: cautare-binara-6
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["cautare-binara", "vector-sortat", "injumatatire"]
+visualizers: ["cautare-binara"]
+relatedProblems: []
+quiz:
+  - question: "De ce funcționează căutarea binară DOAR pe vectori sortați?"
+    options:
+      - "Ca să ocupe mai puțină memorie"
+      - "Pentru că, fiind sortat, dacă mijlocul e prea mic știm sigur că ținta e în dreapta"
+      - "Pentru că pe vectori nesortați nu există indici"
+      - "Nu contează, merge pe orice vector"
+    correctIndex: 1
+    explanation: "Sortarea garantează că o jumătate poate fi eliminată cu siguranță: dacă a[mid] < țintă, toate valorile din stânga sunt și ele mai mici, deci ținta e doar în dreapta."
+  - question: "Câți pași face căutarea binară pe un vector cu 1.000.000 de elemente?"
+    options:
+      - "1.000.000"
+      - "1000"
+      - "aproximativ 20"
+      - "500.000"
+    correctIndex: 2
+    explanation: "Fiecare pas înjumătățește intervalul. log₂(1.000.000) ≈ 20, deci cel mult ~20 de pași."
+  - question: "De ce scriem `mid = st + (dr - st) / 2` în loc de `(st + dr) / 2`?"
+    options:
+      - "E mai rapid"
+      - "Ca să evităm depășirea (overflow) când st și dr sunt foarte mari"
+      - "Ca să rotunjim în sus"
+      - "Nu există nicio diferență"
+    correctIndex: 1
+    explanation: "Dacă st și dr sunt amândoi aproape de limita lui int, suma st + dr depășește int. Forma st + (dr - st) / 2 dă același mijloc, fără să adune două numere mari."
+---
+
+<LessonHook>
+Te gândești la un număr între 1 și 100 și eu trebuie să-l ghicesc. Întreb „e 50?”. Spui „mai mare”. Acum știu că e între 51 și 100 — am eliminat jumătate dintr-o singură întrebare. Întreb „e 75?”... În 7 întrebări îl găsesc sigur. Asta e căutarea binară.
+</LessonHook>
+
+## Condiția obligatorie: vector sortat
+
+Căutarea binară găsește o valoare într-un vector **sortat crescător**. Sortarea e cheia: ea garantează că, uitându-te la un singur element din mijloc, poți arunca jumătate din vector cu certitudine.
+
+<ObservationBox>
+Pe un vector nesortat, faptul că mijlocul e prea mic nu-ți spune nimic — ținta ar putea fi oriunde. De-asta căutarea binară are nevoie de ordine.
+</ObservationBox>
+
+## Algoritmul
+
+Ținem două margini: `st` (stânga) și `dr` (dreapta). Cât timp intervalul `[st, dr]` nu e gol:
+
+1. Calculăm mijlocul `mid`.
+2. Dacă `v[mid] == țintă` → am găsit, poziția e `mid`.
+3. Dacă `v[mid] < țintă` → ținta e în dreapta: `st = mid + 1`.
+4. Dacă `v[mid] > țintă` → ținta e în stânga: `dr = mid - 1`.
+
+## Pas cu pas pe numere
+
+Căutăm `23` în `v = {2, 5, 8, 12, 16, 23, 38, 45, 72, 91}` (10 elemente, indici 0..9).
+
+<ArrayDiagram
+  values="2 5 8 12 16 23 38 45 72 91"
+  valueLabel="v"
+  range="0-9"
+  pointers="0:st:success 4:mid:primary 9:dr:success"
+  caption="Pas 1: st=0, dr=9, mid=4. v[4]=16 < 23 → mergem la dreapta." />
+
+<ArrayDiagram
+  values="2 5 8 12 16 23 38 45 72 91"
+  valueLabel="v"
+  dim="0 1 2 3 4"
+  range="5-9"
+  pointers="5:st:success 7:mid:primary 9:dr:success"
+  caption="Pas 2: st=5, dr=9, mid=7. v[7]=45 > 23 → mergem la stânga." />
+
+<ArrayDiagram
+  values="2 5 8 12 16 23 38 45 72 91"
+  valueLabel="v"
+  dim="0 1 2 3 4 7 8 9"
+  highlight="5"
+  pointers="5:st,mid:primary 6:dr:success"
+  caption="Pas 3: st=5, dr=6, mid=5. v[5]=23 = țintă → găsit la indexul 5." />
+
+În 3 pași am ajuns la răspuns, deși vectorul are 10 elemente. Pe 1.000.000 de elemente am face ~20 de pași.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cautareBinara(int v[], int n, int tinta) {
+    int st = 0, dr = n - 1;
+    while (st <= dr) {
+        int mid = st + (dr - st) / 2; // evita overflow fata de (st+dr)/2
+        if (v[mid] == tinta) return mid;     // gasit
+        if (v[mid] < tinta) st = mid + 1;    // tinta e in dreapta
+        else dr = mid - 1;                   // tinta e in stanga
+    }
+    return -1; // nu exista in vector
+}
+
+int main() {
+    int v[] = {2, 5, 8, 12, 16, 23, 38, 45, 72, 91};
+    int n = 10;
+    cout << cautareBinara(v, n, 23) << "\n"; // 5
+    cout << cautareBinara(v, n, 40) << "\n"; // -1 (nu exista)
+    return 0;
+}
+```
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|---|---|---|
+| Căutare liniară | O(n) | O(1) |
+| Căutare binară | O(log n) | O(1) |
+
+Diferența e uriașă la `n` mare: `log₂` dintr-un miliard e doar `30`. De aceea căutarea binară e una dintre cele mai folosite tehnici de concurs.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Vector nesortat.** Cea mai comună capcană: aplici căutarea binară fără să sortezi întâi. Rezultatul pare să meargă pe unele teste, dar e greșit.
+- **`st < dr` în loc de `st <= dr`.** Cu `<`, când intervalul ajunge la un singur element (`st == dr`) bucla se oprește prea devreme și ratezi exact acel element.
+- **Overflow la mijloc.** `(st + dr) / 2` poate depăși `int` dacă marginile sunt aproape de 2 miliarde. Scrie `st + (dr - st) / 2`.
+- **Uiți `mid + 1` / `mid - 1`.** Dacă faci `st = mid` (nu `mid + 1`) când `st == dr - 1`, intervalul nu se mai micșorează și obții buclă infinită.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum intervalul `[st, dr]` se înjumătățește la fiecare pas:
+
+<Visualizer name="cautare-binara" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas. Observă cum jumătatea eliminată nu mai e niciodată vizitată — de-aici vine viteza.
+</HintBox>
+
+## Recapitulare
+
+- Căutarea binară merge **doar pe vectori sortați** și găsește ținta în **O(log n)** pași.
+- La fiecare pas compari cu **mijlocul** și arunci jumătatea în care ținta nu poate fi.
+- Atenție la `st <= dr`, la `mid ± 1` și la **overflow**: `mid = st + (dr - st) / 2`.

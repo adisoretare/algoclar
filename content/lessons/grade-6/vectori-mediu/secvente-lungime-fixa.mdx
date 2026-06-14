@@ -1,0 +1,147 @@
+---
+title: "Secvențe de lungime fixă — fereastra care alunecă"
+slug: secvente-lungime-fixa
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["fereastra-glisanta", "secvente", "sume-partiale"]
+visualizers: ["sliding-window"]
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă o „secvență de lungime fixă k” într-un vector?"
+    options:
+      - "Orice submulțime de k elemente"
+      - "k elemente consecutive (pe poziții vecine)"
+      - "Cele mai mari k elemente"
+      - "Primele k elemente"
+    correctIndex: 1
+    explanation: "O secvență (subsecvență contiguă) e formată din elemente pe poziții consecutive. „De lungime fixă k” înseamnă exact k poziții vecine."
+  - question: "Când fereastra alunecă cu o poziție la dreapta, cum actualizezi suma fără s-o recalculezi?"
+    options:
+      - "Aduni tot din nou"
+      - "Scazi elementul care iese și aduni elementul care intră"
+      - "Înmulțești cu k"
+      - "Scazi primul element din vector"
+    correctIndex: 1
+    explanation: "Fereastra pierde un element la stânga și câștigă unul la dreapta. Suma nouă = suma veche - elementul ieșit + elementul intrat. O adunare și o scădere, O(1)."
+  - question: "Ce complexitate are parcurgerea tuturor ferestrelor de lungime k cu tehnica ferestrei glisante?"
+    options:
+      - "O(n × k)"
+      - "O(n)"
+      - "O(k²)"
+      - "O(n log n)"
+    correctIndex: 1
+    explanation: "Calculezi prima fereastră în O(k), apoi fiecare alunecare costă O(1). În total O(n), indiferent de k."
+---
+
+<LessonHook>
+Te uiți pe geamul unui tren printr-un cadru de aceeași mărime. Pe măsură ce trenul înaintează, cadrul „alunecă”: peisajul din stânga dispare, apare peisaj nou în dreapta. Tu vezi mereu o felie de aceeași lățime. Așa funcționează o fereastră glisantă pe un vector.
+</LessonHook>
+
+## Problema
+
+Ai un vector și vrei să analizezi toate **secvențele de exact `k` elemente consecutive** — de exemplu, să găsești suma maximă a oricăror `k` elemente vecine.
+
+Naiv: pentru fiecare poziție de start, aduni `k` elemente. Asta e O(n·k) — lent dacă `k` e mare.
+
+<ObservationBox>
+Două ferestre vecine se suprapun aproape complet: diferă doar prin **un element care iese** (stânga) și **unul care intră** (dreapta). Nu recalcula tot — ajustează doar diferența.
+</ObservationBox>
+
+## Fereastra glisantă
+
+Calculezi suma primei ferestre `[1, k]` o singură dată. Apoi, ca să treci la fereastra următoare, **scazi elementul care iese** și **aduni elementul care intră**:
+
+```
+suma_noua = suma_veche - v[i-1] + v[i+k-1]
+```
+
+O adunare și o scădere — O(1) per alunecare.
+
+## Pas cu pas pe numere
+
+Fie `v = {2, 1, 5, 1, 3, 2}` și `k = 3`. Căutăm suma maximă a 3 elemente consecutive.
+
+<ArrayDiagram
+  values="2 1 5 1 3 2"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="0-2"
+  caption="Fereastra 1: [2,1,5], suma = 8." />
+
+<ArrayDiagram
+  values="2 1 5 1 3 2"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="1-3"
+  dim="0"
+  caption="Alunecă: scoatem 2, intră 1. Suma = 8 - 2 + 1 = 7." />
+
+<ArrayDiagram
+  values="2 1 5 1 3 2"
+  valueLabel="v" index="1 2 3 4 5 6"
+  range="2-4"
+  dim="0 1"
+  caption="Alunecă: scoatem 1, intră 3. Suma = 7 - 1 + 3 = 9 (noul maxim)." />
+
+Continuând, ultima fereastră `[1,3,2]` are suma `6`. Maximul găsit este **9**, pentru secvența `{5, 1, 3}`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[] = {0, 2, 1, 5, 1, 3, 2}; // v[0] nefolosit
+    int n = 6, k = 3;
+
+    int suma = 0;
+    for (int i = 1; i <= k; i++) suma += v[i]; // prima fereastra, O(k)
+    int sumaMax = suma;
+
+    for (int i = k + 1; i <= n; i++) {
+        suma += v[i] - v[i - k]; // intra v[i], iese v[i-k]
+        if (suma > sumaMax) sumaMax = suma;
+    }
+
+    cout << sumaMax << "\n"; // 9
+    return 0;
+}
+```
+
+Bucla face un singur pas per poziție: total O(n).
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|---|---|---|
+| Naiv (recalculezi tot) | O(n·k) | O(1) |
+| Fereastră glisantă | O(n) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Indici greșiți la ieșire/intrare.** Când treci la fereastra care se termină în `i`, elementul care iese e `v[i-k]`, nu `v[i-1]`. O confuzie aici strică toate sumele.
+- **Inițializezi `sumaMax` cu 0.** Pe valori negative obții un maxim fals. Inițializează cu suma primei ferestre.
+- **Pornești alunecarea de la poziția greșită.** Prima fereastră acoperă `[1, k]`; alunecarea începe de la `i = k+1`. Dacă pornești de la `k`, dublezi un pas.
+- **`k > n`.** Dacă fereastra e mai mare decât vectorul, nu există nicio secvență validă — tratează cazul separat.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește fereastra cum alunecă și cum suma se ajustează doar la capete:
+
+<Visualizer name="sliding-window" />
+
+<HintBox>
+Reține regula de aur a ferestrei fixe: **un element iese, un element intră**. Tot ce e între capete rămâne neschimbat, deci nu-l atingi.
+</HintBox>
+
+## Recapitulare
+
+- O **secvență de lungime fixă `k`** = `k` elemente consecutive; le analizezi cu o **fereastră glisantă**.
+- La fiecare alunecare: **scazi elementul ieșit, aduni elementul intrat** → O(1) per pas.
+- Total **O(n)** în loc de O(n·k); atenție la indicele `v[i-k]` și la inițializarea maximului.

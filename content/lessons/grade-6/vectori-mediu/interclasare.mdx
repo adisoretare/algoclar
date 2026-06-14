@@ -1,0 +1,141 @@
+---
+title: "Interclasarea vectorilor — îmbină doi vectori sortați"
+slug: interclasare
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["interclasare", "vectori-sortati", "doi-indici"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce trebuie ca cei doi vectori să fie deja sortați pentru interclasare?"
+    options:
+      - "Ca să ocupe mai puțină memorie"
+      - "Ca să putem alege mereu cel mai mic element comparând doar capetele"
+      - "Ca să evităm numerele negative"
+      - "Nu trebuie, merge pe orice vectori"
+    correctIndex: 1
+    explanation: "Dacă ambii sunt sortați, cel mai mic element neadăugat e mereu unul dintre cele două elemente curente. Comparăm doar capetele, nu tot vectorul."
+  - question: "Ce complexitate are interclasarea a doi vectori de lungimi n și m?"
+    options:
+      - "O(n × m)"
+      - "O(n + m)"
+      - "O((n+m)²)"
+      - "O(log(n+m))"
+    correctIndex: 1
+    explanation: "Fiecare element e copiat exact o dată în rezultat, deci facem n + m pași — liniar."
+  - question: "După ce un vector se termină, ce faci cu celălalt?"
+    options:
+      - "Îl ignori"
+      - "Copiezi tot ce a rămas în el, în ordine"
+      - "Îl sortezi din nou"
+      - "Reiei de la început"
+    correctIndex: 1
+    explanation: "Vectorul rămas e deja sortat și are doar valori ≥ ultima adăugată, deci copiezi restul direct, fără comparații."
+---
+
+<LessonHook>
+Doi profesori îți dau fiecare câte un teanc de lucrări, fiecare teanc deja ordonat alfabetic. Vrei un singur teanc ordonat. Te uiți la prima lucrare din fiecare teanc, o iei pe cea care vine prima în alfabet, și repeți. Asta e interclasarea.
+</LessonHook>
+
+## Ce este interclasarea
+
+**Interclasarea** (engl. *merge*) ia doi vectori **deja sortați** și produce un singur vector sortat care le conține pe toate elementele.
+
+E o operație fundamentală: stă la baza sortării prin interclasare (merge sort) și apare în multe probleme de concurs unde trebuie să combini liste ordonate.
+
+<ObservationBox>
+Trucul: dacă ambii vectori sunt sortați, cel mai mic element rămas e **mereu** la unul dintre cele două capete curente. Nu trebuie să cauți — doar să compari două valori.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Ținem doi indici: `i` în primul vector `a`, `j` în al doilea vector `b`. La fiecare pas, comparăm `a[i]` cu `b[j]`, adăugăm cel mai mic în rezultat și avansăm indicele de unde l-am luat.
+
+Fie `a = {1, 4, 7, 9}` și `b = {2, 3, 8}`.
+
+<ArrayDiagram
+  values="1 4 7 9"
+  valueLabel="a" indexLabel="i"
+  pointers="0:i:primary"
+  caption="Pornim cu i = 0, j = 0. Comparăm a[0]=1 cu b[0]=2." />
+
+<ArrayDiagram
+  values="2 3 8"
+  valueLabel="b" indexLabel="j"
+  pointers="0:j:warning"
+  caption="1 < 2 → adăugăm 1, avansăm i." />
+
+Urmărind pas cu pas comparațiile:
+
+```
+i=0 j=0 : a[0]=1 < b[0]=2 -> iau 1   rezultat: 1
+i=1 j=0 : a[1]=4 > b[0]=2 -> iau 2   rezultat: 1 2
+i=1 j=1 : a[1]=4 > b[1]=3 -> iau 3   rezultat: 1 2 3
+i=1 j=2 : a[1]=4 < b[2]=8 -> iau 4   rezultat: 1 2 3 4
+i=2 j=2 : a[2]=7 < b[2]=8 -> iau 7   rezultat: 1 2 3 4 7
+i=3 j=2 : a[3]=9 > b[2]=8 -> iau 8   rezultat: 1 2 3 4 7 8
+        : b s-a terminat -> copiez restul din a: 9
+rezultat final: 1 2 3 4 7 8 9
+```
+
+<ArrayDiagram
+  values="1 2 3 4 7 8 9"
+  valueLabel="rez"
+  caption="Rezultatul interclasării: un singur vector sortat." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a[] = {1, 4, 7, 9};
+    int b[] = {2, 3, 8};
+    int n = 4, m = 3;
+    int rez[100], k = 0;
+
+    int i = 0, j = 0;
+    while (i < n && j < m) {
+        if (a[i] <= b[j]) rez[k++] = a[i++]; // <= pastreaza stabilitatea
+        else rez[k++] = b[j++];
+    }
+    // unul dintre vectori s-a terminat; copiem restul celuilalt
+    while (i < n) rez[k++] = a[i++];
+    while (j < m) rez[k++] = b[j++];
+
+    for (int t = 0; t < k; t++) cout << rez[t] << " ";
+    cout << "\n"; // 1 2 3 4 7 8 9
+    return 0;
+}
+```
+
+Cele două bucle `while` de la final par redundante, dar exact una dintre ele rulează (cealaltă are condiția falsă). Ele „golesc” vectorul care a mai rămas.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|---|---|---|
+| Interclasare | O(n + m) | O(n + m) rezultat |
+
+Liniar: fiecare element e mutat o singură dată. Comparativ, dacă ai lipi cei doi vectori și ai sorta, ai obține O((n+m)·log(n+m)) — mai lent.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Vectori nesortați.** Interclasarea presupune că intrările sunt sortate. Pe vectori dezordonați rezultatul e greșit — sortează-i întâi sau folosește altă metodă.
+- **Uiți de „coada” rămasă.** Dacă te oprești când unul se termină și nu copiezi restul celuilalt, pierzi elemente. Cele două bucle finale sunt obligatorii.
+- **`<` în loc de `<=`.** Cu valori egale, alegerea contează pentru stabilitate (ordinea elementelor egale). La numere simple nu se vede, dar la structuri (sortare după cheie) contează.
+- **Depășești dimensiunea lui `rez`.** Rezultatul are `n + m` elemente — dimensionează vectorul corect, altfel ieși din memorie.
+</MistakeBox>
+
+## Recapitulare
+
+- Interclasarea îmbină **doi vectori sortați** într-unul singur sortat, în timp **O(n + m)**.
+- Folosești **doi indici** și compari mereu doar capetele curente; cel mai mic intră în rezultat.
+- La final **copiezi restul** vectorului care n-a fost epuizat — pasul ușor de uitat.

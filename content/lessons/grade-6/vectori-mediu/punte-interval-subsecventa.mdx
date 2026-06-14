@@ -1,0 +1,90 @@
+---
+title: "Lecție-punte: interval, subsecvență și subșir"
+slug: punte-interval-subsecventa
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["terminologie", "subsecventa", "subsir"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e diferența esențială dintre o subsecvență și un subșir?"
+    options:
+      - "Nu e nicio diferență"
+      - "Subsecvența e formată din elemente consecutive; subșirul poate sări peste elemente"
+      - "Subșirul e mereu mai lung"
+      - "Subsecvența e sortată, subșirul nu"
+    correctIndex: 1
+    explanation: "Subsecvența (sau secvența) ia elemente pe poziții consecutive. Subșirul păstrează ordinea, dar poate omite elemente — deci e o noțiune mai largă."
+  - question: "Vectorul {3, 1, 4, 1, 5}. Care dintre acestea este o SUBSECVENȚĂ (contiguă)?"
+    options:
+      - "{3, 4, 5}"
+      - "{1, 4, 1}"
+      - "{3, 1, 5}"
+      - "{4, 1, 3}"
+    correctIndex: 1
+    explanation: "{1, 4, 1} sunt elementele de pe pozițiile 2, 3, 4 — consecutive. {3,4,5} și {3,1,5} sar peste poziții (subșiruri), iar {4,1,3} schimbă ordinea."
+  - question: "Pentru câte subsecvențe contigue și câte subșiruri are un vector cu n elemente?"
+    options:
+      - "Ambele n(n+1)/2"
+      - "Subsecvențe: n(n+1)/2 ; subșiruri: 2ⁿ"
+      - "Ambele 2ⁿ"
+      - "Subsecvențe: 2ⁿ ; subșiruri: n"
+    correctIndex: 1
+    explanation: "O subsecvență e dată de două capete: n(n+1)/2. Un subșir alege independent pentru fiecare element dacă îl ia sau nu: 2ⁿ. Diferența de mărime e uriașă."
+---
+
+<LessonHook>
+Trei prieteni descriu același clasament. Unul zice „locurile 3 până la 6”, altul „primul, al treilea și al cincilea”, al treilea „undeva între început și mijloc”. Vorbesc despre lucruri diferite, deși toți se uită la același șir. Ca să nu te încurci la concurs, trebuie să știi exact ce înseamnă fiecare cuvânt.
+</LessonHook>
+
+## Trei noțiuni ușor de confundat
+
+În problemele cu vectori apar trei cuvinte care par sinonime, dar **nu sunt**:
+
+- **Interval** `[i, j]` — o pereche de poziții. Descrie *unde* te uiți, nu *ce* valori. „Suma pe intervalul [2, 5]”.
+- **Subsecvență** (sau **secvență**) — elementele de pe poziții **consecutive**, `v[i], v[i+1], ..., v[j]`. Un bloc neîntrerupt.
+- **Subșir** — elemente care păstrează **ordinea**, dar pot **sări** peste altele. `v[i₁], v[i₂], ...` cu `i₁ < i₂ < ...`.
+
+<ObservationBox>
+Regula de memorat: **subsecvență = lipită** (poziții vecine), **subșir = poate avea găuri** (ordine păstrată, dar sărituri permise). Intervalul e doar perechea de capete care delimitează o subsecvență.
+</ObservationBox>
+
+## Exemplu concret
+
+Pe `v = {3, 1, 4, 1, 5}`:
+
+| Exemplu | Ce este | De ce |
+|---|---|---|
+| `{1, 4, 1}` | subsecvență | pozițiile 2, 3, 4 — consecutive |
+| `{3, 4, 5}` | subșir (nu subsecvență) | pozițiile 1, 3, 5 — sare peste 2 și 4 |
+| `[2, 4]` | interval | doar capetele; conține subsecvența `{1, 4, 1}` |
+| `{4, 1, 3}` | niciuna | schimbă ordinea — interzis la ambele |
+
+## De ce contează la concurs
+
+Alegerea cuvântului schimbă complet dificultatea și tehnica:
+
+- O cerință pe **subsecvențe** se rezolvă des cu sume parțiale, fereastră glisantă sau doi indici — pentru că lucrezi cu blocuri contigue. Sunt `n(n+1)/2` la număr.
+- O cerință pe **subșiruri** explodează: sunt `2ⁿ` subșiruri. De obicei ai nevoie de programare dinamică (ex. cel mai lung subșir crescător), nu de o simplă parcurgere.
+
+Confuzia te poate face să cauți o soluție mult mai grea (sau mult prea simplă) decât cere problema.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Citești „subșir” și aplici fereastră glisantă.** Fereastra merge pe blocuri contigue (subsecvențe). Pe subșiruri cu găuri nu funcționează — îți va lipsi din soluții.
+- **Citești „subsecvență” și încerci programare dinamică grea.** Multe probleme pe subsecvențe au soluții liniare. Nu complica fără motiv.
+- **Confunzi intervalul cu valorile.** `[2, 5]` e o pereche de indici, nu un set de numere. „Suma pe interval” înseamnă suma subsecvenței delimitate de acele capete.
+- **Traducere ambiguă.** În unele enunțuri „secvență” = subsecvență contiguă, în altele se folosește liber. Citește definiția din enunț și verifică pe exemplul dat.
+</MistakeBox>
+
+## Recapitulare
+
+- **Interval** = pereche de capete `[i, j]`; **subsecvență** = elemente **consecutive**; **subșir** = ordine păstrată, dar cu **sărituri** permise.
+- Subsecvențe: `n(n+1)/2` (tehnici liniare); subșiruri: `2ⁿ` (de obicei programare dinamică).
+- Înainte de a alege tehnica, **stabilește exact** despre care dintre cele trei vorbește enunțul.

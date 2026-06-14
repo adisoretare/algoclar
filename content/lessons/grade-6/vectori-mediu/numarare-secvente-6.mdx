@@ -1,0 +1,143 @@
+---
+title: "Numărarea secvențelor — câte secvențe respectă o proprietate"
+slug: numarare-secvente-6
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["numarare", "doi-indici", "secvente"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câte secvențe contigue (subsecvențe) are un vector cu n elemente?"
+    options:
+      - "n"
+      - "n × (n+1) / 2"
+      - "2ⁿ"
+      - "n²"
+    correctIndex: 1
+    explanation: "Pentru fiecare poziție de start i sunt n-i+1 secvențe care încep acolo. Suma 1+2+...+n = n(n+1)/2."
+  - question: "Dacă o secvență [st, dr] are sumă ≤ S (elemente pozitive), câte secvențe care se termină în dr și sunt valide există?"
+    options:
+      - "Una singură"
+      - "dr - st + 1"
+      - "S"
+      - "dr"
+    correctIndex: 1
+    explanation: "Orice început între st și dr dă o secvență validă (e mai scurtă, deci sumă și mai mică). Sunt dr - st + 1 astfel de începuturi."
+  - question: "De ce e mai bine să numeri în O(n) cu doi indici decât să verifici toate secvențele?"
+    options:
+      - "Verificarea tuturor e O(n²) sau O(n³), prea lent pentru n mare"
+      - "Doi indici dau alt rezultat"
+      - "Nu e mai bine, e la fel"
+      - "Pentru că vectorul trebuie sortat"
+    correctIndex: 0
+    explanation: "Sunt ~n² secvențe; a calcula suma fiecăreia separat poate ajunge la O(n³). Cu doi indici numeri toate secvențele valide în O(n)."
+---
+
+<LessonHook>
+La un magazin vrei să afli în câte intervale de zile consecutive ai cheltuit cel mult 100 de lei. Nu te interesează care anume, ci **câte** sunt. Numărarea secvențelor e exact asta: nu le afișezi, le numeri — repede.
+</LessonHook>
+
+## Câte secvențe există?
+
+O **secvență** (subsecvență contiguă) e dată de un capăt stânga și unul dreapta. Un vector cu `n` elemente are
+
+`1 + 2 + ... + n = n(n+1)/2`
+
+secvențe în total. Pentru `n = 1000` sunt ~500.000 — prea multe ca să le verifici pe fiecare în detaliu dacă faci muncă suplimentară pe fiecare.
+
+<ObservationBox>
+Trucul numărării: nu enumera secvențele una câte una. Pentru fiecare capăt drept `dr`, numără **dintr-o singură mișcare** câte începuturi `st` dau o secvență validă.
+</ObservationBox>
+
+## Exemplu: secvențe cu sumă ≤ S
+
+Numărăm câte secvențe contigue au suma `≤ S` (elemente pozitive). Folosim aceeași fereastră variabilă din lecția precedentă, dar acum **numărăm**, nu măsurăm lungimea.
+
+Cheia: dacă `[st, dr]` e cea mai lungă secvență validă care se termină în `dr`, atunci **toate** secvențele care se termină în `dr` și încep la `st, st+1, ..., dr` sunt valide. Sunt `dr - st + 1` la număr.
+
+## Pas cu pas pe numere
+
+Fie `v = {1, 2, 1, 3}` și `S = 3`.
+
+<ArrayDiagram
+  values="1 2 1 3"
+  valueLabel="v" index="1 2 3 4"
+  range="0-1"
+  pointers="0:st:success 1:dr:primary"
+  caption="dr=2: cea mai lungă validă e [1,2] sumă=3 → 2 secvențe noi: {2}, {1,2}." />
+
+Numărăm pe rând, pentru fiecare `dr`:
+
+```
+dr=1: fereastra [1,1] suma=1<=3 -> st=1 -> 1-1+1 = 1 secventa
+dr=2: fereastra [1,2] suma=3<=3 -> st=1 -> 2-1+1 = 2 secvente
+dr=3: suma=4>3 -> st=2; [2,3] suma=3 -> 3-2+1 = 2 secvente
+dr=4: suma=1+3=4>3 -> st=3; [3,4]? suma=1+3=4>3 -> st=4; [4,4] suma=3 -> 1
+total: 1 + 2 + 2 + 1 = 6 secvente cu suma <= 3
+```
+
+Cele 6 secvențe sunt: `{1}, {2}, {1,2}, {1}, {3}` și `{1}` (a treia poziție) — toate cu sumă ≤ 3.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[] = {0, 1, 2, 1, 3}; // v[0] nefolosit
+    int n = 4, S = 3;
+
+    int st = 1, suma = 0;
+    long long total = 0; // poate fi mare: pana la n(n+1)/2
+    for (int dr = 1; dr <= n; dr++) {
+        suma += v[dr];
+        while (suma > S) {       // strangem pana redevine valida
+            suma -= v[st];
+            st++;
+        }
+        total += dr - st + 1;    // cate secvente valide se termina in dr
+    }
+
+    cout << total << "\n"; // 6
+    return 0;
+}
+```
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|---|---|---|
+| Verifici toate secvențele | O(n²) sau O(n³) | O(1) |
+| Numărare cu doi indici | O(n) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Overflow la `total`.** Numărul de secvențe poate ajunge la `n(n+1)/2`, adică ~`5·10^11` pentru `n = 10^6`. Folosește `long long`, nu `int`.
+- **Numeri secvențe greșite.** Pentru fiecare `dr` aduni `dr - st + 1`, nu `1`. Fiecare început valid contează separat.
+- **Aplici metoda pe valori negative.** Numărarea cu fereastră merge doar dacă proprietatea e monotonă (sume cu elemente pozitive). Cu negative, o secvență mai scurtă nu e neapărat „mai validă”.
+- **Confuzi secvență cu submulțime.** Aici numeri elemente **consecutive**. Submulțimile (elemente oarecare) sunt `2ⁿ` — cu totul altă problemă.
+</MistakeBox>
+
+## Ilustrație
+
+Pentru `dr` fixat, toate începuturile de la `st` la `dr` dau secvențe valide:
+
+<ArrayDiagram
+  values="1 2 1 3"
+  valueLabel="v" index="1 2 3 4"
+  dim="3"
+  range="1-2"
+  caption="dr=3, st=2: secvențele {2,1} și {1} sunt valide → 2 secvențe." />
+
+## Recapitulare
+
+- Un vector are `n(n+1)/2` secvențe contigue — prea multe pentru verificare individuală.
+- Pentru fiecare capăt `dr`, numeri **dintr-un foc** câte începuturi valide există: `dr - st + 1`.
+- Total **O(n)**; atenție la **overflow** pe `total` (folosește `long long`).

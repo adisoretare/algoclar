@@ -1,0 +1,126 @@
+---
+title: "Maxime și minime pe prefixe — cel mai bun „de până aici”"
+slug: maxime-minime-prefixe
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["prefixe", "maxim", "precalculare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce reprezintă `pmax[i]` (maximul pe prefix)?"
+    options:
+      - "Maximul întregului vector"
+      - "Cel mai mare element dintre primele i elemente"
+      - "Poziția maximului"
+      - "Maximul elementelor de după i"
+    correctIndex: 1
+    explanation: "pmax[i] = max(v[1], v[2], ..., v[i]), adică cel mai mare element văzut până la poziția i inclusiv."
+  - question: "Care e relația de recurență pentru maximul pe prefix?"
+    options:
+      - "pmax[i] = pmax[i-1] + v[i]"
+      - "pmax[i] = max(pmax[i-1], v[i])"
+      - "pmax[i] = max(v[i], v[i+1])"
+      - "pmax[i] = pmax[i-1] * v[i]"
+    correctIndex: 1
+    explanation: "Maximul până la i e fie maximul de până la i-1, fie noul element v[i] dacă e mai mare. Comparăm cele două."
+  - question: "La ce e utilă combinarea prefixului cu sufixul pe aceeași poziție?"
+    options:
+      - "Ca să sortezi vectorul"
+      - "Ca să răspunzi rapid la întrebări de tip „maximul din afara poziției i”"
+      - "Ca să numeri elementele"
+      - "Nu sunt utile împreună"
+    correctIndex: 1
+    explanation: "max(pmax[i-1], smax[i+1]) îți dă maximul tuturor elementelor în afară de v[i], fără să recalculezi de fiecare dată."
+---
+
+<LessonHook>
+La un concurs de sărituri, după fiecare concurent se afișează „cel mai bun rezultat de până acum”. Nu se recalculează tot clasamentul — se compară doar noua săritură cu recordul curent. Exact asta face maximul pe prefix.
+</LessonHook>
+
+## Ce este maximul pe prefix
+
+Un **prefix** al vectorului sunt primele `i` elemente. **Maximul pe prefix** `pmax[i]` e cel mai mare element dintre primele `i`:
+
+`pmax[i] = max(v[1], v[2], ..., v[i])`.
+
+La fel definim minimul pe prefix `pmin[i]`. Le construiești dintr-o singură parcurgere, comparând fiecare element nou cu cel mai bun de până atunci.
+
+<ObservationBox>
+Recurența e simplă: cel mai bun de până la `i` e fie cel mai bun de până la `i-1`, fie chiar `v[i]`. Deci `pmax[i] = max(pmax[i-1], v[i])`.
+</ObservationBox>
+
+## Pas cu pas pe numere
+
+Fie `v = {4, 2, 7, 3, 9, 5}` (indici 1..6).
+
+<ArrayDiagram
+  values="4 2 7 3 9 5"
+  valueLabel="v" index="1 2 3 4 5 6"
+  caption="Vectorul original." />
+
+Construim `pmax` comparând fiecare element cu recordul curent:
+
+<ArrayDiagram
+  values="4 4 7 7 9 9"
+  valueLabel="pmax" index="1 2 3 4 5 6"
+  caption="pmax[i] = max(pmax[i-1], v[i]). La i=3, 7 bate 4; la i=5, 9 bate 7." />
+
+Observă cum `pmax` **nu scade niciodată** — odată ce ai văzut un record, el rămâne până apare unul mai mare.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[] = {0, 4, 2, 7, 3, 9, 5}; // v[0] nefolosit
+    int n = 6;
+    int pmax[100], pmin[100];
+
+    pmax[1] = pmin[1] = v[1];
+    for (int i = 2; i <= n; i++) {
+        pmax[i] = max(pmax[i - 1], v[i]); // record maxim de pana aici
+        pmin[i] = min(pmin[i - 1], v[i]); // record minim de pana aici
+    }
+
+    for (int i = 1; i <= n; i++) cout << pmax[i] << " ";
+    cout << "\n"; // 4 4 7 7 9 9
+    return 0;
+}
+```
+
+## La ce folosește: maximul „în afară de poziția i”
+
+Combinând prefixul cu **sufixul** (vezi lecția următoare) poți răspunde la întrebări de tip „care e maximul tuturor elementelor, ignorându-l pe `v[i]`?”:
+
+`maxFaraI = max(pmax[i-1], smax[i+1])`.
+
+Asta e util, de pildă, când vrei pentru fiecare poziție produsul/maximul celorlalte elemente, fără bucle imbricate.
+
+## Complexitate
+
+| Etapă | Timp | Spațiu |
+|---|---|---|
+| Construire `pmax`/`pmin` | O(n) | O(n) |
+| Fiecare interogare „prefix” | O(1) | — |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Inițializare greșită.** Dacă pornești `pmax` cu `0` și vectorul are numere negative, primești un maxim fals. Inițializează cu `v[1]`, nu cu `0` sau cu o constantă arbitrară.
+- **Confuzi prefix cu maximul global.** `pmax[i]` e maximul **până la `i`**, nu al întregului vector. Maximul global e `pmax[n]`.
+- **Off-by-one la combinarea cu sufixul.** Pentru „în afară de `i`” folosești `pmax[i-1]` și `smax[i+1]` — nu `pmax[i]`, care l-ar include pe `v[i]`.
+- **Margini neglijate.** La `i = 1` nu există `pmax[0]` util; la `i = n` nu există sufix după el. Tratează capetele separat.
+</MistakeBox>
+
+## Recapitulare
+
+- `pmax[i]` = **cel mai bun element dintre primele `i`**, construit cu `max(pmax[i-1], v[i])`.
+- Maximul pe prefix **nu scade niciodată**; maximul global e `pmax[n]`.
+- Combinat cu sufixul, răspunde în O(1) la „maximul în afară de poziția `i`”.

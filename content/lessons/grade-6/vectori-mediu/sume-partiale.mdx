@@ -1,0 +1,153 @@
+---
+title: "Sume parțiale — răspunde instant la „cât e suma de la i la j?”"
+slug: sume-partiale
+grade: 6
+chapter: vectori-mediu
+difficulty: mediu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["sume-partiale", "prefix", "precalculare"]
+visualizers: ["prefix-sums"]
+relatedProblems: []
+quiz:
+  - question: "Ce reprezintă `s[i]` în vectorul de sume parțiale?"
+    options:
+      - "Al i-lea element din vectorul original"
+      - "Suma primelor i elemente (de la 1 la i)"
+      - "Maximul primelor i elemente"
+      - "Numărul de elemente nenule până la i"
+    correctIndex: 1
+    explanation: "s[i] = v[1] + v[2] + ... + v[i], adică suma primelor i elemente. De aceea s[0] = 0 (suma a zero elemente)."
+  - question: "Cum afli suma elementelor de la poziția i la poziția j folosind sume parțiale?"
+    options:
+      - "s[j] + s[i]"
+      - "s[j] - s[i-1]"
+      - "s[j] - s[i]"
+      - "s[i] - s[j]"
+    correctIndex: 1
+    explanation: "s[j] e suma până la j inclusiv, s[i-1] e suma până înainte de i. Scăzându-le, rămâne exact suma de la i la j."
+  - question: "După ce ai construit vectorul de sume parțiale, cât durează un răspuns la o întrebare de tip sumă pe interval?"
+    options:
+      - "O(n) pentru fiecare întrebare"
+      - "O(1) — o singură scădere"
+      - "O(log n)"
+      - "Depinde de mărimea intervalului"
+    correctIndex: 1
+    explanation: "Răspunsul e o singură scădere s[j] - s[i-1], deci O(1), indiferent cât de mare e intervalul."
+---
+
+<LessonHook>
+Ții un caiet în care notezi în fiecare seară cât ai cheltuit, dar și totalul de la începutul lunii până azi. Dacă vrei să afli cât ai cheltuit între ziua 5 și ziua 12, nu mai aduni nimic: iei totalul din ziua 12 și scazi totalul din ziua 4. O scădere, gata. Asta sunt sumele parțiale.
+</LessonHook>
+
+## Problema
+
+Ai un vector și ți se pun multe întrebări de forma: „cât e suma elementelor de la poziția `i` la poziția `j`?”. Dacă pentru fiecare întrebare aduni de la `i` la `j`, o întrebare costă O(n). La multe întrebări (Q) devine O(Q·n) — prea lent.
+
+<ObservationBox>
+Ideea de **precalculare**: muncește o singură dată la început (construiești ceva util), apoi fiecare întrebare e instantanee. Plătești O(n) o dată, ca să răspunzi în O(1) de oricâte ori.
+</ObservationBox>
+
+## Vectorul de sume parțiale
+
+Definim `s[i]` = suma primelor `i` elemente:
+
+`s[0] = 0`, `s[i] = s[i-1] + v[i]`.
+
+Lucrăm cu vectorul **indexat de la 1** ca să avem `s[0] = 0` (suma a zero elemente) — asta face formula finală curată.
+
+Atunci suma pe intervalul `[i, j]` este:
+
+```
+suma(i, j) = s[j] - s[i-1]
+```
+
+## Pas cu pas pe numere
+
+Fie `v = {3, 1, 4, 1, 5, 9}` (indici 1..6).
+
+<ArrayDiagram
+  values="3 1 4 1 5 9"
+  valueLabel="v" index="1 2 3 4 5 6"
+  caption="Vectorul original, indexat de la 1." />
+
+Construim `s` adunând pe rând:
+
+<ArrayDiagram
+  values="0 3 4 8 9 14 23"
+  valueLabel="s" index="0 1 2 3 4 5 6"
+  caption="s[i] = s[i-1] + v[i]. Ex: s[3] = 4 + 4 = 8." />
+
+Vrem suma de la poziția `2` la `5` (adică `1 + 4 + 1 + 5 = 11`):
+
+`suma(2, 5) = s[5] - s[1] = 14 - 3 = 11`. ✓
+
+<ArrayDiagram
+  values="0 3 4 8 9 14 23"
+  valueLabel="s" index="0 1 2 3 4 5 6"
+  highlight="1 5"
+  caption="suma(2,5) = s[5] - s[1] = 14 - 3 = 11. O singură scădere." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 100;
+long long s[N + 1]; // long long: sumele pot depasi int
+
+int main() {
+    int v[] = {0, 3, 1, 4, 1, 5, 9}; // v[0] nefolosit, lucram de la 1
+    int n = 6;
+
+    s[0] = 0;
+    for (int i = 1; i <= n; i++)
+        s[i] = s[i - 1] + v[i]; // precalculare O(n)
+
+    // raspunsuri O(1) fiecare:
+    int i = 2, j = 5;
+    cout << s[j] - s[i - 1] << "\n"; // 11
+
+    i = 1; j = 6;
+    cout << s[j] - s[i - 1] << "\n"; // 23 (suma totala)
+    return 0;
+}
+```
+
+## Complexitate
+
+| Etapă | Timp |
+|---|---|
+| Construire `s` | O(n), o singură dată |
+| Fiecare întrebare | O(1) |
+| Total pentru Q întrebări | O(n + Q) |
+
+Comparativ cu metoda naivă O(n·Q), câștigul e enorm când ai multe întrebări.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Overflow.** Suma multor numere mari depășește `int`. Folosește `long long` pentru vectorul `s`. E greșeala numărul unu la sume parțiale.
+- **`s[i]` în loc de `s[i-1]`.** Formula corectă e `s[j] - s[i-1]`. Dacă scrii `s[j] - s[i]`, pierzi exact elementul `v[i]` de la începutul intervalului.
+- **Indexare de la 0 fără grijă.** Dacă lucrezi de la 0, ai nevoie de un caz special pentru `i = 0` (nu există `s[-1]`). De-asta indexarea de la 1 cu `s[0] = 0` e mai sigură.
+- **Reconstruiești `s` la fiecare întrebare.** Sensul tehnicii e să construiești `s` **o singură dată**. Dacă o refaci mereu, ai pierdut tot avantajul.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum se construiește vectorul de sume parțiale și cum o întrebare devine o scădere:
+
+<Visualizer name="prefix-sums" />
+
+<HintBox>
+Citește `s[i]` ca „totalul de până aici”. Suma unui interval = „totalul la final” minus „totalul de dinainte de început”.
+</HintBox>
+
+## Recapitulare
+
+- `s[i]` = **suma primelor `i` elemente**; o construiești o dată în O(n).
+- Orice sumă pe interval devine o **singură scădere**: `s[j] - s[i-1]`, în O(1).
+- Folosește **`long long`** pentru `s` și ai grijă la `i-1`, nu `i`.
