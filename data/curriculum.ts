@@ -219,7 +219,7 @@ export const CURRICULUM: Grade[] = [
         lessons: [
           { id: 'operatii-cu-multimi', title: 'Operații cu mulțimi', visualizer: 'set-map' },
           { id: 'interclasare', title: 'Interclasarea vectorilor' },
-          { id: 'cautare-binara', title: 'Căutare binară', visualizer: 'cautare-binara' },
+          { id: 'cautare-binara-6', title: 'Căutare binară', visualizer: 'cautare-binara' },
           { id: 'sume-partiale', title: 'Sume parțiale', visualizer: 'prefix-sums' },
           { id: 'maxime-minime-prefixe', title: 'Maxime și minime pe prefixe' },
           { id: 'maxime-minime-sufixe', title: 'Maxime și minime pe sufixe' },
