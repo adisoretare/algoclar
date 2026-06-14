@@ -1,0 +1,119 @@
+---
+title: "Descompunerea în factori primi"
+slug: descompunere-factori-primi
+grade: 6
+chapter: divizibilitate-avansata
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["factori-primi", "descompunere", "divizibilitate", "radacina"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Până la ce valoare merge bucla de încercare a divizorilor d în descompunere?"
+    options:
+      - "Până la n"
+      - "Până la n/2"
+      - "Cât timp d·d ≤ n (adică d ≤ √n)"
+      - "Până la 100"
+    correctIndex: 2
+    explanation: "Dacă n mai are un factor, cel mic e ≤ √n. Testezi divizori până la √n; ce rămâne după buclă, dacă e > 1, e un factor prim mare."
+  - question: "După buclă, dacă n a rămas > 1, ce este acel n?"
+    options:
+      - "O greșeală de cod"
+      - "Un număr compus"
+      - "Un factor prim, mai mare decât √n-ul inițial"
+      - "Mereu 1"
+    correctIndex: 2
+    explanation: "Un număr nu poate avea doi factori primi mai mari ca √n. Dacă a rămas ceva > 1, acela e un singur factor prim mare, care trebuie afișat."
+  - question: "Cum elimini complet un factor d înainte de a trece mai departe?"
+    options:
+      - "Împarți o singură dată"
+      - "Împarți la d cât timp n se mai împarte exact la d"
+      - "Scazi d din n"
+      - "Înmulțești n cu d"
+    correctIndex: 1
+    explanation: "Un factor poate apărea de mai multe ori (ex. 8 = 2·2·2). Folosești while (n % d == 0) n /= d, ca să scoți toate aparițiile lui d."
+---
+
+<LessonHook>
+Orice construcție din piese LEGO se poate desface până la cărămizile de bază din care e făcută. La fel, orice număr natural se descompune unic într-un produs de numere prime — „cărămizile" indivizibile ale aritmeticii. 360 nu e doar „360": e `2 · 2 · 2 · 3 · 3 · 5`, iar acea rețetă îți spune aproape tot despre el.
+</LessonHook>
+
+## Ce înseamnă descompunerea
+
+**Teorema fundamentală a aritmeticii** spune că orice număr natural `> 1` se scrie **unic** ca produs de numere prime:
+
+```
+360 = 2³ · 3² · 5
+```
+
+<ArrayDiagram
+  values="2 2 2 3 3 5"
+  index="off"
+  caption="360 = 2 · 2 · 2 · 3 · 3 · 5 = 2³ · 3² · 5. Factorii primi sunt „cărămizile" numărului." />
+
+Această rețetă e foarte utilă: din ea afli numărul de divizori, dacă două numere sunt prime între ele, CMMDC-ul și CMMMC-ul — toate fără calcule grele.
+
+## Algoritmul prin împărțiri succesive
+
+Încerci pe rând divizorii `d = 2, 3, 4, …` și, de fiecare dată când `d` divide pe `n`, îl scoți complet (poate apărea de mai multe ori). Cheia: e suficient să mergi cu `d` **doar până la `√n`**.
+
+Exemplu pentru `n = 360`:
+
+```
+d=2: 360 -> 180 -> 90 -> 45   (scos de 3 ori, factor 2^3)
+d=3: 45 -> 15 -> 5            (scos de 2 ori, factor 3^2)
+d=4: 5 % 4 != 0               (nu divide)
+d*d > 5 -> ne oprim
+n = 5 > 1 -> factor prim ramas: 5
+```
+
+<ObservationBox>
+De ce `√n` e suficient? Dacă după ce ai scos toți factorii mici a rămas `n > 1`, acela nu mai poate avea doi factori `> √n` (produsul lor ar depăși `n`). Deci e el însuși **un singur prim** — îl afișezi separat.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 360;
+
+    for (int d = 2; (long long)d * d <= n; d++) {
+        while (n % d == 0) {
+            cout << d << " ";   // d este factor prim
+            n /= d;             // il scoatem complet
+        }
+    }
+    if (n > 1) cout << n;       // factor prim ramas, mai mare ca sqrt
+    cout << "\n";               // 2 2 2 3 3 5
+    return 0;
+}
+```
+
+Deși bucla testează și divizori compuși (4, 6, …), aceștia nu apar niciodată ca factori: când ajungi la `d = 4`, toți factorii de 2 au fost deja scoși, deci `n % 4 != 0`. Astfel se afișează automat doar primele.
+
+## Complexitate
+
+Algoritmul rulează în **O(√n)**: bucla merge cât timp `d·d ≤ n`. Pentru un singur număr e foarte rapid; pentru a descompune **multe** numere mici se folosește, în schimb, un ciur precalculat.
+
+<MistakeBox>
+**Greșeala 1 — uiți factorul prim rămas:** dacă oprești bucla la `√n` și nu afișezi `n`-ul rămas (când e `> 1`), pierzi cel mai mare factor prim. Exemplu: pentru `14`, fără `if (n > 1)` ratezi factorul `7`.
+
+**Greșeala 2 — scoți factorul o singură dată:** `if (n % d == 0)` în loc de `while` ratează aparițiile repetate. `8` ar da doar un `2`, nu `2 2 2`.
+
+**Greșeala 3 — bucla până la `n`:** corect, dar lentă — `O(n)` în loc de `O(√n)`. Folosește condiția `d*d <= n`.
+
+**Greșeala 4 — overflow la `d*d`:** pentru `n` mare, `d*d` poate depăși `int`. Folosește `(long long)d * d <= n`.
+</MistakeBox>
+
+## Recapitulare
+
+- Orice număr `> 1` are o descompunere **unică** în factori primi; ea îți dă rapid divizori, CMMDC, CMMMC.
+- Algoritmul prin împărțiri succesive testează divizori până la `√n`, scoțând fiecare factor complet cu `while`.
+- Dacă după buclă rămâne `n > 1`, acela e un **factor prim mare** și trebuie afișat; complexitatea totală e **O(√n)**.

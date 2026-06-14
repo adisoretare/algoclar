@@ -1,0 +1,126 @@
+---
+title: "Baze de numerație"
+slug: baze-de-numeratie
+grade: 6
+chapter: sisteme-numeratie
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["baze", "binar", "pozitional", "numeratie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce valoare în baza 10 are numărul 1011 scris în baza 2?"
+    options:
+      - "1011"
+      - "11"
+      - "8"
+      - "23"
+    correctIndex: 1
+    explanation: "Fiecare poziție are o valoare de loc, putere a lui 2: 1·8 + 0·4 + 1·2 + 1·1 = 11."
+  - question: "Câte cifre diferite folosește baza b?"
+    options:
+      - "exact b cifre, de la 0 la b−1"
+      - "b+1 cifre, de la 0 la b"
+      - "mereu 10 cifre"
+      - "depinde de număr"
+    correctIndex: 0
+    explanation: "Baza b folosește cifrele 0, 1, …, b−1. Baza 2 are doar 0 și 1; baza 10 are 0–9. O cifră egală sau mai mare ca baza nu există în acel sistem."
+  - question: "De ce poziția cea mai din dreapta are mereu valoarea de loc 1, în orice bază?"
+    options:
+      - "Pentru că e o convenție arbitrară"
+      - "Pentru că este b⁰, iar orice bază la puterea 0 dă 1"
+      - "Pentru că e cifra unităților în baza 10"
+      - "Pentru că acolo punem virgula"
+    correctIndex: 1
+    explanation: "Valorile de loc sunt puteri ale bazei: b⁰, b¹, b², … Poziția din dreapta e b⁰ = 1, indiferent de bază."
+---
+
+<LessonHook>
+Te uiți la un ceas: 1 oră înseamnă 60 de minute, iar 1 minut înseamnă 60 de secunde. Fără să-ți dai seama, folosești deja un sistem cu „baza 60". Tot timpul grupăm lucruri în pachete: zeci, duzini, ore. O bază de numerație e doar regula după care decidem cât de mare e un „pachet".
+</LessonHook>
+
+## Ce este o bază de numerație
+
+Sistemul nostru obișnuit e **pozițional în baza 10**: aceeași cifră înseamnă altceva în funcție de locul ei. În `234`, cifra `2` valorează 200, nu 2, pentru că stă pe poziția sutelor.
+
+<ArrayDiagram
+  values="2 3 4"
+  valueLabel="cifra"
+  index="100 10 1"
+  indexLabel="valoare loc"
+  caption="În baza 10 valorile de loc sunt puteri ale lui 10: 2·100 + 3·10 + 4·1 = 234." />
+
+Ideea se generalizează la orice **bază** `b`: folosești cifrele `0 … b−1`, iar fiecare poziție are valoarea de loc `bᵖᵒᶻⁱᵗⁱᵉ` — adică `b⁰ = 1`, `b¹ = b`, `b² = b·b`, și așa mai departe, de la dreapta la stânga.
+
+| Bază | Nume | Cifre folosite |
+|------|------|----------------|
+| 2 | binar | 0, 1 |
+| 8 | octal | 0 … 7 |
+| 10 | zecimal | 0 … 9 |
+| 16 | hexazecimal | 0 … 9, A … F |
+
+<ObservationBox>
+Calculatorul lucrează intern în **baza 2**: fiecare bit e o poziție cu cifra 0 sau 1. De aceea bazele 2, 8 și 16 apar peste tot în informatică — sunt „limba" naturală a memoriei.
+</ObservationBox>
+
+## Cum afli valoarea unui număr dintr-o bază
+
+Un număr în baza 2 se citește la fel ca în baza 10, doar că valorile de loc sunt puteri ale lui 2:
+
+<ArrayDiagram
+  values="1 0 1 1"
+  valueLabel="cifra"
+  index="8 4 2 1"
+  indexLabel="valoare loc"
+  highlight="0 2 3"
+  caption="1011 în baza 2 = 1·8 + 0·4 + 1·2 + 1·1 = 11 în baza 10." />
+
+Aduni valorile de loc unde cifra e 1 (sau, în general, înmulțești fiecare cifră cu valoarea ei de loc și aduni tot).
+
+## Implementare C++
+
+Calculezi valoarea folosind **schema lui Horner**: pleci de la 0 și, pentru fiecare cifră de la stânga la dreapta, înmulțești ce ai cu baza și adaugi cifra nouă. Asta evită calcularea explicită a puterilor.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int b = 2;
+    int cifre[] = {1, 0, 1, 1};  // 1011 in baza 2, de la stanga
+    int n = 4;
+
+    int valoare = 0;
+    for (int i = 0; i < n; i++) {
+        valoare = valoare * b + cifre[i];  // schema lui Horner
+    }
+
+    cout << valoare << "\n";  // 11
+    return 0;
+}
+```
+
+De ce funcționează Horner: la fiecare pas, înmulțirea cu `b` „împinge" cifrele de până acum cu o poziție mai sus, exact ca atunci când adaugi o cifră la dreapta unui număr.
+
+## Complexitate
+
+Citirea unui număr cu `k` cifre costă **O(k)** — o singură trecere prin cifre. Numărul de cifre necesare pentru o valoare `n` în baza `b` este aproximativ `log_b n`, deci bazele mari (16) folosesc mai puține cifre decât bazele mici (2) pentru aceeași valoare.
+
+<MistakeBox>
+**Greșeala 1 — cifră ≥ bază:** în baza 2 nu există cifra `2`, în baza 8 nu există `9`. O cifră trebuie să fie mereu strict mai mică decât baza.
+
+**Greșeala 2 — confunzi ordinea pozițiilor:** valoarea de loc 1 (`b⁰`) e la **dreapta**, nu la stânga. Dacă citești puterile invers, obții un alt număr.
+
+**Greșeala 3 — uiți literele în baza 16:** după cifra 9 urmează A=10, B=11, …, F=15. `1F` în baza 16 nu e o eroare, ci 1·16 + 15 = 31.
+
+**Greșeala 4 — `0⁰` greșit:** `b⁰` este 1 pentru orice bază, inclusiv valoarea de loc a unităților. Nu confunda poziția 0 cu valoarea 0.
+</MistakeBox>
+
+## Recapitulare
+
+- O bază `b` folosește cifrele `0 … b−1`, iar fiecare poziție are valoarea de loc `bᵖᵒᶻⁱᵗⁱᵉ`, începând de la `b⁰ = 1` în dreapta.
+- Valoarea unui număr = suma fiecărei cifre înmulțite cu valoarea ei de loc; o calculezi rapid cu schema lui Horner în **O(k)**.
+- Bazele 2, 8 și 16 sunt esențiale în informatică pentru că reflectă felul în care memoria stochează datele în biți.

@@ -1,0 +1,107 @@
+---
+title: "Precalcularea informațiilor despre numere"
+slug: precalculare
+grade: 6
+chapter: divizibilitate-avansata
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["precalculare", "ciur", "divizori", "interogari"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Când merită să precalculezi informații pentru toate numerele până la n?"
+    options:
+      - "Mereu, indiferent de problemă"
+      - "Când ai multe interogări și vrei un răspuns rapid la fiecare"
+      - "Doar pentru o singură întrebare"
+      - "Niciodată, e risipă de memorie"
+    correctIndex: 1
+    explanation: "Precalcularea plătește un cost mare o singură dată, ca apoi fiecare interogare să fie aproape instantanee. Are sens când răspunzi la multe întrebări pe același interval de numere."
+  - question: "Cum calculezi numărul de divizori pentru toate numerele până la n cu un ciur?"
+    options:
+      - "Pentru fiecare n descompui separat în factori primi"
+      - "Pentru fiecare d, adaugi 1 la toți multiplii lui d"
+      - "Numeri primele până la n"
+      - "Aduni toate numerele"
+    correctIndex: 1
+    explanation: "Fiecare d este divizor pentru multiplii săi d, 2d, 3d, … Parcurgând fiecare d și incrementând nrDiv la toți multiplii, obții numărul de divizori pentru toate numerele dintr-o singură trecere de tip ciur."
+  - question: "Ce complexitate are precalcularea numărului de divizori pentru toate numerele până la n?"
+    options:
+      - "O(n)"
+      - "O(n log n)"
+      - "O(n²)"
+      - "O(√n)"
+    correctIndex: 1
+    explanation: "Suma n/1 + n/2 + n/3 + … + n/n ≈ n·ln(n), deci precalcularea prin ciur costă O(n log n), apoi orice interogare e O(1)."
+---
+
+<LessonHook>
+Un bucătar bun pregătește toate ingredientele înainte să înceapă să gătească: taie, măsoară, aliniază. Munca grea se face o singură dată, la început, iar apoi fiecare fel iese rapid. Precalcularea e aceeași idee în programare: faci efortul mare o dată, ca să răspunzi instant la sute de întrebări.
+</LessonHook>
+
+## Ideea precalculării
+
+Multe probleme pun aceeași întrebare de **multe ori**: „câți divizori are X?", „care e cel mai mic factor prim al lui Y?". Dacă reiei calculul de la zero la fiecare întrebare, pierzi timp repetând muncă.
+
+Soluția: **calculezi o dată** răspunsurile pentru toate numerele până la `n`, le stochezi într-un vector, apoi fiecare interogare devine o simplă citire — **O(1)**.
+
+<ArrayDiagram
+  values="1 2 2 3 2 4 2 4"
+  valueLabel="nr.div"
+  index="1 2 3 4 5 6 7 8"
+  indexLabel="n"
+  caption="Numărul de divizori precalculat: nrDiv[6]=4 (1,2,3,6), nrDiv[8]=4 (1,2,4,8). O dată calculat, citirea e instantanee." />
+
+## Numărul de divizori printr-un ciur
+
+Trucul: în loc să descompui fiecare număr separat, întorci problema pe dos. Pentru fiecare `d`, `d` este divizor pentru **toți multiplii săi**: `d, 2d, 3d, …`. Deci parcurgi fiecare `d` și adaugi `1` la toți multiplii lui:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 1000000;
+int nrDiv[N + 1];   // global: vector mare
+
+int main() {
+    for (int d = 1; d <= N; d++)
+        for (int m = d; m <= N; m += d)
+            nrDiv[m]++;          // d este divizor al lui m
+
+    cout << nrDiv[6]  << "\n";   // 4  (1,2,3,6)
+    cout << nrDiv[12] << "\n";   // 6  (1,2,3,4,6,12)
+    return 0;
+}
+```
+
+<ObservationBox>
+Aceeași schemă de „ciur" calculează multe alte lucruri: suma divizorilor (aduni `d` în loc de 1), cel mai mic factor prim al fiecărui număr, indicatorul lui Euler etc. Schimbi doar ce pui în buclă, structura rămâne identică.
+</ObservationBox>
+
+## De ce e rapid
+
+Bucla interioară rulează de `N/d` ori pentru fiecare `d`. Suma totală `N/1 + N/2 + N/3 + … ≈ N·ln(N)`, deci precalcularea costă **O(n log n)**. După ea, fiecare dintre cele eventual milioane de interogări costă **O(1)**.
+
+| Abordare | Cost per interogare | Bun pentru |
+|----------|---------------------|------------|
+| Calcul direct (descompunere) | O(√n) | puține interogări |
+| Precalculare cu ciur | O(1) după O(n log n) | multe interogări |
+
+<MistakeBox>
+**Greșeala 1 — recalculezi la fiecare interogare:** dacă ai `q` întrebări și descompui de fiecare dată, costul e `O(q√n)`. Cu precalculare scapi la `O(n log n + q)`.
+
+**Greșeala 2 — vector local prea mare:** `int nrDiv[1000001]` în `main` depășește stiva și dă crash. Declară-l **global**.
+
+**Greșeala 3 — `N` prea mare pentru memorie:** un vector de `int` de `10⁸` elemente cere ~400 MB — peste limita uzuală. Verifică memoria înainte să alegi `N`.
+
+**Greșeala 4 — precalculezi degeaba:** pentru o **singură** interogare, ciurul `O(n log n)` e mai lent decât o descompunere directă `O(√n)`. Precalcularea merită doar la multe întrebări.
+</MistakeBox>
+
+## Recapitulare
+
+- Precalcularea mută munca grea la început: o trecere de tip ciur completează un vector, apoi fiecare interogare e **O(1)**.
+- Numărul de divizori (și suma lor, cel mai mic factor prim etc.) se obține adăugând la multiplii fiecărui `d`, în **O(n log n)**.
+- Merită doar când ai **multe** interogări; vectorul mare se declară global și trebuie să încapă în memorie.

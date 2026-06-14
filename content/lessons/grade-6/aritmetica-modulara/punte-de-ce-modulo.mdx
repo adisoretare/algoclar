@@ -1,0 +1,79 @@
+---
+title: "Lecție-punte: de ce folosim modulo în probleme"
+slug: punte-de-ce-modulo
+grade: 6
+chapter: aritmetica-modulara
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["modulo", "overflow", "numarare", "mod"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce cer multe probleme răspunsul „modulo 1.000.000.007" în loc de numărul exact?"
+    options:
+      - "Ca să fie mai greu"
+      - "Pentru că rezultatul exact ar fi un număr uriaș care nu încape în niciun tip"
+      - "Pentru că 1.000.000.007 e singurul număr permis"
+      - "Ca să ascundă răspunsul corect"
+    correctIndex: 1
+    explanation: "La problemele de numărare rezultatul crește exponențial și depășește orice tip. Cerând răspunsul modulo un număr fix, el rămâne mic și verificabil, iar tu lucrezi cu aritmetică modulară pe tot parcursul."
+  - question: "Modulo se distribuie corect peste care operații?"
+    options:
+      - "Doar adunare"
+      - "Adunare, scădere și înmulțire"
+      - "Doar înmulțire"
+      - "Adunare, scădere, înmulțire și împărțire la fel de simplu"
+    correctIndex: 1
+    explanation: "Pentru +, − și · poți reduce modulo pe parcurs. Împărțirea modulo NU funcționează la fel — cere invers modular, un subiect separat și mai avansat."
+---
+
+<LessonHook>
+Numeri în câte feluri poți aranja 50 de cărți pe un raft. Răspunsul are zeci de cifre — nu încape în nimic și n-ai cum să-l scrii întreg. Totuși problema îți cere un singur număr verificabil. Soluția consacrată: nu răspunsul exact, ci restul lui la împărțirea cu un număr fix. Asta e rostul lui modulo în probleme.
+</LessonHook>
+
+## De ce explodează numerele
+
+Problemele de **numărare** (în câte feluri, câte configurații, câte drumuri) au răspunsuri care cresc **exponențial**. Un factorial, o putere, o sumă de combinări — toate ajung repede la sute de cifre. Niciun tip întreg nu le poate ține: nici `long long`, nici numere mari n-ar mai fi practice de comparat.
+
+Soluția enunțurilor: „dă răspunsul **modulo 1.000.000.007**". Astfel rezultatul rămâne un număr între 0 și `m−1`, ușor de afișat și de verificat, iar tu poți lucra modulo pe **tot** parcursul, nu doar la final.
+
+<ObservationBox>
+`1.000.000.007` (sau `998.244.353`) e ales pentru că e **prim** și suficient de mare. Fiind prim, permite și operații avansate (invers modular pentru împărțire), iar fiind mare, reduce șansa unor „coincidențe" între rezultate diferite.
+</ObservationBox>
+
+## Modulo te ține în siguranță tot timpul
+
+Cheia e că modulo **se distribuie** peste cele trei operații de bază:
+
+```
+(a + b) % m = (a % m + b % m) % m
+(a − b) % m = ((a % m − b % m) % m + m) % m
+(a · b) % m = (a % m · b % m) % m
+```
+
+Asta înseamnă că poți aplica `% m` după fiecare pas, fără să schimbi rezultatul final. Numerele nu cresc niciodată peste `m` (sau `m²` pentru produs), deci eviti complet overflow-ul. Practic, transformi un calcul cu numere imense într-unul cu numere mici, dar cu același rest.
+
+## Când aplici modulo
+
+- Enunțul spune explicit „modulo `m`" → reduci la **fiecare** adunare, scădere și înmulțire.
+- Faci numărări/produse care ar depăși `long long` → modulo le menține mărginite.
+- **NU** aplici modulo dacă problema cere valoarea exactă mică (ex. un maxim, o sumă care încape în `long long`) — acolo modulo ar strica răspunsul.
+
+<MistakeBox>
+**Greșeala 1 — modulo doar la final:** dacă lași numerele să crească și aplici `% m` abia la sfârșit, ai dat deja overflow pe parcurs. Reduci la **fiecare** pas.
+
+**Greșeala 2 — împărțire modulo „obișnuită":** `(a / b) % m` NU e corect — împărțirea modulo cere invers modular (subiect avansat). Adunare, scădere, înmulțire: da. Împărțire: nu așa.
+
+**Greșeala 3 — rest negativ la scădere:** după o scădere, rezultatul poate fi negativ. Folosește forma cu `+ m` ca să-l readuci în `0…m−1`.
+
+**Greșeala 4 — aplici modulo unde nu trebuie:** dacă problema cere un maxim sau o valoare exactă care încape în tip, `% m` îți falsifică răspunsul. Modulo e doar pentru numere care altfel ar exploda.
+</MistakeBox>
+
+## Recapitulare
+
+- Modulo apare în probleme pentru că rezultatele numărărilor cresc exponențial și nu încap în niciun tip — restul la un modul fix le face mici și verificabile.
+- Funcționează pentru că `% m` se distribuie peste adunare, scădere și înmulțire, deci reduci pe parcurs fără să schimbi rezultatul și fără overflow.
+- Aplici modulo la fiecare pas când enunțul o cere; nu îl folosești la împărțire (cere invers modular) și nici la valori exacte care oricum încap în tip.

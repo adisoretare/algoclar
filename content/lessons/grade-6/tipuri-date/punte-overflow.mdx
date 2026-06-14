@@ -1,0 +1,99 @@
+---
+title: "Lecție-punte: overflow"
+slug: punte-overflow
+grade: 6
+chapter: tipuri-date
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["overflow", "long-long", "cast", "limite"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce se întâmplă când un `int` depășește valoarea maximă (2.147.483.647) cu +1?"
+    options:
+      - "Programul dă eroare și se oprește"
+      - "Valoarea se „înfășoară" și devine cea mai mică valoare negativă"
+      - "Se transformă automat în long long"
+      - "Rămâne blocat la maxim"
+    correctIndex: 1
+    explanation: "Ca un kilometraj care trece de la 999999 la 000000, int trece de la maxim direct la minimul negativ. Nu apare nicio eroare — de asta overflow-ul e atât de înșelător."
+  - question: "Care e cel mai sigur semn că ai un overflow într-un program?"
+    options:
+      - "Programul rulează prea încet"
+      - "Un rezultat care „ar trebui" să fie pozitiv și mare iese negativ sau absurd de mic"
+      - "Compilatorul refuză să compileze"
+      - "Variabilele își schimbă tipul"
+    correctIndex: 1
+    explanation: "Overflow-ul nu dă erori; semnul tipic e un rezultat negativ sau mult prea mic acolo unde te așteptai la un număr mare pozitiv."
+---
+
+<LessonHook>
+Kilometrajul vechi al unei mașini are un număr fix de rotițe. Când mașina trece de 999999 km, kilometrajul nu explodează și nici nu se oprește — pur și simplu se întoarce la 000000 și o ia de la capăt. Overflow-ul în programe este exact această „întoarcere la zero": valoarea depășește ce încape în tip și se înfășoară, fără niciun avertisment.
+</LessonHook>
+
+## Ce este overflow
+
+**Overflow** apare când o valoare depășește maximul tipului în care e stocată. Calculul nu se oprește și nu dă eroare — rezultatul devine pur și simplu **greșit**, înfășurându-se de la maxim spre minimul negativ.
+
+<ArrayDiagram
+  values="... 2147483646 2147483647 -2147483648 -2147483647 ..."
+  index="off"
+  highlight="2"
+  caption="După maximul int (2147483647), +1 nu dă 2147483648 — sare direct la minimul negativ." />
+
+Tocmai pentru că nu există niciun semnal de eroare, overflow-ul e printre cele mai frecvente și mai greu de găsit bug-uri la concursuri: codul „arată corect", compilează, rulează — și dă răspuns greșit doar pe testele cu numere mari.
+
+## Cum îl recunoști
+
+Câteva semne tipice că un overflow ți-a stricat rezultatul:
+
+- o sumă sau un produs care ar trebui să fie mare iese **negativ**;
+- un rezultat e mult **mai mic** decât ai estima;
+- programul merge perfect pe exemplele mici din enunț, dar pică pe testele „mari".
+
+<ObservationBox>
+Overflow-ul depinde de **valori**, nu de logica algoritmului. De aceea trece neobservat pe exemplele mici și lovește exact la testele cu limite maxime — unde se dau cele mai multe puncte.
+</ObservationBox>
+
+## Cum îl previi
+
+Trei tehnici acoperă aproape toate cazurile:
+
+1. **Alege tipul destul de mare de la început.** Dacă valorile pot trece de ~2×10⁹, declară `long long`.
+2. **Fă cast înainte de înmulțire.** Înmulțirea a doi `int` se calculează în `int` și dă overflow înainte de a fi salvată. Forțează un operand: `(long long)a * b`.
+3. **Lucrează modulo când enunțul cere.** Multe probleme cer rezultatul „modulo 1.000.000.007" tocmai ca să nu crească numerele necontrolat.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 100000, b = 100000;
+
+    int gresit = a * b;                  // overflow: produsul depaseste int
+    long long corect = (long long)a * b; // 10000000000
+
+    cout << gresit << "\n";   // valoare negativa, gresita
+    cout << corect << "\n";   // 10000000000
+    return 0;
+}
+```
+
+<MistakeBox>
+**Greșeala 1 — cast prea târziu:** `long long c = a * b;` nu te salvează dacă `a` și `b` sunt `int` — overflow-ul se produce în înmulțire, înainte de copierea în `long long`. Cast-ul trebuie făcut pe un operand: `(long long)a * b`.
+
+**Greșeala 2 — testezi doar pe exemplele mici:** programul trece pe datele din enunț (valori mici), dar pică pe testul cu limite maxime. Verifică mereu mental scenariul „cu cele mai mari valori posibile".
+
+**Greșeala 3 — `unsigned` în loc de soluție:** trecerea la `unsigned` mărește maximul pozitiv, dar mută problema: o scădere care iese negativă se înfășoară la un număr uriaș. Nu rezolvă overflow-ul, doar îl deghizează.
+
+**Greșeala 4 — uiți modulo la pași intermediari:** dacă problema cere rezultat modulo, aplică `% MOD` și pe produsele intermediare, nu doar la final — altfel acelea pot da overflow înainte de modulo.
+</MistakeBox>
+
+## Recapitulare
+
+- Overflow = valoarea depășește tipul și se „înfășoară" de la maxim la minimul negativ, **fără nicio eroare** vizibilă.
+- Semnul tipic e un rezultat negativ sau absurd de mic, care apare doar pe testele cu valori mari.
+- Îl previi alegând `long long` din timp, făcând cast înainte de înmulțire și aplicând modulo la pașii intermediari când enunțul o cere.

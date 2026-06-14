@@ -1,0 +1,141 @@
+---
+title: "Tipuri întregi"
+slug: tipuri-intregi
+grade: 6
+chapter: tipuri-date
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["int", "long-long", "biti", "octeti"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce un întreg pe 16 biți (short) ajunge doar până la 32.767, nu mai mult?"
+    options:
+      - "Pentru că 16 biți pot forma 2¹⁶ = 65.536 valori, împărțite între numere negative și pozitive"
+      - "Pentru că procesorul nu poate aduna numere mai mari"
+      - "Pentru că 32.767 este cel mai mare număr prim"
+      - "Pentru că short folosește doar 8 biți efectivi"
+    correctIndex: 0
+    explanation: "16 biți reprezintă 2¹⁶ = 65.536 combinații. Pentru un tip cu semn, jumătate sunt negative și jumătate (minus zero) pozitive: de la −32.768 la 32.767."
+  - question: "Câți octeți ocupă de obicei un int și un long long?"
+    options:
+      - "2 și 4"
+      - "4 și 8"
+      - "8 și 16"
+      - "1 și 2"
+    correctIndex: 1
+    explanation: "Pe arhitecturile uzuale int are 4 octeți (32 biți) iar long long are 8 octeți (64 biți). Dublarea octeților ridică limita de la ~2×10⁹ la ~9×10¹⁸."
+  - question: "Ce tip alegi dacă trebuie să calculezi suma a 100.000 de numere, fiecare până la 1.000.000?"
+    options:
+      - "short, e suficient"
+      - "int, suma încape sigur"
+      - "long long, suma poate ajunge la 10¹¹"
+      - "unsigned, ca să fie pozitivă"
+    correctIndex: 2
+    explanation: "Suma maximă e 100.000 × 1.000.000 = 10¹¹, mult peste limita int (≈ 2×10⁹). Trebuie long long, altfel apare overflow tăcut."
+---
+
+<LessonHook>
+Gândește-te la kilometrajul vechi al unei mașini: are exact șase rotițe cu cifre. Poate arăta orice număr de la 000000 la 999999, dar nici unul mai mare — pur și simplu nu are loc. Tipurile întregi din C++ funcționează la fel: fiecare are un număr fix de „rotițe" (biți), iar acela hotărăște cât de mari pot fi numerele pe care le ține.
+</LessonHook>
+
+## Ce este un tip întreg
+
+Un **tip întreg** spune calculatorului doi lucruri: **câtă memorie** rezervă pentru o variabilă și **ce interval** de valori încap în ea. Memoria se măsoară în **octeți** (1 octet = 8 **biți**), iar fiecare bit e o rotiță care poate fi 0 sau 1.
+
+Regula de bază: cu `n` biți poți forma `2ⁿ` combinații distincte. Pentru un tip **cu semn** (care ține și numere negative), combinațiile se împart aproape egal:
+
+- minimul este `−2ⁿ⁻¹`
+- maximul este `2ⁿ⁻¹ − 1`
+
+De aceea un `int` pe 32 de biți ajunge la `2³¹ − 1 = 2.147.483.647`, nu la un număr „rotund". Limita nu e arbitrară — e o consecință directă a câți biți ai la dispoziție.
+
+| Tip | Octeți | Biți | Minim | Maxim |
+|-----|--------|------|-------|-------|
+| `short` | 2 | 16 | −32.768 | 32.767 |
+| `int` | 4 | 32 | −2.147.483.648 | ≈ 2,1 × 10⁹ |
+| `long long` | 8 | 64 | ≈ −9,2 × 10¹⁸ | ≈ 9,2 × 10¹⁸ |
+| `unsigned int` | 4 | 32 | 0 | ≈ 4,3 × 10⁹ |
+
+<ObservationBox>
+Un tip `unsigned` (fără semn) nu poate ține numere negative, dar în schimb dublează maximul pozitiv — toate combinațiile merg spre numere pozitive. `unsigned int` ajunge la ≈ 4,3 × 10⁹ în loc de ≈ 2,1 × 10⁹.
+</ObservationBox>
+
+## Cum „încap" cifrele într-un octet
+
+Un octet are 8 biți, fiecare cu o valoare de loc (128, 64, 32, …, 1), exact ca cifrele într-un număr, doar că pe bază 2. Numărul stocat e suma valorilor de loc unde bitul e 1.
+
+<ArrayDiagram
+  values="1 0 1 1 0 1 0 1"
+  valueLabel="bit"
+  index="128 64 32 16 8 4 2 1"
+  indexLabel="valoare"
+  highlight="0 2 3 5 7"
+  caption="Un octet (8 biți) reprezintă 10110101 = 128 + 32 + 16 + 4 + 1 = 181." />
+
+Cu 8 biți acoperi numerele de la 0 la 255 (sau −128 la 127 dacă tipul are semn). Adaugi biți → maximul crește exponențial: fiecare bit nou **dublează** câte numere poți reprezenta.
+
+## Cum afli limitele în cod
+
+Nu trebuie să le memorezi pe de rost — C++ ți le oferă prin `sizeof` și `<climits>`:
+
+```cpp
+#include <iostream>
+#include <climits>
+using namespace std;
+
+int main() {
+    cout << "int ocupa "  << sizeof(int)       << " octeti\n";  // 4
+    cout << "long long: " << sizeof(long long) << " octeti\n";  // 8
+
+    cout << "INT_MAX = "   << INT_MAX   << "\n";  // 2147483647
+    cout << "INT_MIN = "   << INT_MIN   << "\n";  // -2147483648
+    cout << "LLONG_MAX = " << LLONG_MAX << "\n";  // 9223372036854775807
+    return 0;
+}
+```
+
+## Cum alegi tipul potrivit
+
+Pune-ți o singură întrebare: **cât de mare poate ajunge cea mai mare valoare din program?** Nu doar rezultatul final, ci și calculele intermediare.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 100000, b = 100000;
+
+    int gresit = a * b;                  // 10^10 > 2*10^9 -- OVERFLOW
+    long long corect = (long long)a * b; // 10000000000
+
+    cout << gresit << "\n";   // valoare gresita (negativa)
+    cout << corect << "\n";   // 10000000000
+    return 0;
+}
+```
+
+Reține regula de concurs: dacă valorile rămân sub `2 × 10⁹`, `int` e suficient; dacă produse sau sume pot trece de atât, treci la `long long`.
+
+## Complexitate
+
+Operațiile aritmetice pe întregi (`+`, `−`, `*`, `/`, `%`) costă **O(1)** — sunt instrucțiuni hardware directe, indiferent de tip. Diferența dintre `int` și `long long` nu e viteza, ci **intervalul** de valori. Singurul cost al lui `long long` e că ocupă dublu spațiu în memorie, ceea ce rareori contează.
+
+<MistakeBox>
+**Greșeala 1 — overflow la înmulțire:** `long long c = a * b;` cu `a`, `b` de tip `int` NU e corect. Înmulțirea se face întâi în `int` și dă overflow ÎNAINTE de a copia în `long long`. Corect: `long long c = (long long)a * b;`
+
+**Greșeala 2 — scădere pe `unsigned`:** `unsigned x = 0; x--;` nu dă −1, ci ≈ 4,3 × 10⁹. Tipurile fără semn se „înfășoară" la zero, fără nicio eroare vizibilă.
+
+**Greșeala 3 — constante mari fără sufix:** `long long x = 3000000000;` poate da warning sau overflow, pentru că literalul e tratat ca `int`. Scrie `3000000000LL` ca să forțezi tipul.
+
+**Greșeala 4 — presupui dimensiuni fixe:** nu te baza pe „`int` are mereu 4 octeți" pe orice sistem. Când contează, verifică cu `sizeof` în loc să ghicești.
+</MistakeBox>
+
+## Recapitulare
+
+- Un tip întreg fixează numărul de biți, deci și intervalul: cu `n` biți cu semn ai `−2ⁿ⁻¹ … 2ⁿ⁻¹ − 1`.
+- `int` (4 octeți) acoperă până la ≈ 2,1 × 10⁹; pentru valori mai mari folosești `long long` (8 octeți, ≈ 9,2 × 10¹⁸).
+- Alegi tipul după cea mai mare valoare posibilă — inclusiv în calculele intermediare, nu doar în rezultatul final.

@@ -1,0 +1,119 @@
+---
+title: "Înmulțire modulo"
+slug: inmultire-modulo
+grade: 6
+chapter: aritmetica-modulara
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["modulo", "inmultire", "overflow", "long-long"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce este overflow-ul un pericol mult mai mare la înmulțirea modulo decât la adunare?"
+    options:
+      - "Pentru că înmulțirea e mai lentă"
+      - "Pentru că produsul a două numere apropiate de m poate ajunge la ~m², care depășește ușor int"
+      - "Pentru că modulo nu se distribuie peste înmulțire"
+      - "Nu e mai periculos, e la fel"
+    correctIndex: 1
+    explanation: "La adunare suma a două resturi e ~2m; la înmulțire produsul e ~m². Cu m ≈ 10⁹, m² ≈ 10¹⁸ — depășește int de mult și cere long long."
+  - question: "Ce tip folosești pentru produsul a două resturi modulo 1.000.000.007?"
+    options:
+      - "int, e suficient"
+      - "long long, pentru că produsul ajunge la ~10¹⁸"
+      - "double, pentru precizie"
+      - "short, ca să economisești memorie"
+    correctIndex: 1
+    explanation: "Produsul a două valori până la ~10⁹ ajunge la ~10¹⁸, peste limita int (~2×10⁹) dar sub long long (~9,2×10¹⁸). Trebuie long long."
+  - question: "Care egalitate descrie înmulțirea modulo?"
+    options:
+      - "(a · b) % m = (a % m · b % m) % m"
+      - "(a · b) % m = a % m · b % m"
+      - "(a · b) % m = (a % m + b % m) % m"
+      - "(a · b) % m = (a · b) % (m²)"
+    correctIndex: 0
+    explanation: "Modulo se distribuie și peste înmulțire, dar produsul resturilor poate depăși m, deci se aplică din nou % m la final."
+---
+
+<LessonHook>
+Pune un bob de orez pe primul pătrat al unei table de șah, două pe al doilea, patru pe al treilea, și tot dublezi. Până la ultimul pătrat numărul devine astronomic — imposibil de scris. Multe probleme cer tocmai astfel de numărări uriașe, iar înmulțirea modulo e felul în care le ținem sub control fără să le pierdem.
+</LessonHook>
+
+## Regula înmulțirii modulo
+
+Modulo se distribuie și peste înmulțire:
+
+```
+(a · b) % m = (a % m · b % m) % m
+```
+
+Ca la adunare și scădere, reduci factorii înainte și aplici `% m` la final. Diferența crucială e **mărimea numerelor intermediare**.
+
+<ObservationBox>
+La adunare, suma a două resturi e cel mult `~2m`. La înmulțire, produsul a două resturi ajunge la `~m²`. Cu `m ≈ 10⁹`, asta înseamnă `~10¹⁸` — peste `int`, dar (la limită) sub `long long`. De aceea înmulțirea modulo se face **obligatoriu** în `long long`.
+</ObservationBox>
+
+## Capcana de overflow
+
+Iată greșeala numărul unu la concursuri:
+
+```cpp
+int a = 1000000, b = 1000000;
+int p = (a * b) % MOD;  // GRESIT: a*b se calculeaza in int -> overflow
+```
+
+`a * b = 10¹²` depășește `int` **înainte** ca `% MOD` să apuce să reducă ceva. Rezultatul e gunoi. Corect:
+
+```cpp
+long long p = ((long long)a * b) % MOD;  // 10^12 incape in long long
+```
+
+Cast-ul pe primul operand forțează înmulțirea să se facă pe 64 de biți.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    const int MOD = 1000000007;
+    long long a = 1000000000, b = 999999999;
+
+    long long p = (a % MOD) * (b % MOD) % MOD;  // produs pe long long
+    cout << p << "\n";  // rezultat corect, in 0..MOD-1
+
+    // factorial modulo: numere care altfel ar exploda
+    long long fact = 1;
+    for (int i = 1; i <= 20; i++) {
+        fact = fact * i % MOD;  // ramane mereu sub MOD
+    }
+    cout << fact << "\n";  // 20! modulo MOD
+    return 0;
+}
+```
+
+Bucla de factorial arată ideea: `20!` are 19 cifre și nu încape nicăieri, dar `fact * i % MOD` ține valoarea mereu sub `MOD`, la fiecare pas.
+
+## Complexitate
+
+O înmulțire modulo costă **O(1)**. Un produs de `n` factori (ca factorialul) rulează în **O(n)**, cu numerele menținute mici tot timpul prin reducerea modulo la fiecare pas.
+
+<MistakeBox>
+**Greșeala 1 — overflow la produs:** `(a * b) % m` cu `a`, `b` de tip `int` dă overflow înainte de modulo. Cast: `((long long)a * b) % m`.
+
+**Greșeala 2 — cast prea târziu:** `long long p = a * b % m;` nu te salvează dacă `a`, `b` sunt `int` — produsul se face tot în `int`. Cast-ul trebuie pe operand, nu pe rezultat.
+
+**Greșeala 3 — uiți reducerea în buclă:** la un produs lung (factorial, putere), dacă nu aplici `% m` la fiecare pas, valoarea explodează după câteva înmulțiri.
+
+**Greșeala 4 — `long double` în loc de modulo corect:** încercarea de a ține numere mari în `double`/`long double` pierde precizia; pentru numărări exacte folosești `long long` cu modulo, nu virgulă mobilă.
+</MistakeBox>
+
+## Recapitulare
+
+- Modulo se distribuie peste înmulțire: `(a · b) % m = (a % m · b % m) % m`.
+- Produsul a două resturi ajunge la `~m²`, deci înmulțirea modulo se face **obligatoriu** în `long long`, cu cast pe operand: `(long long)a * b`.
+- La produse lungi (factorial, puteri) reduci `% m` la **fiecare** pas, ca numerele să rămână mici și exacte.

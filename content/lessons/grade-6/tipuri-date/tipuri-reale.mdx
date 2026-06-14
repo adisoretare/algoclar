@@ -1,0 +1,134 @@
+---
+title: "Tipuri reale"
+slug: tipuri-reale
+grade: 6
+chapter: tipuri-date
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["double", "float", "precizie", "virgula-mobila"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce `0.1 + 0.2 == 0.3` este de obicei fals în C++?"
+    options:
+      - "Pentru că 0.1 și 0.2 nu pot fi stocate exact în binar, deci suma are o eroare minusculă"
+      - "Pentru că C++ rotunjește mereu în jos"
+      - "Pentru că `==` nu funcționează cu numere"
+      - "Pentru că 0.3 este un număr prim"
+    correctIndex: 0
+    explanation: "În baza 2, fracții ca 0.1 sunt periodice și se stochează aproximativ. Suma a două aproximări diferă de 0.3 cu o eroare de ordinul 10⁻¹⁶, deci comparația exactă eșuează."
+  - question: "Care e diferența practică dintre `float` și `double`?"
+    options:
+      - "float e pentru numere mici, double pentru numere mari"
+      - "double reține mai multe cifre semnificative (~15–16 față de ~7)"
+      - "float e mai precis, double mai rapid"
+      - "Nu există nicio diferență"
+    correctIndex: 1
+    explanation: "double ocupă 8 octeți și reține ~15–16 cifre semnificative, față de ~7 la float (4 octeți). La concursuri se folosește aproape mereu double."
+  - question: "Cum compari corect dacă două valori reale `a` și `b` sunt egale?"
+    options:
+      - "a == b"
+      - "abs(a - b) < epsilon, cu epsilon mic (ex. 1e-9)"
+      - "a - b == 0"
+      - "(int)a == (int)b"
+    correctIndex: 1
+    explanation: "Din cauza erorilor de reprezentare nu compari direct cu ==. Verifici dacă diferența absolută e sub un prag mic (epsilon), adică „suficient de aproape"."
+---
+
+<LessonHook>
+Imaginează-ți o riglă pe care sunt marcate doar milimetrii. Cu ea poți măsura 3 mm sau 4 mm, dar nu poți arăta exact „a treia parte dintr-un milimetru" — pui creionul cât de aproape poți și accepți o mică eroare. Calculatorul face exact asta cu numerele cu virgulă: nu le ține perfect, ci le aproximează cât de bine îi permit biții lui.
+</LessonHook>
+
+## Ce este un tip real
+
+Un **tip real** (sau în virgulă mobilă) stochează numere cu parte fracționară: `3.14`, `0.5`, `-2.718`. Spre deosebire de întregi, aici valoarea e aproape mereu **o aproximare**, nu o copie exactă.
+
+Motivul: calculatorul lucrează în baza 2, iar multe fracții simple în baza 10 sunt periodice în baza 2. La fel cum `1/3 = 0,3333…` nu se termină în baza 10, `0,1` nu se termină în baza 2. Tipul real păstrează doar primele câteva zeci de cifre binare și taie restul — de acolo vine eroarea.
+
+| Tip | Octeți | Cifre semnificative | Folosire |
+|-----|--------|---------------------|----------|
+| `float` | 4 | ~7 | rar la concursuri |
+| `double` | 8 | ~15–16 | alegerea standard |
+| `long double` | 12–16 | ~18–19 | când ai nevoie de precizie extra |
+
+<ObservationBox>
+La concursuri folosește aproape mereu **`double`**. `float` are doar ~7 cifre sigure, ceea ce duce des la răspunsuri greșite la testele cu numere mari sau cu multe operații acumulate.
+</ObservationBox>
+
+## Câte cifre sunt de încredere
+
+„Cifre semnificative" înseamnă câte cifre de la început poți crede înainte ca aproximarea să strice restul. Iată cifrele lui π:
+
+<ArrayDiagram
+  values="3 1 4 1 5 9 2 6 5 3 5 8 9 7 9"
+  index="off"
+  range="0-6"
+  caption="float reține de încredere ~7 cifre (verde); double duce sigur până la ~15–16 cifre." />
+
+Dincolo de zona sigură, cifrele afișate pot fi „gunoi" matematic — există în memorie, dar nu mai reprezintă valoarea reală.
+
+## Capcana comparației cu `==`
+
+Pentru că valorile sunt aproximări, două calcule care „ar trebui" să dea același rezultat pot diferi cu o eroare minusculă:
+
+```cpp
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double a = 0.1 + 0.2;
+    double b = 0.3;
+
+    cout << (a == b) << "\n";              // 0 (fals!)
+    cout << setprecision(17) << a << "\n"; // 0.30000000000000004
+
+    // comparatie corecta: "suficient de aproape"
+    double eps = 1e-9;
+    cout << (fabs(a - b) < eps) << "\n";   // 1 (adevarat)
+    return 0;
+}
+```
+
+Regula: **nu** compara niciodată două reale cu `==`. Verifică dacă diferența lor absolută e sub un prag mic (`epsilon`).
+
+## Afișarea cu precizie controlată
+
+Implicit, `cout` afișează doar câteva cifre. Pentru rezultate cu zecimale fixe folosești `fixed` și `setprecision`:
+
+```cpp
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double x = 2.0 / 3.0;
+    cout << x << "\n";                          // 0.666667 (implicit)
+    cout << fixed << setprecision(4) << x;      // 0.6667 (4 zecimale)
+    return 0;
+}
+```
+
+## Complexitate
+
+Operațiile pe reale costă tot **O(1)**, dar sunt în general **mai lente** decât cele pe întregi, pentru că procesorul face mai multă muncă pentru virgula mobilă. Concluzie practică: dacă o problemă se poate rezolva cu întregi, preferă întregii — sunt și mai rapizi, și exacți.
+
+<MistakeBox>
+**Greșeala 1 — compari cu `==`:** `if (a == b)` pe reale eșuează din cauza erorilor de reprezentare. Folosește `fabs(a - b) < 1e-9`.
+
+**Greșeala 2 — folosești `float` în loc de `double`:** cele ~7 cifre ale lui `float` se epuizează repede. La concurs, `double` e alegerea sigură.
+
+**Greșeala 3 — împărțire întreagă fără cast:** `double r = 5 / 2;` dă `2.0`, nu `2.5`, pentru că `5 / 2` se calculează între întregi. Scrie `5.0 / 2` sau `(double)5 / 2`.
+
+**Greșeala 4 — afișare fără `setprecision`:** dacă problema cere un anumit număr de zecimale și nu setezi `fixed << setprecision(k)`, rezultatul corect poate fi marcat greșit.
+</MistakeBox>
+
+## Recapitulare
+
+- Tipurile reale stochează **aproximări**, nu valori exacte, pentru că multe fracții nu au reprezentare finită în baza 2.
+- Folosește `double` (≈ 15–16 cifre sigure), nu `float`, și nu compara niciodată cu `==` — verifică `fabs(a - b) < epsilon`.
+- Pentru afișare controlată folosești `fixed << setprecision(k)`; dacă poți rezolva cu întregi, evită cu totul realele.

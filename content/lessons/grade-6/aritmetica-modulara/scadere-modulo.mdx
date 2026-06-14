@@ -1,0 +1,116 @@
+---
+title: "Scădere modulo"
+slug: scadere-modulo
+grade: 6
+chapter: aritmetica-modulara
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["modulo", "scadere", "rest-negativ", "mod"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pe un ceas de 12 ore, ora 2 minus 5 ore înseamnă ce oră?"
+    options:
+      - "-3"
+      - "9"
+      - "7"
+      - "3"
+    correctIndex: 1
+    explanation: "2 − 5 = −3, iar pe cerc −3 înseamnă 12 − 3 = 9. Adunând modulul corectezi un rest negativ: (−3 % 12 + 12) % 12 = 9."
+  - question: "De ce adăugăm m la rezultatul scăderii modulo?"
+    options:
+      - "Ca să mărim rezultatul"
+      - "Pentru că scăderea poate da un rest negativ, iar +m îl readuce în intervalul 0…m−1"
+      - "Pentru că m e mereu par"
+      - "Ca să evităm împărțirea la zero"
+    correctIndex: 1
+    explanation: "În C++ un rest poate fi negativ. La scădere asta apare des; adunând m și aplicând din nou % m readuci valoarea în intervalul corect 0…m−1."
+  - question: "Care e forma sigură pentru (a − b) modulo m?"
+    options:
+      - "(a - b) % m"
+      - "(a % m - b % m) % m"
+      - "((a % m - b % m) % m + m) % m"
+      - "(a - b + m)"
+    correctIndex: 2
+    explanation: "Diferența resturilor poate fi negativă, deci adaugi m și aplici încă un % m: ((a%m − b%m) % m + m) % m garantează un rezultat în 0…m−1."
+---
+
+<LessonHook>
+Dacă e ora 2 și dai ceasul înapoi cu 5 ore, nu ajungi la „ora minus 3" — ajungi la ora 9. Acele au trecut peste 12 înapoi și au continuat. Scăderea modulo e aceeași plimbare pe cerc, doar în sens invers, iar singura grijă e ce faci când treci de zero.
+</LessonHook>
+
+## Regula scăderii modulo
+
+Ca și adunarea, scăderea respectă distribuția modulo:
+
+```
+(a − b) % m = (a % m − b % m) % m
+```
+
+Problema apare pentru că diferența `a % m − b % m` poate fi **negativă**, iar în C++ restul unui număr negativ rămâne negativ. Pe ceas, `2 − 5 = −3`, dar răspunsul corect pe cerc e `9`.
+
+<ObservationBox>
+Soluția e simplă: adaugi modulul `m` și aplici din nou `% m`. Adunarea unui `m` complet nu schimbă poziția pe cerc (e o tură întreagă), dar transformă un rest negativ în corespondentul lui pozitiv.
+</ObservationBox>
+
+## Forma sigură
+
+Folosește mereu acest tipar pentru scăderea modulo:
+
+```
+((a % m − b % m) % m + m) % m
+```
+
+Pas cu pas pentru `2 − 5` modulo `12`:
+
+```
+a % m - b % m = 2 - 5 = -3
+(-3) % 12      = -3        (rest negativ in C++)
+-3 + 12        = 9         (corectie: o tura intreaga)
+9 % 12         = 9         (rezultatul final, in 0..11)
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int modScad(int a, int b, int m) {
+    return ((a % m - b % m) % m + m) % m;  // forma sigura
+}
+
+int main() {
+    const int MOD = 1000000007;
+
+    cout << modScad(2, 5, 12) << "\n";   // 9
+    cout << modScad(10, 3, MOD) << "\n"; // 7
+    cout << modScad(0, 1, MOD) << "\n";  // 1000000006 (nu -1!)
+    return 0;
+}
+```
+
+Observă ultimul exemplu: `0 − 1` modulo `MOD` nu e `−1`, ci `MOD − 1 = 1000000006` — corespondentul pozitiv pe cerc.
+
+## Complexitate
+
+Scăderea modulo cu corecție costă tot **O(1)**: câteva operații aritmetice elementare. Nu adaugi complexitate față de o scădere obișnuită.
+
+<MistakeBox>
+**Greșeala 1 — rezultat negativ neglijat:** `(a - b) % m` poate ieși negativ. Dacă apoi îl folosești ca index sau îl afișezi ca răspuns final, ai un bug. Adaugă mereu `+ m`.
+
+**Greșeala 2 — adaugi `m` dar uiți `% m`-ul final:** `(a % m − b % m) % m + m` poate fi acum ≥ `m` (când diferența era deja pozitivă). Mai trebuie un `% m`.
+
+**Greșeala 3 — adaugi `m` la termen, nu la rezultat:** corecția se face pe diferența finală, nu pe `a` sau pe `b` separat. Respectă ordinea din formă.
+
+**Greșeala 4 — folosești formula doar uneori:** dacă într-un program ai și scăderi care „par" pozitive, tot folosește forma sigură peste tot — e mai ieftin decât să cauți un bug intermitent.
+</MistakeBox>
+
+## Recapitulare
+
+- Scăderea respectă distribuția modulo, dar diferența resturilor poate fi **negativă**.
+- Forma sigură `((a % m − b % m) % m + m) % m` corectează restul negativ adăugând o tură întreagă (`m`).
+- Corecția costă **O(1)**; aplic-o sistematic, altfel rezultatele negative produc bug-uri greu de prins.

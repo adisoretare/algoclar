@@ -1,0 +1,106 @@
+---
+title: "Adunare modulo"
+slug: adunare-modulo
+grade: 6
+chapter: aritmetica-modulara
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["modulo", "adunare", "overflow", "mod"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pe un ceas de 12 ore, ora 10 + 5 ore înseamnă ce oră?"
+    options:
+      - "15"
+      - "3"
+      - "5"
+      - "7"
+    correctIndex: 1
+    explanation: "10 + 5 = 15, iar 15 % 12 = 3. Adunarea pe ceas e chiar adunarea modulo 12."
+  - question: "De ce reducem fiecare termen modulo m înainte să-l adunăm, în loc să adunăm întâi totul?"
+    options:
+      - "Ca să fie mai elegant"
+      - "Ca să ținem numerele mici și să evităm overflow-ul"
+      - "Pentru că adunarea normală nu funcționează modulo"
+      - "Nu contează, e același lucru"
+    correctIndex: 1
+    explanation: "Modulo se distribuie peste adunare, deci rezultatul e același. Reducem pe parcurs ca să nu lăsăm sumele să crească peste limita tipului — altfel apare overflow."
+  - question: "Care egalitate este corectă pentru adunarea modulo?"
+    options:
+      - "(a + b) % m = (a % m + b % m) % m"
+      - "(a + b) % m = a % m + b % m"
+      - "(a + b) % m = (a + b) % (2m)"
+      - "(a + b) % m = a % b + m"
+    correctIndex: 0
+    explanation: "Modulo se distribuie peste adunare, dar trebuie aplicat încă o dată la final, pentru că suma a două resturi poate ea însăși depăși m."
+---
+
+<LessonHook>
+Pe un ceas, dacă e ora 10 și aștepți 5 ore, nu ajungi la ora 15 — ajungi la ora 3. Acele au făcut o tură completă și au luat-o de la capăt. Adunarea modulo e exact acest fel de adunare „în cerc", unde numerele se întorc la zero când ating modulul.
+</LessonHook>
+
+## Regula adunării modulo
+
+Proprietatea fundamentală e că **modulo se distribuie peste adunare**:
+
+```
+(a + b) % m = (a % m + b % m) % m
+```
+
+Cu alte cuvinte, poți reduce fiecare termen modulo `m` înainte să-l aduni, iar rezultatul rămâne același. Pe ceasul de 12: `10 + 5 = 15`, iar `15 % 12 = 3`.
+
+<ObservationBox>
+De ce mai aplici `% m` la final, dacă termenii erau deja reduși? Pentru că suma a două resturi (fiecare sub `m`) poate ajunge până la `2m − 2`, deci poate depăși `m`. Un ultim `% m` o readuce în intervalul corect.
+</ObservationBox>
+
+## De ce reducem pe parcurs
+
+Dacă aduni mii de numere și vrei rezultatul modulo `m`, ai două variante: aduni tot și aplici `% m` la final, sau reduci după fiecare adunare. Matematic dau același lucru — dar a doua variantă ține numerele mici și **evită overflow-ul**.
+
+Exemplu: aduni 100.000 de valori, fiecare aproape de `10⁹`. Suma reală ar ajunge la `10¹⁴`, mult peste `int`. Reducând modulo după fiecare pas, valoarea nu trece niciodată de `m`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    const int MOD = 1000000007;
+    int v[] = {900000000, 800000000, 700000000};
+    int n = 3;
+
+    int suma = 0;
+    for (int i = 0; i < n; i++) {
+        suma = (suma + v[i]) % MOD;  // reducem la fiecare pas
+    }
+
+    cout << suma << "\n";  // (2400000000) % MOD = 399999979
+    return 0;
+}
+```
+
+Aici `suma + v[i]` ajunge cel mult la `2·(MOD−1) ≈ 2×10⁹`, ceea ce încă încape în `int` — la limită. Dacă modulul ar fi mai mare, ai folosi `long long` pentru siguranță.
+
+## Complexitate
+
+Fiecare adunare modulo costă **O(1)**. Adunarea modulo a `n` termeni rulează în **O(n)** — o singură parcurgere, cu numerele menținute mici tot timpul.
+
+<MistakeBox>
+**Greșeala 1 — aduni tot și aplici `% m` abia la final:** suma intermediară poate depăși tipul și să dea overflow înainte de a ajunge la `%`. Redu **după fiecare** adunare.
+
+**Greșeala 2 — uiți `% m` final după ce ai redus termenii:** `(a % m + b % m)` poate fi încă ≥ `m`. Mai trebuie un `% m`.
+
+**Greșeala 3 — tip prea mic:** dacă `2·MOD` nu încape în `int`, suma a două resturi dă overflow. Când modulul e mare, folosește `long long`.
+
+**Greșeala 4 — presupui rezultat pozitiv fără grijă la negative:** dacă vreunul dintre termeni poate fi negativ, rezultatul `%` poate ieși negativ — corectează cu `(x % m + m) % m`.
+</MistakeBox>
+
+## Recapitulare
+
+- Modulo se distribuie peste adunare: `(a + b) % m = (a % m + b % m) % m`.
+- Reduci `% m` **după fiecare** adunare ca să ții numerele mici și să eviți overflow-ul; rezultatul matematic e neschimbat.
+- Mai aplici un `% m` la final pentru că suma a două resturi poate ea însăși depăși `m`.

@@ -1,0 +1,127 @@
+---
+title: "Reprezentarea numerelor în baze diferite"
+slug: reprezentare-in-baze
+grade: 6
+chapter: sisteme-numeratie
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["reprezentare", "baze", "hexazecimal", "cifre"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Valoarea 45 (baza 10) se scrie 101101 în baza 2 și 2D în baza 16. Ce s-a schimbat?"
+    options:
+      - "Valoarea numărului"
+      - "Doar reprezentarea (cum scriem), nu și valoarea"
+      - "Numărul a devenit mai mare în baza 16"
+      - "Nimic, sunt numere diferite"
+    correctIndex: 1
+    explanation: "Valoarea e aceeași — 45 de obiecte rămân 45. Se schimbă doar forma scrisă, în funcție de bază. Bazele mai mari folosesc mai puține cifre."
+  - question: "De ce un număr are mai puține cifre în baza 16 decât în baza 2?"
+    options:
+      - "Pentru că baza 16 rotunjește"
+      - "Pentru că fiecare cifră în baza 16 cuprinde mai multă informație (un grup de 4 biți)"
+      - "Pentru că baza 2 repetă cifrele"
+      - "Nu e adevărat, au același număr de cifre"
+    correctIndex: 1
+    explanation: "O bază mai mare împachetează mai multă valoare pe poziție. O cifră hexazecimală (0–F) corespunde exact unui grup de 4 biți, deci numărul de cifre scade de ~4 ori față de binar."
+  - question: "Cum reprezinți cifrele mai mari ca 9 în baza 16?"
+    options:
+      - "Cu două cifre: 10, 11, …"
+      - "Cu litere: A=10, B=11, …, F=15"
+      - "Nu se poate"
+      - "Cu zecimale"
+    correctIndex: 1
+    explanation: "Baza 16 are nevoie de 16 simboluri. După 0–9 se folosesc literele A–F pentru valorile 10–15, ca fiecare poziție să rămână o singură cifră."
+---
+
+<LessonHook>
+45 de lei rămân 45 de lei, fie că-i ai într-o bancnotă de 45 (dacă ar exista), fie în 45 de monede de 1 leu, fie în câteva monede mari și câteva mici. Suma nu se schimbă — doar felul în care o „scrii" cu monedele pe care le ai. Reprezentarea unui număr în baze diferite e exact asta: aceeași valoare, alte simboluri.
+</LessonHook>
+
+## Aceeași valoare, scrieri diferite
+
+Un număr are o singură **valoare**, dar nenumărate **reprezentări**, câte una pentru fiecare bază. Iată valoarea 45 scrisă în trei baze:
+
+| Bază | Reprezentarea lui 45 |
+|------|----------------------|
+| 10 (zecimal) | 45 |
+| 2 (binar) | 101101 |
+| 16 (hexazecimal) | 2D |
+
+<ArrayDiagram
+  values="2 D"
+  valueLabel="cifra"
+  index="16 1"
+  indexLabel="valoare loc"
+  caption="2D în baza 16 = 2·16 + 13 = 45. Cifra D reprezintă valoarea 13." />
+
+Observă cum **baza mai mare folosește mai puține cifre**: 45 cere 6 cifre binare, dar doar 2 cifre hexazecimale. Cu cât baza e mai mare, cu atât fiecare poziție „duce" mai multă valoare.
+
+## Câte cifre are un număr într-o bază
+
+Numărul de cifre necesare pentru valoarea `n` în baza `b` este `⌊log_b n⌋ + 1`. Intuitiv: fiecare cifră nouă permite valori de `b` ori mai mari, deci numărul de cifre crește logaritmic, nu liniar.
+
+<ObservationBox>
+Legătura specială dintre baza 2 și baza 16: **o cifră hexazecimală = exact 4 biți** (pentru că 16 = 2⁴). De aceea programatorii scriu valori pe biți în hexazecimal — e mult mai scurt și se traduce direct în binar, grup cu grup.
+</ObservationBox>
+
+## Implementare C++ — scrierea într-o bază oarecare
+
+Funcția de mai jos scrie un număr în orice bază până la 16, folosind cifre `0–9` și litere `A–F`:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void scrieInBaza(int n, int b) {
+    if (n == 0) {           // tratam separat cazul zero
+        cout << 0;
+        return;
+    }
+    char cifre[40];
+    int k = 0;
+    while (n > 0) {
+        int r = n % b;
+        // cifrele 0-9 raman cifre, 10-15 devin litere A-F
+        cifre[k++] = (r < 10) ? ('0' + r) : ('A' + r - 10);
+        n /= b;
+    }
+    for (int i = k - 1; i >= 0; i--) cout << cifre[i];  // ordine inversa
+}
+
+int main() {
+    scrieInBaza(45, 2);  cout << "\n";  // 101101
+    scrieInBaza(45, 16); cout << "\n";  // 2D
+    return 0;
+}
+```
+
+Trucul `(r < 10) ? ('0' + r) : ('A' + r - 10)` folosește aritmetica pe caractere: pentru rest 13 obții `'A' + 3 = 'D'`.
+
+## Reprezentarea cu lățime fixă
+
+Uneori vrei un număr fix de cifre, completând cu zerouri la stânga — de exemplu un octet scris pe 8 biți: `13` devine `00001101`. Zerourile din față **nu schimbă valoarea**, doar aliniază reprezentarea.
+
+## Complexitate
+
+Scrierea unei valori `n` în baza `b` costă **O(log_b n)** — adică numărul de cifre produse. Conversia e proporțională cu câte cifre are rezultatul, nu cu mărimea numărului în sine.
+
+<MistakeBox>
+**Greșeala 1 — crezi că valoarea s-a schimbat:** `101101` și `45` și `2D` sunt **același număr**. Doar reprezentarea diferă; nu compara reprezentări din baze diferite ca șiruri.
+
+**Greșeala 2 — afișezi resturile ≥ 10 ca numere:** în baza 16, un rest de 13 trebuie scris `D`, nu `13`. Altfel reprezentarea devine ambiguă.
+
+**Greșeala 3 — uiți zerourile la lățime fixă:** dacă o problemă cere exact 8 biți, `1101` e greșit — corect e `00001101`. Zerourile din față contează la afișare, deși nu la valoare.
+
+**Greșeala 4 — confunzi numărul de cifre cu valoarea:** un număr mare în baza 2 are multe cifre, dar asta nu-l face „mai mare" decât reprezentarea lui scurtă din baza 16. Compari valori, nu lungimi de scriere.
+</MistakeBox>
+
+## Recapitulare
+
+- Un număr are o singură valoare, dar o reprezentare diferită în fiecare bază; bazele mari folosesc mai puține cifre.
+- O cifră hexazecimală corespunde exact la 4 biți (16 = 2⁴), motiv pentru care hexazecimalul e folosit ca scurtătură pentru binar.
+- Scrierea într-o bază costă **O(log_b n)**; atenție la literele A–F pentru cifre ≥ 10 și la zerourile din față când se cere o lățime fixă.

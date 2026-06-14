@@ -1,0 +1,134 @@
+---
+title: "Restul împărțirii"
+slug: restul-impartirii
+grade: 6
+chapter: aritmetica-modulara
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["modulo", "rest", "impartire", "paritate"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce valoare are 17 % 5?"
+    options:
+      - "3"
+      - "2"
+      - "5"
+      - "0"
+    correctIndex: 1
+    explanation: "17 = 3·5 + 2, deci câtul e 3 și restul e 2. Restul e mereu între 0 și împărțitor−1."
+  - question: "Cum verifici dacă un număr n este par?"
+    options:
+      - "n % 2 == 1"
+      - "n % 2 == 0"
+      - "n / 2 == 0"
+      - "n % 0 == 2"
+    correctIndex: 1
+    explanation: "Un număr e par dacă împărțit la 2 dă rest 0. n % 2 == 0 înseamnă par, n % 2 == 1 (sau != 0) înseamnă impar."
+  - question: "Ce dă în C++ expresia -7 % 3?"
+    options:
+      - "2 (rest mereu pozitiv)"
+      - "-1 (C++ păstrează semnul deîmpărțitului)"
+      - "1"
+      - "Eroare"
+    correctIndex: 1
+    explanation: "În C++ restul ia semnul deîmpărțitului: -7 % 3 = -1. Asta e o capcană clasică — dacă vrei un rest pozitiv, trebuie să-l corectezi."
+---
+
+<LessonHook>
+Ceasul arată ora 14, dar tu spui „2 după-amiaza". Ai împărțit fără să-ți dai seama: 14 ore înseamnă o tură completă de 12 plus 2 care „prisosesc". Acel 2 care rămâne după ce ai scos cât mai multe ture întregi este exact restul împărțirii — și el e inima aritmeticii modulare.
+</LessonHook>
+
+## Ce este restul
+
+Când împarți `a` la `b`, găsești un **cât** `q` și un **rest** `r` care respectă:
+
+```
+a = b · q + r,   cu   0 ≤ r < b
+```
+
+Restul e cât „prisosește" după ce ai scos `q` grupuri întregi de câte `b`. În C++ îl obții cu operatorul `%`:
+
+```cpp
+17 % 5   // 2,  pentru ca 17 = 3*5 + 2
+20 % 4   // 0,  pentru ca 20 = 5*4 + 0
+3 % 7    // 3,  pentru ca 3 = 0*7 + 3
+```
+
+<ObservationBox>
+Restul împărțirii la `b` este mereu unul dintre numerele `0, 1, …, b−1` — exact `b` valori posibile. De aceea resturile se „învârt în cerc": după `b−1` revii la 0, ca acele ceasului.
+</ObservationBox>
+
+## Resturile se repetă periodic
+
+Dacă iei numerele `0, 1, 2, 3, …` și le împarți pe rând la 3, resturile formează un ciclu care se repetă la nesfârșit:
+
+<ArrayDiagram
+  values="0 1 2 0 1 2 0 1"
+  valueLabel="n % 3"
+  index="0 1 2 3 4 5 6 7"
+  indexLabel="n"
+  caption="Resturile la împărțirea cu 3 se repetă în ciclul 0, 1, 2 — periodicitatea e proprietatea-cheie a modulo." />
+
+Această periodicitate e ceea ce face restul atât de util: orice se „repetă la fiecare `b` pași" se exprimă cu `% b`.
+
+## La ce folosești restul
+
+- **Paritate:** `n % 2` — rest 0 înseamnă par, rest 1 înseamnă impar.
+- **Ultima cifră** a unui număr: `n % 10`.
+- **Divizibilitate:** `n % d == 0` înseamnă „`n` se împarte exact la `d`".
+- **Cicluri:** poziția pe un cerc de `b` elemente după `n` pași este `n % b`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 2347;
+
+    cout << n % 10 << "\n";              // 7  (ultima cifra)
+    cout << (n % 2 == 0 ? "par" : "impar") << "\n";  // impar
+    cout << (n % 7 == 0 ? "da" : "nu")    << "\n";    // se imparte la 7?
+    return 0;
+}
+```
+
+## Restul numerelor negative în C++
+
+Atenție: în C++ restul **ia semnul deîmpărțitului**. Asta surprinde mulți începători:
+
+```cpp
+cout << (-7) % 3 << "\n";   // -1, nu 2!
+```
+
+Dacă ai nevoie de un rest mereu pozitiv (frecvent în aritmetica modulară), îl corectezi adăugând modulul:
+
+```cpp
+int r = (-7) % 3;        // -1
+int rPozitiv = (r + 3) % 3;  // 2  (corect pe cerc)
+```
+
+## Complexitate
+
+Operația `%` costă **O(1)** — e o instrucțiune hardware directă, la fel ca `+` sau `*`.
+
+<MistakeBox>
+**Greșeala 1 — rest negativ neașteptat:** `-7 % 3` dă `-1` în C++, nu `2`. Când lucrezi pe un „cerc", corectează cu `(r % m + m) % m`.
+
+**Greșeala 2 — împărțire la 0:** `n % 0` provoacă o eroare în execuție (crash), exact ca `n / 0`. Verifică întotdeauna că modulul nu e 0.
+
+**Greșeala 3 — paritate pe numere negative:** `n % 2 == 1` e fals pentru numere negative impare (`-3 % 2` dă `-1`). Pentru paritate sigură folosește `n % 2 != 0`.
+
+**Greșeala 4 — confunzi câtul cu restul:** `/` dă câtul, `%` dă restul. `17 / 5 = 3`, dar `17 % 5 = 2`. Nu le inversa.
+</MistakeBox>
+
+## Recapitulare
+
+- Restul `a % b` e ce prisosește din `a` după ce scoți grupuri întregi de `b`; e mereu între `0` și `b−1`.
+- Resturile se repetă **periodic**, ceea ce le face unealta naturală pentru paritate, ultima cifră, divizibilitate și cicluri.
+- În C++ restul ia semnul deîmpărțitului; pentru un rest mereu pozitiv folosești `(r % m + m) % m`.

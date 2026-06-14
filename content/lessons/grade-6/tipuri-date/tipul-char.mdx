@@ -1,0 +1,140 @@
+---
+title: "Tipul char"
+slug: tipul-char
+grade: 6
+chapter: tipuri-date
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["char", "ascii", "caractere", "cod"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este de fapt stocat într-o variabilă `char c = 'A';`?"
+    options:
+      - "Litera A, ca imagine"
+      - "Codul numeric al lui A (65), pe un singur octet"
+      - "Textul \"A\" cu lungime variabilă"
+      - "Un număr real apropiat de 65"
+    correctIndex: 1
+    explanation: "char ocupă 1 octet și ține codul ASCII al caracterului. 'A' este pur și simplu numărul 65; afișarea ca literă se face la `cout`."
+  - question: "Cum transformi cifra-caracter '7' în numărul întreg 7?"
+    options:
+      - "(int)'7'"
+      - "'7' - '0'"
+      - "'7' / 10"
+      - "'7' + 48"
+    correctIndex: 1
+    explanation: "Codurile cifrelor sunt consecutive: '0'=48, '1'=49, …, '9'=57. Diferența '7' - '0' = 55 - 48 = 7 dă chiar valoarea cifrei."
+  - question: "Ce afișează `char c = 'a'; cout << (char)(c - 32);` ?"
+    options:
+      - "a"
+      - "A"
+      - "32"
+      - "65"
+    correctIndex: 1
+    explanation: "Literele mari sunt cu 32 sub cele mici în ASCII ('a'=97, 'A'=65). Scăderea lui 32 transformă litera mică în litera mare corespunzătoare, iar cast-ul (char) o afișează ca literă."
+---
+
+<LessonHook>
+Fiecare tastă de pe tastatură ascunde un număr secret. Când apeși „A", calculatorul nu memorează forma literei, ci un cod — numărul 65. Toate literele, cifrele și semnele au câte un astfel de cod, stabilit printr-o convenție numită ASCII. Tipul `char` este exact acel sertăraș de un octet în care stă codul.
+</LessonHook>
+
+## Ce este tipul char
+
+`char` ocupă **un singur octet** și, în esență, este un **tip întreg mic**: ține un număr între −128 și 127 (sau 0–255 dacă e fără semn). Diferența față de `int` e doar felul în care îl afișăm: la `cout`, un `char` apare ca **simbolul** corespunzător codului său, nu ca număr.
+
+Convenția care leagă coduri de simboluri se numește **ASCII**. Câteva repere de memorat:
+
+| Caracter | Cod ASCII |
+|----------|-----------|
+| `'0'` … `'9'` | 48 … 57 |
+| `'A'` … `'Z'` | 65 … 90 |
+| `'a'` … `'z'` | 97 … 122 |
+| spațiu `' '` | 32 |
+
+<ObservationBox>
+Pentru fiecare grup (cifre, litere mari, litere mici), codurile sunt **consecutive**. Asta e ceea ce face aritmetica pe caractere atât de utilă: poți trece de la un simbol la următorul adunând 1.
+</ObservationBox>
+
+## Caracterele ca numere
+
+Pentru că `char` e un număr, poți face aritmetică cu el. Iată cum arată codurile pentru câteva litere:
+
+<ArrayDiagram
+  values="65 66 67 68 69"
+  valueLabel="cod"
+  index="A B C D E"
+  indexLabel="litera"
+  caption="Literele consecutive au coduri consecutive: de la 'A' la 'E' codul crește cu 1 la fiecare pas." />
+
+De aici ies două trucuri folosite la aproape orice problemă cu text:
+
+- **Cifră-caracter → număr:** `c - '0'`. De exemplu `'7' - '0' = 7`.
+- **Poziția unei litere în alfabet:** `c - 'a'` dă 0 pentru `'a'`, 1 pentru `'b'`, … (util pentru vectori de frecvență pe litere).
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    char c = 'A';
+    cout << c << "\n";        // A
+    cout << (int)c << "\n";   // 65 (codul, fortat ca numar)
+
+    char cifra = '7';
+    int val = cifra - '0';    // 7
+    cout << val << "\n";
+
+    // litera mica -> litera mare (diferenta este 32)
+    char mic = 'g';
+    char mare = mic - 32;     // 'G'
+    cout << mare << "\n";     // G
+    return 0;
+}
+```
+
+## Aplicație: numără literele mari dintr-un text
+
+Combinând citirea caracter cu caracter și comparația de coduri, rezolvi o clasă întreagă de probleme:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    char c;
+    int litereMari = 0;
+    while (cin >> c) {
+        if (c >= 'A' && c <= 'Z') litereMari++;  // cod intre 65 si 90
+    }
+    cout << litereMari << "\n";
+    return 0;
+}
+```
+
+Compararea `c >= 'A' && c <= 'Z'` funcționează tocmai pentru că literele mari au coduri într-un interval continuu.
+
+## Complexitate
+
+Fiecare operație pe un `char` (comparație, adunare, conversie) costă **O(1)**. Parcurgerea unui text de lungime `n` caracter cu caracter este **O(n)** — la fel ca parcurgerea unui vector, pentru că un șir este chiar un vector de `char`.
+
+<MistakeBox>
+**Greșeala 1 — confunzi caracterul cu cifra:** `int val = c;` pentru `c = '7'` îți dă 55 (codul), nu 7. Pentru valoarea cifrei scrie `c - '0'`.
+
+**Greșeala 2 — afișezi codul în loc de literă:** dacă faci aritmetică și uiți cast-ul, `cout << ('A' + 1)` afișează `66`, nu `B`. Forțează cu `(char)('A' + 1)`.
+
+**Greșeala 3 — presupui că totul e ASCII:** literele românești cu diacritice (ă, â, î) NU sunt caractere ASCII simple și nu încap într-un `char` obișnuit. Problemele de concurs lucrează aproape mereu cu litere fără diacritice.
+
+**Greșeala 4 — `char` cu semn la coduri peste 127:** pe un `char` cu semn, un cod de 200 devine negativ. Când lucrezi cu valori peste 127, folosește `unsigned char`.
+</MistakeBox>
+
+## Recapitulare
+
+- `char` ocupă 1 octet și ține **codul ASCII** al unui simbol: `'A'` este de fapt numărul 65.
+- Codurile fiecărui grup (cifre, litere mari, litere mici) sunt **consecutive**, ceea ce permite aritmetica pe caractere: `c - '0'`, `c - 'a'`, `c - 32`.
+- Un șir de caractere este un vector de `char`, deci parcurgerea lui costă **O(n)**.

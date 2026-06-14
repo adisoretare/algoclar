@@ -1,0 +1,142 @@
+---
+title: "Conversii între baze"
+slug: conversii-intre-baze
+grade: 6
+chapter: sisteme-numeratie
+difficulty: baza
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["conversii", "baze", "impartiri-repetate", "binar"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pentru a converti 13 din baza 10 în baza 2 prin împărțiri repetate, în ce ordine citești resturile?"
+    options:
+      - "În ordinea în care au apărut"
+      - "În ordine inversă față de cum au apărut (ultimul rest primul)"
+      - "Crescător după valoare"
+      - "Doar ultimul rest contează"
+    correctIndex: 1
+    explanation: "Resturile dau cifrele de la cea mai puțin semnificativă spre cea mai semnificativă, deci numărul se citește în ordine inversă: 13 → resturi 1,0,1,1 → 1101."
+  - question: "Ce operație folosești ca să treci dintr-o bază oarecare în baza 10?"
+    options:
+      - "Împărțiri repetate la bază"
+      - "Înmulțești fiecare cifră cu valoarea ei de loc și aduni (schema Horner)"
+      - "Aduni toate cifrele"
+      - "Inversezi cifrele"
+    correctIndex: 1
+    explanation: "Spre baza 10 mergi prin valori de loc (Horner). Împărțirile repetate se folosesc în sens invers: din baza 10 spre o altă bază."
+  - question: "Câte împărțiri faci ca să converteşti n din baza 10 într-o bază b?"
+    options:
+      - "exact n"
+      - "aproximativ log_b n (numărul de cifre ale rezultatului)"
+      - "exact b"
+      - "n²"
+    correctIndex: 1
+    explanation: "Fiecare împărțire produce o cifră și micșorează numărul de b ori, deci numărul de pași e ~log_b n — câte cifre are rezultatul."
+---
+
+<LessonHook>
+Ai 13 lei și vrei să-i dai doar în monede de 2 lei și de 1 leu. Iei cât mai multe monede de 2 (șase monede = 12 lei) și-ți rămâne 1 leu. Conversia unui număr într-o altă bază e exact acest joc de „grupare repetată": împarți mereu la bază și notezi ce-ți rămâne.
+</LessonHook>
+
+## Două drumuri, două metode
+
+Conversiile merg în ambele sensuri, dar folosesc procedee diferite:
+
+- **dintr-o bază oarecare → baza 10:** înmulțești fiecare cifră cu valoarea ei de loc și aduni (schema lui Horner, din lecția anterioară).
+- **din baza 10 → o altă bază:** faci **împărțiri repetate** la bază și aduni resturile.
+
+Cheia e să nu le amesteci: spre baza 10 mergi prin *valori de loc*, dinspre baza 10 mergi prin *împărțiri*.
+
+## Din baza 10 într-o altă bază
+
+Algoritmul: împarți numărul la bază, reții **restul** ca cifră, treci la **cât**, și repeți până ajungi la 0. Cifrele ies de la cea mai puțin semnificativă spre cea mai semnificativă, deci la final le citești **invers**.
+
+Exemplu: `13` în baza 2.
+
+```
+13 : 2 = 6  rest 1
+ 6 : 2 = 3  rest 0
+ 3 : 2 = 1  rest 1
+ 1 : 2 = 0  rest 1
+```
+
+Resturile, în ordinea apariției, sunt `1, 0, 1, 1`. Citite invers dau rezultatul:
+
+<ArrayDiagram
+  values="1 1 0 1"
+  valueLabel="cifra"
+  index="8 4 2 1"
+  indexLabel="valoare loc"
+  caption="Resturile (1,0,1,1) citite în ordine inversă dau 1101 în baza 2 = 13." />
+
+<ObservationBox>
+De ce ordinea inversă? Prima împărțire scoate restul împărțirii la `b`, adică **cifra unităților** — poziția cea mai din dreapta. Ultima împărțire dă cifra cea mai din stânga. Deci ordinea găsirii e exact pe dos față de ordinea scrierii.
+</ObservationBox>
+
+## Implementare C++ — baza 10 → baza b
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 13, b = 2;
+    int cifre[40], k = 0;
+
+    while (n > 0) {
+        cifre[k++] = n % b;  // restul = cifra curenta
+        n /= b;              // catul = ce ramane de convertit
+    }
+
+    // afisam in ordine inversa fata de cum le-am gasit
+    for (int i = k - 1; i >= 0; i--) cout << cifre[i];
+    cout << "\n";  // 1101
+    return 0;
+}
+```
+
+## Implementare C++ — baza b → baza 10
+
+Aici aplici Horner pe cifrele citite de la stânga:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int cifre[] = {1, 1, 0, 1};  // 1101 in baza 2
+    int n = 4, b = 2;
+
+    int valoare = 0;
+    for (int i = 0; i < n; i++) {
+        valoare = valoare * b + cifre[i];
+    }
+
+    cout << valoare << "\n";  // 13
+    return 0;
+}
+```
+
+## Complexitate
+
+Ambele conversii costă **O(k)**, unde `k ≈ log_b n` este numărul de cifre al rezultatului. Fiecare împărțire scade numărul de `b` ori, deci ajungi la 0 după aproximativ `log_b n` pași.
+
+<MistakeBox>
+**Greșeala 1 — citești resturile în ordinea apariției:** dacă afișezi `1,0,1,1` cum au ieșit, obții `1011` (= 11), nu `1101` (= 13). Resturile se citesc **invers**.
+
+**Greșeala 2 — confunzi cele două sensuri:** încerci împărțiri repetate ca să mergi *spre* baza 10, sau Horner ca să mergi *dinspre* baza 10. Reține: împărțiri = ieși din baza 10; valori de loc = intri în baza 10.
+
+**Greșeala 3 — nu tratezi `n = 0`:** bucla `while (n > 0)` nu rulează deloc pentru 0 și nu afișează nimic. Tratează separat cazul zero, afișând cifra `0`.
+
+**Greșeala 4 — uiți literele peste baza 10:** dacă restul e ≥ 10 (în baza 16), nu-l afișa ca număr; transformă-l în literă (10 → A, 11 → B, …).
+</MistakeBox>
+
+## Recapitulare
+
+- Din baza 10 într-o altă bază: **împărțiri repetate** la bază; resturile sunt cifrele, citite în **ordine inversă**.
+- Dintr-o bază oarecare în baza 10: **schema lui Horner** pe cifre, de la stânga la dreapta.
+- Ambele metode rulează în **O(log_b n)**; atenție la cazul `n = 0` și la literele A–F când baza depășește 10.

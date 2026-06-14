@@ -1,0 +1,114 @@
+---
+title: "Ciurul lui Eratostene"
+slug: ciurul-eratostene
+grade: 6
+chapter: divizibilitate-avansata
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["ciur", "numere-prime", "eratostene", "precalculare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce putem începe marcarea multiplilor lui i chiar de la i·i, nu de la 2·i?"
+    options:
+      - "Ca să mergem mai repede, dar pierdem niște numere"
+      - "Pentru că toți multiplii mai mici (2·i, 3·i, …) au fost deja marcați de numere prime mai mici"
+      - "Pentru că i·i e mereu prim"
+      - "E o greșeală, trebuie de la 2·i"
+    correctIndex: 1
+    explanation: "Un multiplu ca k·i cu k < i are un factor mai mic decât i, deci a fost deja marcat când am procesat acel factor. Primul multiplu nemarcat încă este i·i."
+  - question: "Care e complexitatea ciurului lui Eratostene pentru numere până la n?"
+    options:
+      - "O(n²)"
+      - "O(n)"
+      - "O(n log log n)"
+      - "O(√n)"
+    correctIndex: 2
+    explanation: "Suma 1/2 + 1/3 + 1/5 + … pe numere prime dă factorul log log n, deci ciurul rulează în O(n log log n) — practic aproape liniar."
+  - question: "Până la ce valoare e suficient să meargă bucla exterioară i?"
+    options:
+      - "Până la n"
+      - "Până la n/2"
+      - "Până la √n"
+      - "Până la 2"
+    correctIndex: 2
+    explanation: "Orice număr compus ≤ n are un factor prim ≤ √n. Dacă am marcat multiplii tuturor primelor până la √n, toate compusele sunt deja tăiate."
+---
+
+<LessonHook>
+Ai o sită prin care treci nisip: bobițele mari rămân sus, cele fine cad. Ciurul lui Eratostene face exact asta cu numerele — „cerne" și aruncă toate numerele compuse, iar ce rămâne neatins sunt numerele prime. În loc să verifici fiecare număr separat, le marchezi pe toate dintr-o singură trecere.
+</LessonHook>
+
+## Ideea ciurului
+
+Ca să găsești **toate** numerele prime până la `n`, nu verifici fiecare pe rând (ar fi lent). În schimb, pornești cu presupunerea că toate sunt prime și **tai multiplii**: 2 e prim → tai 4, 6, 8, …; 3 e prim → tai 6, 9, 12, …; și tot așa. Numerele care nu sunt tăiate niciodată sunt primele.
+
+<ArrayDiagram
+  values="2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"
+  index="off"
+  highlight="0 1 3 5 9 11"
+  dim="2 4 6 7 8 10 12 13 14"
+  caption="După cernere: primele rămân evidențiate (2,3,5,7,11,13), compusele sunt tăiate ca multipli ai unui prim mai mic." />
+
+<ObservationBox>
+Cheia eficienței: marcarea unui multiplu costă **O(1)**, iar fiecare compus e marcat de puține ori (o dată pentru fiecare factor prim al lui). Pe total, munca e mult mai mică decât verificarea individuală a fiecărui număr.
+</ObservationBox>
+
+## Două optimizări care contează
+
+1. **Începe de la `i·i`.** Când ajungi la primul `i`, multiplii `2·i`, `3·i`, … `(i−1)·i` au fost deja tăiați de factorii lor mai mici. Primul multiplu nou e `i·i`.
+2. **Oprește bucla exterioară la `√n`.** Orice compus ≤ `n` are un factor prim ≤ `√n`, deci după ce marchezi multiplii primelor până la `√n`, toate compusele sunt deja tăiate.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 100;
+bool compus[N + 1];   // compus[i] = true daca i NU este prim
+
+int main() {
+    for (int i = 2; i * i <= N; i++) {
+        if (!compus[i]) {                       // i e prim
+            for (int j = i * i; j <= N; j += i)
+                compus[j] = true;               // taiem multiplii lui i
+        }
+    }
+
+    for (int i = 2; i <= N; i++)
+        if (!compus[i]) cout << i << " ";       // a ramas netaiat -> prim
+    cout << "\n";
+    return 0;
+}
+```
+
+Vectorul global `compus` e inițializat automat cu `false` (toate „posibil prime"). La final, indicii rămași `false` sunt numerele prime.
+
+## Complexitate
+
+| Aspect | Valoare |
+|--------|---------|
+| Timp | O(n log log n) — practic aproape liniar |
+| Spațiu | O(n) — un bit/bool pentru fiecare număr |
+
+Comparat cu verificarea fiecărui număr separat (`O(n√n)`), ciurul e dramatic mai rapid pentru a găsi **toate** primele dintr-un interval.
+
+<MistakeBox>
+**Greșeala 1 — pornești de la `2·i`:** funcționează, dar faci muncă inutilă marcând multipli deja tăiați. Pornește de la `i·i`.
+
+**Greșeala 2 — tratezi 0 și 1 ca prime:** bucla începe de la 2 tocmai pentru că 0 și 1 NU sunt prime. Nu le include în rezultat.
+
+**Greșeala 3 — `i <= N` în loc de `i*i <= N` la bucla exterioară:** nu dă rezultat greșit, dar pierzi optimizarea — bucla merge inutil până la `N`.
+
+**Greșeala 4 — `N` prea mare pentru un vector local:** un `bool compus[N+1]` cu `N` de ordinul milioanelor trebuie declarat **global**, nu în `main` (stiva e prea mică, dă crash).
+</MistakeBox>
+
+## Recapitulare
+
+- Ciurul găsește toate primele până la `n` tăind multiplii fiecărui prim, în loc să verifice numerele unul câte unul.
+- Pornești marcarea de la `i·i` și oprești bucla exterioară la `√n` — ambele optimizări se bazează pe faptul că factorii mici au tăiat deja restul.
+- Rulează în **O(n log log n)** timp și **O(n)** spațiu; vectorul mare se declară global.

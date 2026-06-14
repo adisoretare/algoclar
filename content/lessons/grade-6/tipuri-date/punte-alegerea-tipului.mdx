@@ -1,0 +1,80 @@
+---
+title: "Lecție-punte: alegerea tipului potrivit"
+slug: punte-alegerea-tipului
+grade: 6
+chapter: tipuri-date
+difficulty: baza
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["tipuri", "alegere", "long-long", "double"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "O problemă spune că răspunsul poate ajunge la 5 × 10¹². Ce tip alegi?"
+    options:
+      - "int — e suficient"
+      - "long long — depășește limita int de ~2×10⁹"
+      - "double — pentru numere mari"
+      - "char — ocupă mai puțin"
+    correctIndex: 1
+    explanation: "5 × 10¹² e mult peste maximul int (≈ 2,1 × 10⁹), dar încape lejer în long long (≈ 9,2 × 10¹⁸). Pentru numărare exactă nu folosești double, care ar pierde precizia."
+  - question: "Pentru a număra câte persoane sunt într-o sală (cel mult 200), ce tip e cel mai potrivit?"
+    options:
+      - "long long, ca să fii sigur"
+      - "double, pentru flexibilitate"
+      - "int, e exact și suficient"
+      - "char cu semn"
+    correctIndex: 2
+    explanation: "200 încape ușor în int, care e exact și clar. long long ar funcționa, dar e inutil de mare; double ar fi greșit conceptual — numeri lucruri întregi."
+---
+
+<LessonHook>
+Când mergi la cumpărături alegi recipientul după ce transporți: nu cari apă într-o pungă de hârtie și nici un singur măr într-un camion. La fel alegi tipul de date: nu după cum „sună", ci după cât de mare poate fi valoarea și dacă ai nevoie de zecimale.
+</LessonHook>
+
+## Trei întrebări înainte să declari o variabilă
+
+Nu există un tip „cel mai bun" în general — există tipul potrivit pentru valorile tale. Pune-ți, în ordine, aceste întrebări:
+
+1. **Am nevoie de zecimale?** Dacă da → tip real (`double`). Dacă nu → tip întreg.
+2. **Cât de mare poate fi valoarea?** Inclusiv sumele și produsele intermediare, nu doar rezultatul final.
+3. **Trebuie să fie exact?** Numărările, banii (în bani/cenți), indicii cer exactitate → întregi, niciodată `double`.
+
+| Situație | Tip potrivit |
+|----------|--------------|
+| Numărare, indici, valori sub ~2×10⁹ | `int` |
+| Sume/produse care pot trece de ~2×10⁹ | `long long` |
+| Distanțe, medii, rezultate cu zecimale | `double` |
+| Litere și simboluri | `char` |
+
+<ObservationBox>
+Regula scurtă de concurs: privește **constrângerile din enunț** (`n ≤ ...`, `valori ≤ ...`), calculează mental cea mai mare valoare care apare oriunde în program și alege cel mai mic tip care o cuprinde **cu rezervă**.
+</ObservationBox>
+
+## De ce nu „long long peste tot, ca să fim siguri"
+
+Pare tentant să folosești `long long` mereu și să nu te mai gândești. De obicei merge, dar nu e o deprindere bună:
+
+- ascunde momentul în care chiar **trebuie** să te gândești la limite (și într-o zi vei depăși și `long long`);
+- pentru indici de vector sau bucle, `int` exprimă mai clar intenția;
+- `double` „pentru orice" e de-a dreptul periculos: pierde exactitatea la numere întregi mari, deci o numărare poate ieși greșită.
+
+Tipul potrivit nu e doar despre „a încăpea" — e și despre a comunica ce reprezintă valoarea.
+
+<MistakeBox>
+**Greșeala 1 — `int` pentru un produs mare:** valorile încap fiecare în `int`, dar produsul lor nu. `n ≤ 10⁵` și un produs de două elemente de `10⁵` dă `10¹⁰` → ai nevoie de `long long`.
+
+**Greșeala 2 — `double` pentru numărare:** pentru valori întregi foarte mari, `double` pierde din precizie și poate da `99999999999999` în loc de `100000000000000`. Numeri lucruri întregi → folosește `long long`.
+
+**Greșeala 3 — uiți de calculele intermediare:** rezultatul final încape în `int`, dar o sumă parțială depășește pe parcurs. Tipul trebuie să acopere **maximul atins oriunde**, nu doar valoarea de la final.
+
+**Greșeala 4 — `float` în loc de `double`:** când chiar ai nevoie de zecimale, `float` (~7 cifre) e prea sărac. Alege `double`.
+</MistakeBox>
+
+## Recapitulare
+
+- Alegi tipul după trei criterii: ai nevoie de zecimale, cât de mare e valoarea, cât de exact trebuie să fie.
+- Verifică **maximul atins oriunde** în program — sume și produse intermediare incluse — nu doar rezultatul final.
+- `long long` peste tot și `double` pentru numărări sunt scurtături care ascund bug-uri; alege tipul care cuprinde valoarea și îi exprimă sensul.

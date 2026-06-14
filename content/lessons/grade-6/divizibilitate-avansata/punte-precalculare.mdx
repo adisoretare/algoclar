@@ -1,0 +1,78 @@
+---
+title: "Lecție-punte: ideea de precalculare"
+slug: punte-precalculare
+grade: 6
+chapter: divizibilitate-avansata
+difficulty: mediu
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["precalculare", "interogari", "memorie-vs-timp", "tehnica"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e semnalul tipic că o problemă se rezolvă prin precalculare?"
+    options:
+      - "Are un singur număr de prelucrat"
+      - "Pune multe interogări pe același interval de valori"
+      - "Cere un răspuns modulo"
+      - "Folosește numere reale"
+    correctIndex: 1
+    explanation: "Când vezi „q interogări" pe același domeniu, precalcularea unei structuri o dată face fiecare răspuns rapid. Semnalul e repetarea aceleiași întrebări pe date fixe."
+  - question: "Ce schimbi, de fapt, atunci când precalculezi?"
+    options:
+      - "Memorie în plus contra timp mai mic per interogare"
+      - "Corectitudine contra viteză"
+      - "Cod mai scurt contra cod mai lung"
+      - "Nimic, e doar un stil"
+    correctIndex: 0
+    explanation: "Precalcularea e un compromis: folosești memorie suplimentară (vectorul precalculat) ca să transformi fiecare interogare dintr-un calcul costisitor într-o simplă citire."
+---
+
+<LessonHook>
+Înainte de un meci, o echipă se antrenează săptămâni întregi — efort mare, o singură dată — ca în timpul jocului reacțiile să fie instantanee. Precalcularea funcționează la fel: investești o muncă mare la început, ca fiecare răspuns de mai târziu să vină pe loc.
+</LessonHook>
+
+## Tiparul: muncă o dată, răspunsuri de multe ori
+
+Precalcularea nu e un algoritm anume, ci o **strategie**: când o problemă cere același tip de răspuns de multe ori pe aceleași date, calculezi rezultatele **o singură dată** și le stochezi, ca apoi fiecare interogare să fie o citire rapidă.
+
+Ai văzut-o deja la:
+- **ciurul lui Eratostene** — toate primele până la `n`, dintr-o trecere;
+- **numărul de divizori** — completat pentru toate numerele printr-un ciur;
+- **sumele parțiale** (din alt capitol) — suma oricărui interval în `O(1)` după o pregătire `O(n)`.
+
+<ObservationBox>
+Semnalul din enunț: cuvintele „**q interogări**", „pentru fiecare întrebare", „se dau `t` cazuri de test" pe același domeniu de valori. Acolo precalcularea transformă `O(q · cost_mare)` în `O(pregătire + q)`.
+</ObservationBox>
+
+## Compromisul memorie–timp
+
+Precalcularea **cumpără timp cu memorie**. Vectorul precalculat ocupă spațiu, dar fiecare interogare devine `O(1)` în loc de un calcul costisitor. De obicei e un schimb excelent — dar nu gratuit.
+
+Pune-ți două întrebări înainte:
+1. **Câte interogări** sunt? Puține → poate nu merită; multe → aproape sigur merită.
+2. **Încape** vectorul în memorie? Un domeniu de `10⁸` `int`-uri (~400 MB) depășește limita uzuală.
+
+## Când NU precalculezi
+
+- Pentru o **singură** întrebare: un calcul direct e adesea mai rapid decât pregătirea întregului tabel.
+- Când domeniul e **prea mare** ca să încapă în memorie (precalculezi pe tot intervalul degeaba).
+- Când fiecare interogare e pe **date diferite** — precalcularea presupune un domeniu fix, reutilizat.
+
+<MistakeBox>
+**Greșeala 1 — precalculezi pentru o singură interogare:** plătești pregătirea `O(n log n)` ca să răspunzi o dată. Pentru o întrebare unică, calculul direct `O(√n)` e mai bun.
+
+**Greșeala 2 — ignori memoria:** alegi `N` uriaș „ca să fie sigur" și vectorul nu încape. Verifică întâi câtă memorie cere.
+
+**Greșeala 3 — recalculezi în buclă fără să-ți dai seama:** ai precalculat, dar tot apelezi funcția costisitoare la fiecare interogare. Folosește vectorul gata calculat.
+
+**Greșeala 4 — precalculezi ce nu se reutilizează:** dacă fiecare test are alt domeniu, tabelul precalculat nu se mai poate refolosi — câștigul dispare.
+</MistakeBox>
+
+## Recapitulare
+
+- Precalcularea e o strategie: faci munca grea **o dată**, apoi răspunzi la fiecare interogare în **O(1)**.
+- Semnalul e „multe interogări pe același domeniu"; transformi `O(q · cost)` în `O(pregătire + q)`.
+- E un compromis **memorie contra timp** — nu o aplica pentru o singură întrebare sau când vectorul nu încape în memorie.
