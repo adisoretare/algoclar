@@ -1,0 +1,125 @@
+---
+title: "upper_bound — prima poziție > valoare"
+slug: upper-bound
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "upper-bound", "cautare"]
+visualizers: ["cautare-binara"]
+relatedProblems: []
+quiz:
+  - question: "Ce returnează `upper_bound(v, v+n, x)`?"
+    options:
+      - "Un iterator spre primul element ≥ x"
+      - "Un iterator spre primul element strict > x"
+      - "`true` dacă x există"
+      - "Ultima apariție a lui x"
+    correctIndex: 1
+    explanation: "`upper_bound` găsește primul element STRICT mai mare decât x. Diferența față de `lower_bound` (≥ x) e tocmai egalitatea: upper sare peste toate aparițiile lui x."
+  - question: "Cum afli de câte ori apare x într-un vector sortat folosind cele două funcții?"
+    options:
+      - "upper_bound + lower_bound"
+      - "upper_bound(x) - lower_bound(x)"
+      - "lower_bound(x) - upper_bound(x)"
+      - "Nu se poate"
+    correctIndex: 1
+    explanation: "`lower_bound` dă începutul zonei cu x, `upper_bound` dă sfârșitul (prima poziție după x). Diferența lor e numărul de apariții ale lui x."
+  - question: "Pentru `v = {2, 4, 4, 6}` și x = 4, ce poziție dă `upper_bound`?"
+    options:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+    correctIndex: 2
+    explanation: "`upper_bound` sare peste ambii de 4 (pozițiile 1 și 2) și se oprește la primul element > 4, adică 6 de pe poziția 3."
+---
+
+<LessonHook>
+La o coadă ordonată după vârstă, vrei prima persoană strict mai în vârstă decât 18 ani — nu cei de exact 18, ci primul de după ei. `upper_bound` găsește exact acel prim element care depășește pragul.
+</LessonHook>
+
+## Ce face `upper_bound`
+
+Pe un vector **sortat**, `upper_bound` găsește **prima poziție unde elementul este strict > x**. Întoarce un iterator spre acel element.
+
+```cpp
+int *p = upper_bound(v, v + n, x);
+```
+
+Diferența cheie față de `lower_bound`:
+
+- `lower_bound(x)` → primul element **≥ x** (include x).
+- `upper_bound(x)` → primul element **> x** (sare peste toate aparițiile lui x).
+
+<ObservationBox>
+Gândește perechea ca pe cele două capete ale zonei lui x în vector: `lower_bound` e unde *începe* zona, `upper_bound` e unde se *termină* (prima poziție de după).
+</ObservationBox>
+
+## Exemplu concret
+
+Vectorul sortat `v = {2, 4, 4, 6, 8}`:
+
+```
+lower_bound(..., 4) -> poz 1  (primul >= 4)
+upper_bound(..., 4) -> poz 3  (primul > 4, adica 6)
+upper_bound(..., 5) -> poz 3  (primul > 5, adica 6)
+upper_bound(..., 8) -> poz 5  (= n, niciunul > 8)
+```
+
+## Aplicația vedetă: numărul de apariții
+
+Diferența `upper_bound - lower_bound` dă **de câte ori apare x**:
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int v[5] = {2, 4, 4, 6, 8};   // SORTAT
+    int n = 5, x = 4;
+
+    int st = lower_bound(v, v + n, x) - v;   // 1
+    int dr = upper_bound(v, v + n, x) - v;   // 3
+    cout << "Apare de " << (dr - st) << " ori\n";  // Apare de 2 ori
+    return 0;
+}
+```
+
+Dacă `dr - st == 0`, x nu apare deloc.
+
+## Câte elemente sunt ≤ x
+
+Tot din `upper_bound`: poziția lui `upper_bound(x)` e chiar numărul de elemente ≤ x.
+
+```cpp
+int cate = upper_bound(v, v + n, x) - v;   // cate elemente sunt <= x
+```
+
+Analog, `lower_bound(x) - v` dă câte elemente sunt **strict < x**.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `upper_bound` | O(log n) | O(1) |
+| număr apariții (lower + upper) | O(log n) | O(1) |
+
+<MistakeBox>
+Capcane la `upper_bound`:
+
+- **Confuzi cu `lower_bound`**: lower include x (≥), upper sare peste x (>). Pentru numărul de apariții ai nevoie de amândouă, în ordinea corectă.
+- **Vector nesortat**: rezultat nedefinit, ca la orice căutare binară.
+- **Dereferențiezi capătul**: dacă toate elementele sunt ≤ x, `upper_bound` întoarce `v + n`. Nu accesa `*p` fără să verifici.
+- **Inversezi scăderea**: numărul de apariții e `upper - lower`, nu `lower - upper` (ai obține un număr negativ).
+</MistakeBox>
+
+## Recapitulare
+
+- `upper_bound` întoarce primul element strict > x, în O(log n) pe vector sortat.
+- `lower_bound` și `upper_bound` marchează începutul și sfârșitul zonei lui x; diferența lor = numărul de apariții.
+- `upper_bound(x) - v` = câte elemente ≤ x; atenție să nu dereferențiezi capătul `v + n`.

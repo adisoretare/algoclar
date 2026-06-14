@@ -1,0 +1,141 @@
+---
+title: "Apelul funcțiilor — cum dai controlul și îl primești înapoi"
+slug: apelul-functiilor
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "apel", "argumente"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e diferența dintre parametru și argument?"
+    options:
+      - "Sunt același lucru cu nume diferite"
+      - "Parametrul e variabila din antetul funcției; argumentul e valoarea efectivă pasată la apel"
+      - "Argumentul e în antet; parametrul e la apel"
+      - "Parametrul e mereu un număr, argumentul mereu un text"
+    correctIndex: 1
+    explanation: "Parametrii sunt numele din antetul funcției (`int a, int b`). Argumentele sunt valorile concrete date la apel (`suma(3, 5)` — 3 și 5 sunt argumente)."
+  - question: "Ce se întâmplă cu execuția când apelezi o funcție?"
+    options:
+      - "Programul continuă în paralel pe două fire"
+      - "Controlul sare în funcție, ea rulează, apoi se întoarce la instrucțiunea de după apel"
+      - "Funcția rulează abia la finalul programului"
+      - "Restul din `main` se ignoră"
+    correctIndex: 1
+    explanation: "La apel, controlul trece în funcție. Când funcția întâlnește `return` (sau se termină), controlul revine exact la locul de unde a fost apelată."
+  - question: "Poți folosi rezultatul unei funcții direct ca argument pentru alta?"
+    options:
+      - "Nu, trebuie mereu salvat într-o variabilă întâi"
+      - "Da, de exemplu `maxim(suma(1,2), 5)`"
+      - "Doar dacă funcțiile au același nume"
+      - "Doar pentru funcții `void`"
+    correctIndex: 1
+    explanation: "Apelurile se pot compune: rezultatul unei funcții devine argument pentru alta. `suma(1,2)` produce 3, apoi `maxim(3, 5)` produce 5."
+---
+
+<LessonHook>
+Când trimiți un coleg să cumpere pâine, îi dai banii (intrarea), el pleacă, face cumpărătura și se întoarce cu pâinea (rezultatul). În tot acest timp tu aștepți. Apelul unei funcții funcționează la fel: dai controlul și niște valori, aștepți, primești înapoi un rezultat.
+</LessonHook>
+
+## Ce înseamnă să apelezi o funcție?
+
+Un **apel** este momentul în care folosești o funcție: scrii numele ei urmat de paranteze cu argumente. Execuția „sare" în funcție, aceasta rulează, iar la final controlul revine exact unde era.
+
+```cpp
+int rezultat = suma(3, 5);
+```
+
+Aici `suma` e apelată cu argumentele `3` și `5`. Valoarea întoarsă (`8`) se salvează în `rezultat`.
+
+## Parametri vs. argumente
+
+Două cuvinte ușor de confundat:
+
+- **Parametrii** sunt numele din antetul funcției: `int suma(int a, int b)` → `a` și `b`.
+- **Argumentele** sunt valorile concrete date la apel: `suma(3, 5)` → `3` și `5`.
+
+La apel, argumentele se „pun" în parametri în ordine: `a` primește `3`, `b` primește `5`.
+
+<ObservationBox>
+Ordinea contează. `imparte(10, 2)` nu e același lucru cu `imparte(2, 10)` — primul argument merge în primul parametru, al doilea în al doilea.
+</ObservationBox>
+
+## Cum circulă controlul — pas cu pas
+
+Urmărim ce se întâmplă la fiecare moment când rulează acest program:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int suma(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    cout << "Start\n";
+    int r = suma(3, 5);
+    cout << r << "\n";   // 8
+    cout << "Final\n";
+    return 0;
+}
+```
+
+Firul execuției:
+
+```
+main: afiseaza "Start"
+main: apel suma(3, 5)  -> controlul sare in suma
+  suma: a = 3, b = 5
+  suma: return 8       -> controlul revine in main
+main: r = 8
+main: afiseaza 8
+main: afiseaza "Final"
+```
+
+Cât timp `suma` rulează, `main` „așteaptă" la linia apelului. Abia după ce funcția returnează, `main` continuă cu linia următoare.
+
+## Apeluri compuse
+
+Rezultatul unui apel poate fi argument pentru alt apel. Se evaluează dinăuntru în afară:
+
+```cpp
+int suma(int a, int b) { return a + b; }
+int maxim(int a, int b) { return a > b ? a : b; }
+
+int main() {
+    cout << maxim(suma(1, 2), 5) << endl;  // suma(1,2)=3, maxim(3,5)=5
+    return 0;
+}
+```
+
+Întâi se calculează `suma(1, 2) = 3`, apoi `maxim(3, 5) = 5`.
+
+## Complexitate
+
+Apelul în sine adaugă un cost mic constant (pregătirea parametrilor, salt). Costul real e cel al corpului funcției:
+
+| Caz | Timp apel | Spațiu |
+|-----|-----------|--------|
+| funcție O(1) | O(1) | O(1) |
+| funcție O(n) apelată o dată | O(n) | depinde de corp |
+
+<MistakeBox>
+Greșeli frecvente la apel:
+
+- **Inversezi ordinea argumentelor**: `imparte(2, 10)` în loc de `imparte(10, 2)` dă alt rezultat. Verifică ordinea parametrilor.
+- **Apelezi cu număr greșit de argumente**: `suma(3)` la o funcție cu doi parametri nu compilează.
+- **Ignori valoarea returnată**: `suma(3, 5);` calculează 8 și îl aruncă. Salvează-l sau folosește-l (`int r = suma(3,5);`).
+- **Apel într-o buclă mare cu funcție lentă**: dacă funcția e O(n) și o apelezi de n ori într-o buclă, costul total devine O(n²). Atenție la limita de timp.
+</MistakeBox>
+
+## Recapitulare
+
+- Apelul transferă controlul în funcție; la `return` controlul revine la instrucțiunea de după apel.
+- Argumentele (valori la apel) se pun în parametri (nume în antet), în ordine.
+- Apelurile se pot compune — rezultatul unuia devine argument pentru altul.

@@ -1,0 +1,131 @@
+---
+title: "Vectori de structuri — o listă de fișe"
+slug: vectori-de-structuri
+grade: 7
+chapter: structuri-neomogene
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["struct", "vectori", "campuri"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum accesezi nota celui de-al treilea elev dintr-un vector `Elev v[100]`?"
+    options:
+      - "v.nota[2]"
+      - "v[2].nota"
+      - "v[nota][2]"
+      - "v->nota[2]"
+    correctIndex: 1
+    explanation: "Întâi alegi elementul din vector (`v[2]`), apoi câmpul lui (`.nota`): `v[2].nota`. Indexul selectează fișa, punctul selectează rubrica."
+  - question: "Ce avantaj are un vector de structuri față de mai mulți vectori paraleli?"
+    options:
+      - "Ocupă mereu mai puțină memorie"
+      - "Mutarea unui element mută automat toate câmpurile lui împreună"
+      - "Permite mai multe elemente"
+      - "Nu mai ai nevoie de bucle"
+    correctIndex: 1
+    explanation: "Când muți sau sortezi `v[i]`, toate câmpurile elementului se mută odată. Cu vectori paraleli ar trebui să sincronizezi manual fiecare vector."
+  - question: "Cum parcurgi un vector de structuri ca să le afișezi pe toate?"
+    options:
+      - "Cu o buclă pe indici, accesând câmpurile prin `v[i].camp`"
+      - "Nu se poate parcurge"
+      - "Doar prin sortare"
+      - "Accesând direct `v.camp`"
+    correctIndex: 0
+    explanation: "Parcurgi exact ca un vector obișnuit, cu o buclă de la 0 la n-1, și folosești `v[i].camp` pentru fiecare câmp al elementului curent."
+---
+
+<LessonHook>
+O bibliotecă nu are o singură fișă, ci un sertar întreg cu fișe, în ordine. Vrei fișa a cincea? Numeri până la a cincea și o scoți întreagă, cu toate rubricile ei. Vectorul de structuri e exact acest sertar: o listă numerotată de fișe complete.
+</LessonHook>
+
+## Ce este un vector de structuri?
+
+Dacă o structură descrie un singur element (un elev), un **vector de structuri** ține mulți astfel de elemente, numerotați prin index:
+
+```cpp
+struct Elev {
+    string nume;
+    int nota;
+};
+
+Elev v[100];   // pana la 100 de elevi, fiecare cu nume si nota
+```
+
+`v[i]` e un `Elev` întreg. Ca să ajungi la un câmp al lui, adaugi punctul: `v[i].nume`, `v[i].nota`.
+
+<ObservationBox>
+Două niveluri de acces: indexul `v[i]` alege *care fișă*, punctul `.nota` alege *care rubrică*. Ordinea contează: întâi indexul, apoi câmpul — `v[i].nota`, nu `v.nota[i]`.
+</ObservationBox>
+
+## Citire și afișare
+
+Parcurgi vectorul de structuri exact ca pe un vector obișnuit, dar lucrezi cu câmpurile fiecărui element:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct Elev {
+    string nume;
+    int nota;
+};
+
+int main() {
+    int n;
+    cin >> n;
+    Elev v[100];
+
+    for (int i = 0; i < n; i++) {
+        cin >> v[i].nume >> v[i].nota;   // citesc ambele campuri ale elevului i
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << v[i].nume << " - " << v[i].nota << "\n";
+    }
+    return 0;
+}
+```
+
+## Prelucrări pe câmpuri
+
+Orice statistică se face pe câmpul potrivit. De exemplu, elevul cu nota maximă:
+
+```cpp
+int idxMax = 0;
+for (int i = 1; i < n; i++) {
+    if (v[i].nota > v[idxMax].nota) idxMax = i;   // compar dupa camp
+}
+cout << "Cel mai bun: " << v[idxMax].nume << "\n";
+```
+
+Reține **indicele**, nu doar nota — așa păstrezi legătura cu numele. Asta e puterea structurilor: nota și numele nu se despart niciodată.
+
+## De ce e mai bun decât vectori paraleli
+
+Cu doi vectori `nume[]` și `nota[]`, ca să muți un element trebuie să muți în ambii vectori, sincronizat. Cu un vector de structuri, muți `v[i]` o singură dată și *toate* câmpurile lui merg împreună. Mai puține locuri unde poți greși.
+
+Vizual, un vector de structuri (afișând notele, fiecare cu numele dedesubt ca etichetă):
+
+<ArrayDiagram
+  values="9 7 10 8"
+  index="Ana Bogdan Carmen Dan"
+  caption="Vector de Elev, afișând câmpul nota; eticheta de jos e câmpul nume al aceluiași element. Indexul alege fișa, punctul alege câmpul." />
+
+<MistakeBox>
+Capcane la vectori de structuri:
+
+- **Ordinea greșită a accesului**: `v.nota[i]` nu compilează. Întâi indexul, apoi câmpul: `v[i].nota`.
+- **Vector mare declarat local în `main`**: un `Elev v[1000000]` pe stivă poate da crash. Declară-l global.
+- **Pierzi legătura dintre câmpuri**: dacă reții doar nota maximă (`int mx`), pierzi numele. Reține indicele elementului ca să ai acces la toate câmpurile.
+- **Citire incompletă**: uiți să citești toate câmpurile (`cin >> v[i].nume` fără `nota`) → date eronate la elementele următoare.
+</MistakeBox>
+
+## Recapitulare
+
+- Un vector de structuri e o listă numerotată de elemente complete; `v[i]` e o structură întreagă.
+- Accesezi un câmp cu `v[i].camp` — întâi indexul (care element), apoi câmpul (care rubrică).
+- Mutând un element se mută toate câmpurile lui odată; reține indicele ca să nu pierzi legătura dintre câmpuri.

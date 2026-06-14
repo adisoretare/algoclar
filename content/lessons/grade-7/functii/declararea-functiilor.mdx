@@ -1,0 +1,111 @@
+---
+title: "Declararea funcțiilor — prototipul"
+slug: declararea-functiilor
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "prototip", "declarare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce conține un prototip de funcție?"
+    options:
+      - "Tipul returnat, numele și tipurile parametrilor, urmate de `;`"
+      - "Tot codul funcției, inclusiv corpul"
+      - "Doar numele funcției"
+      - "Apelul funcției din `main`"
+    correctIndex: 0
+    explanation: "Prototipul (declararea) anunță doar antetul funcției: tip returnat, nume și tipurile parametrilor, terminat cu `;`. Corpul vine separat, la definire."
+  - question: "De ce ai nevoie de un prototip înainte de `main`?"
+    options:
+      - "Ca să faci programul mai rapid"
+      - "Ca să poți apela funcția înainte ca definiția ei să apară în fișier"
+      - "Pentru că altfel funcția nu se compilează niciodată"
+      - "Ca să schimbi tipul returnat"
+    correctIndex: 1
+    explanation: "Compilatorul citește fișierul de sus în jos. Dacă apelezi o funcție definită mai jos, prototipul de sus îi spune compilatorului cum arată ea."
+  - question: "Care declarare e validă pentru o funcție care primește două întregi și întoarce un întreg?"
+    options:
+      - "int suma(a, b);"
+      - "suma(int a, int b);"
+      - "int suma(int a, int b);"
+      - "int suma(int, int) {}"
+    correctIndex: 2
+    explanation: "Declararea are tipul returnat, numele și tipurile parametrilor: `int suma(int a, int b);`. Numele parametrilor sunt opționali, dar tipurile sunt obligatorii."
+---
+
+<LessonHook>
+Înainte să suni pe cineva, ai nevoie de numărul lui în agendă. Nu trebuie să știi ce-ți va spune — doar cum îl găsești. Declararea unei funcții e exact asta: îi spui programului „există o funcție cu acest nume și aceste argumente", chiar dacă rețeta completă vine mai târziu.
+</LessonHook>
+
+## Ce este declararea unei funcții?
+
+O **declarare** (numită și **prototip**) anunță compilatorului că o funcție există: cum se numește, ce tip de valoare întoarce și ce parametri primește. Nu conține codul propriu-zis.
+
+Forma generală:
+
+```
+tip_returnat nume_functie(tip1 param1, tip2 param2, ...);
+```
+
+Observă punctul și virgula de la final — semnul că e doar o declarare, nu o definiție.
+
+<ObservationBox>
+Compilatorul citește codul de sus în jos. Dacă în `main` apelezi o funcție scrisă mai jos în fișier, fără prototip compilatorul nu știe încă de ea și dă eroare. Prototipul pus la început rezolvă problema.
+</ObservationBox>
+
+## De ce separăm declararea de definire?
+
+În programe mari, funcțiile se cheamă una pe alta. Dacă funcția A o apelează pe B, iar B o apelează pe A, nu poți să le pui pe amândouă „mai sus" în același timp. Declarările la început rup acest nod: anunți toate funcțiile, apoi le definești în orice ordine.
+
+## Exemplu concret
+
+Vrem o funcție `suma` care adună două numere. O declarăm sus, o folosim în `main`, o definim jos:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int suma(int a, int b);   // declarare (prototip)
+
+int main() {
+    cout << suma(3, 5) << endl;   // 8
+    return 0;
+}
+
+int suma(int a, int b) {  // definire
+    return a + b;
+}
+```
+
+Compilatorul ajunge la `suma(3, 5)` în `main` și, datorită prototipului de sus, știe deja că `suma` primește doi `int` și întoarce un `int`. Verificarea tipurilor reușește, iar definirea de jos completează rețeta.
+
+## Numele parametrilor sunt opționali în prototip
+
+Compilatorului îi pasă doar de tipuri. Aceste două declarări sunt echivalente:
+
+```cpp
+int suma(int a, int b);   // cu nume
+int suma(int, int);       // doar tipuri
+```
+
+Pune totuși numele — fac codul mai ușor de citit pentru oameni.
+
+<MistakeBox>
+Greșeli frecvente la declarare:
+
+- **Uiți `;`-ul** și pui acoladă: `int suma(int a, int b) {` — asta devine o definire, nu o declarare.
+- **Tipul returnat lipsește**: `suma(int a, int b);` nu compilează. Antetul cere mereu tipul.
+- **Tipurile din prototip nu se potrivesc cu definirea**: `int suma(int, int);` declarat, dar `int suma(double, double)` definit — compilatorul le vede ca două funcții diferite și apoi nu găsește definirea celei declarate.
+- **Pui prototipul după `main`**: dacă apelezi funcția în `main`, prototipul trebuie să fie *înainte* de `main`.
+</MistakeBox>
+
+## Recapitulare
+
+- Declararea (prototipul) anunță antetul funcției — tip returnat, nume, tipuri parametri — și se termină cu `;`.
+- Permite apelarea unei funcții înainte ca definirea ei să apară în fișier.
+- Tipurile din prototip trebuie să fie identice cu cele din definire; numele parametrilor sunt opționali.

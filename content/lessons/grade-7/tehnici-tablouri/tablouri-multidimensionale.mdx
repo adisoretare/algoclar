@@ -1,0 +1,131 @@
+---
+title: "Tablouri multidimensionale — dincolo de matrice"
+slug: tablouri-multidimensionale
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["tablouri", "multidimensional", "indexare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum declari un tablou tridimensional în C++ de dimensiuni 2×3×4?"
+    options:
+      - "int a[2,3,4];"
+      - "int a[2][3][4];"
+      - "int a(2)(3)(4);"
+      - "int a[24];"
+    correctIndex: 1
+    explanation: "Fiecare dimensiune are propriile paranteze pătrate: `int a[2][3][4];`. Accesarea unui element se face analog: `a[i][j][k]`."
+  - question: "Câte elemente are un tablou `int a[2][3][4]`?"
+    options:
+      - "9"
+      - "24"
+      - "12"
+      - "234"
+    correctIndex: 1
+    explanation: "Numărul total e produsul dimensiunilor: 2 × 3 × 4 = 24 de elemente, fiecare un `int`."
+  - question: "Care e riscul principal când mărești numărul de dimensiuni?"
+    options:
+      - "Codul nu mai compilează"
+      - "Memoria crește ca produs al dimensiunilor și poate exploda rapid"
+      - "Indicii devin automat greșiți"
+      - "Nu poți parcurge tabloul"
+    correctIndex: 1
+    explanation: "Memoria e produsul tuturor dimensiunilor. `int a[100][100][100]` înseamnă un milion de elemente — 4 MB. Mai multe dimensiuni sau dimensiuni mai mari pot depăși limita de memorie."
+---
+
+<LessonHook>
+O matrice e o tablă de șah: rând și coloană. Un tablou tridimensional e un bloc de apartamente: etaj, apartament, cameră. Adaugi o dimensiune de fiecare dată când ai nevoie de încă o coordonată ca să nimerești exact locul dorit.
+</LessonHook>
+
+## De la matrice la mai multe dimensiuni
+
+Un **vector** are o coordonată (`v[i]`), o **matrice** are două (`a[i][j]`). Un tablou multidimensional adaugă coordonate suplimentare:
+
+```cpp
+int v[10];          // 1D: o coordonata
+int a[10][10];      // 2D: linie, coloana
+int c[10][10][10];  // 3D: strat, linie, coloana
+```
+
+Accesul urmează același tipar: câte un index în paranteze pătrate pentru fiecare dimensiune.
+
+## Când ai nevoie de o dimensiune în plus
+
+Adaugi o dimensiune când fiecare element are nevoie de încă un „criteriu" ca să fie identificat unic:
+
+- **3D**: o grilă care se schimbă în timp → `stare[t][i][j]` (momentul `t`, linia `i`, coloana `j`).
+- **DP cu mai mulți parametri**: `dp[i][j][k]` — la concursuri, când starea depinde de trei mărimi.
+- **Coordonate + atribut**: `harta[i][j][culoare]`.
+
+<ObservationBox>
+Fiecare dimensiune nouă înmulțește memoria. `a[100][100]` are 10.000 elemente; `a[100][100][100]` are 1.000.000. Verifică mereu produsul dimensiunilor înainte să declari.
+</ObservationBox>
+
+## Cum stă în memorie
+
+În C++, tablourile se stochează „row-major": ultimul index variază cel mai repede. Un `a[2][3]` e așezat liniar așa:
+
+<ArrayDiagram
+  values="a00 a01 a02 a10 a11 a12"
+  index="0 1 2 3 4 5"
+  caption="a[2][3] în memorie: întâi tot rândul 0, apoi tot rândul 1. Ultimul index (coloana) se schimbă cel mai des." />
+
+De aceea, ca să fie rapid, parcurge tabloul în ordinea în care stă în memorie: bucla pe ultimul index în interior.
+
+## Parcurgerea cu bucle imbricate
+
+Câte o buclă pentru fiecare dimensiune, cea mai interioară pe ultimul index:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int c[2][3][4];
+
+    // initializare: c[i][j][k] = i*100 + j*10 + k
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 3; j++)
+            for (int k = 0; k < 4; k++)
+                c[i][j][k] = i*100 + j*10 + k;
+
+    cout << c[1][2][3] << "\n";  // 123
+
+    // suma tuturor elementelor
+    long long suma = 0;
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 3; j++)
+            for (int k = 0; k < 4; k++)
+                suma += c[i][j][k];
+    cout << suma << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Aspect | Valoare |
+|--------|---------|
+| memorie | O(d₁ · d₂ · … · dₖ) (produsul dimensiunilor) |
+| parcurgere completă | O(d₁ · d₂ · … · dₖ) |
+| acces la un element | O(1) |
+
+<MistakeBox>
+Capcane la tablouri multidimensionale:
+
+- **Dimensiuni prea mari**: produsul depășește memoria disponibilă (de obicei zeci–sute de MB). `int a[1000][1000][1000]` e imposibil.
+- **Ordinea buclelor inversată**: parcurgi „pe coloane" în memorie row-major → mult mai lent din cauza accesului neîncadrat în cache.
+- **Confuzi sintaxa**: `a[i, j, k]` nu înseamnă acces 3D în C++ (`,` e operatorul virgulă). Corect: `a[i][j][k]`.
+- **Tablou local imens în `main`**: depășește stiva și dă crash. Declară tablourile mari global.
+</MistakeBox>
+
+## Recapitulare
+
+- Adaugi o dimensiune când fiecare element are nevoie de încă o coordonată; sintaxa e `a[i][j][k]...`.
+- Memoria e produsul dimensiunilor și crește exploziv — verific-o înainte de declarare.
+- Parcurge în ordine row-major (ultimul index în bucla interioară) și declară tablourile mari global.

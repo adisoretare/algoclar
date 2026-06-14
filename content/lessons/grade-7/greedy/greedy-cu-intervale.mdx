@@ -1,0 +1,143 @@
+---
+title: "Probleme Greedy cu intervale — cele mai multe activități"
+slug: greedy-cu-intervale
+grade: 7
+chapter: greedy
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["greedy", "intervale", "activitati"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pentru a alege cât mai multe activități care nu se suprapun, după ce criteriu sortezi?"
+    options:
+      - "După începutul activității, crescător"
+      - "După sfârșitul activității, crescător"
+      - "După durată, crescător"
+      - "După durată, descrescător"
+    correctIndex: 1
+    explanation: "Sortarea după timpul de sfârșit funcționează: alegând mereu activitatea care se termină cel mai devreme, eliberezi resursa cât mai repede și lași loc maxim pentru următoarele."
+  - question: "Când poți adăuga următoarea activitate în soluție?"
+    options:
+      - "Dacă începutul ei este după (sau egal cu) sfârșitul ultimei activități alese"
+      - "Dacă are durata cea mai mică"
+      - "Mereu, indiferent de suprapunere"
+      - "Dacă se termină după ultima aleasă"
+    correctIndex: 0
+    explanation: "O activitate e compatibilă dacă nu se suprapune cu ultima aleasă: începutul ei trebuie să fie ≥ sfârșitul ultimei selectate."
+  - question: "De ce nu funcționează sortarea după durata cea mai mică?"
+    options:
+      - "Pentru că e prea lentă"
+      - "O activitate scurtă plasată prost poate bloca două activități mai lungi compatibile între ele"
+      - "Pentru că duratele pot fi egale"
+      - "Funcționează întotdeauna, de fapt"
+    correctIndex: 1
+    explanation: "Lungimea nu spune nimic despre poziție. O activitate scurtă, dar plasată la mijloc, poate intersecta două activități lungi care altfel ar fi încăput amândouă."
+---
+
+<LessonHook>
+O singură sală de sport, multe echipe care vor s-o folosească în intervale fixe. Vrei să programezi cât mai multe antrenamente fără suprapuneri. Trucul: alege mereu antrenamentul care se termină cel mai devreme — eliberezi sala repede și încap mai multe.
+</LessonHook>
+
+## Problema selecției activităților
+
+Ai `n` activități, fiecare cu un interval `[început, sfârșit]`. Două activități sunt compatibile dacă nu se suprapun. Vrei să alegi **numărul maxim** de activități compatibile.
+
+## Criteriul corect: sfârșitul cel mai devreme
+
+Sortezi activitățile **crescător după sfârșit**. Apoi parcurgi și iei fiecare activitate care nu se suprapune cu ultima aleasă.
+
+<ObservationBox>
+Intuiția: terminând cât mai devreme, lași cel mai mult timp liber pentru activitățile rămase. Orice altă primă alegere ar elibera resursa mai târziu — deci nu poate duce la mai multe activități.
+</ObservationBox>
+
+## De ce nu „cea mai scurtă" sau „cea care începe prima"
+
+- **Cea mai scurtă**: o activitate scurtă la mijloc poate tăia două lungi compatibile între ele.
+- **Care începe prima**: o activitate care începe devreme dar ține mult blochează tot intervalul.
+
+Doar „sfârșitul cel mai devreme" rezistă la contraexemple.
+
+## Exemplu pas cu pas
+
+Activități (început–sfârșit): `A(1-4)`, `B(3-5)`, `C(0-6)`, `D(5-7)`, `E(3-9)`, `F(8-9)`.
+
+Sortate după sfârșit: `A(4), B(5), C(6), D(7), E(9), F(9)`. Sfârșiturile, ca diagramă:
+
+<ArrayDiagram
+  values="4 5 6 7 9 9"
+  index="A B C D E F"
+  caption="Activitățile sortate crescător după timpul de sfârșit." />
+
+Parcurgere Greedy:
+
+```
+ultimul_sfarsit = -inf
+A(1-4): 1 >= -inf -> iau A, ultimul = 4
+B(3-5): 3 <  4    -> sar (se suprapune)
+C(0-6): 0 <  4    -> sar
+D(5-7): 5 >= 4    -> iau D, ultimul = 7
+E(3-9): 3 <  7    -> sar
+F(8-9): 8 >= 7    -> iau F, ultimul = 9
+```
+
+Soluție: `A, D, F` — 3 activități, maximul posibil.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct Activitate {
+    int inceput, sfarsit;
+};
+
+bool dupaSfarsit(const Activitate &a, const Activitate &b) {
+    return a.sfarsit < b.sfarsit;   // crescator dupa sfarsit
+}
+
+int main() {
+    Activitate v[6] = {{1,4},{3,5},{0,6},{5,7},{3,9},{8,9}};
+    int n = 6;
+
+    sort(v, v + n, dupaSfarsit);
+
+    int alese = 0, ultimulSfarsit = -1000000000;
+    for (int i = 0; i < n; i++) {
+        if (v[i].inceput >= ultimulSfarsit) {   // compatibila
+            alese++;
+            ultimulSfarsit = v[i].sfarsit;
+        }
+    }
+
+    cout << alese << "\n";   // 3
+    return 0;
+}
+```
+
+## Complexitate
+
+| Etapă | Timp | Spațiu |
+|-------|------|--------|
+| sortare după sfârșit | O(n log n) | O(log n) |
+| parcurgere Greedy | O(n) | O(1) |
+
+<MistakeBox>
+Capcane la Greedy cu intervale:
+
+- **Sortare după început sau durată**: nu dă optimul. Sortează după sfârșit.
+- **Condiție de suprapunere greșită**: compatibilă înseamnă `inceput >= ultimulSfarsit`. Dacă intervalele care se ating la capete nu se consideră suprapuse, păstrează `>=`; dacă se consideră, folosește `>`.
+- **Inițializare `ultimulSfarsit` greșită**: pornește de la un număr foarte mic ca prima activitate să fie mereu acceptată.
+- **Ții intervalele în vectori paraleli**: sortarea le desincronizează. Folosește o structură.
+</MistakeBox>
+
+## Recapitulare
+
+- Pentru numărul maxim de activități compatibile, sortează crescător după sfârșit și ia pe rând cele care nu se suprapun.
+- O activitate e compatibilă dacă începe la sau după sfârșitul ultimei alese.
+- Criteriile „cea mai scurtă" sau „începe prima" cad la contraexemple; doar „sfârșitul cel mai devreme" e corect.

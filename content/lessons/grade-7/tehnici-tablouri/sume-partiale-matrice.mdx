@@ -1,0 +1,148 @@
+---
+title: "Sume parțiale în matrice — suma oricărui dreptunghi în O(1)"
+slug: sume-partiale-matrice
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["sume-partiale", "matrice", "prefixe-2d"]
+visualizers: ["prefix-sums-2d"]
+relatedProblems: []
+quiz:
+  - question: "Ce stochează `S[i][j]` în matricea de sume parțiale 2D?"
+    options:
+      - "Valoarea `a[i][j]`"
+      - "Suma tuturor elementelor din dreptunghiul de la (1,1) la (i,j)"
+      - "Suma de pe linia i"
+      - "Maximul submatricei"
+    correctIndex: 1
+    explanation: "`S[i][j]` e suma întregului dreptunghi cu colțul stânga-sus (1,1) și colțul dreapta-jos (i,j). Cu el răspunzi la orice interogare de submatrice."
+  - question: "De ce apare termenul `+ S[i-1][j-1]` în formula de construire?"
+    options:
+      - "Ca să eviți overflow"
+      - "Pentru că zona de sus-stânga a fost scăzută de două ori și trebuie readăugată (incluziune-excluziune)"
+      - "Ca să incluzi diagonala"
+      - "E o greșeală, nu e necesar"
+    correctIndex: 1
+    explanation: "Adunând `S[i-1][j]` și `S[i][j-1]` numeri colțul comun de două ori. Readaugi `S[i-1][j-1]` o dată ca să corectezi — principiul includerii și excluderii."
+  - question: "Care e complexitatea unei interogări de sumă pe o submatrice, după ce ai construit S?"
+    options:
+      - "O(linii × coloane)"
+      - "O(linii + coloane)"
+      - "O(1)"
+      - "O(log n)"
+    correctIndex: 2
+    explanation: "Orice sumă de submatrice se obține din 4 valori ale lui S printr-o singură formulă — O(1) per interogare."
+---
+
+<LessonHook>
+Vrei să afli câți locuitori sunt într-un dreptunghi de pe hartă. Dacă ai deja, pentru fiecare punct, totalul din colțul stânga-sus până la el, nu mai numeri nimic: scazi și aduni patru colțuri și ai răspunsul instant. Asta sunt sumele parțiale 2D.
+</LessonHook>
+
+## Problema
+
+Ai o matrice `a` și multe întrebări de forma „care e suma elementelor din submatricea de la `(r1, c1)` la `(r2, c2)`?". Naiv, fiecare răspuns costă O(suprafață). Cu sume parțiale, după o pregătire O(linii×coloane), fiecare răspuns devine O(1).
+
+## Construirea matricei de sume parțiale
+
+Definim `S[i][j]` = suma dreptunghiului de la `(1,1)` la `(i,j)`. Lucrăm indexat de la 1, cu rândul și coloana 0 pline cu zero (santinele), ca să evităm cazuri speciale.
+
+Formula de construire:
+
+```
+S[i][j] = a[i][j] + S[i-1][j] + S[i][j-1] - S[i-1][j-1]
+```
+
+<ObservationBox>
+`S[i-1][j]` (banda de sus) și `S[i][j-1]` (banda din stânga) se suprapun pe colțul stânga-sus, numărat de două ori. De aceea scazi o dată `S[i-1][j-1]` — incluziune-excluziune.
+</ObservationBox>
+
+## Interogarea unei submatrice
+
+Suma dreptunghiului `(r1,c1)`–`(r2,c2)` se obține din patru valori ale lui `S`:
+
+```
+suma = S[r2][c2] - S[r1-1][c2] - S[r2][c1-1] + S[r1-1][c1-1]
+```
+
+Scazi banda de deasupra și banda din stânga, apoi readaugi colțul scăzut de două ori. Aceeași logică ca la construire, în sens invers.
+
+## Exemplu concret
+
+Matrice 3×3:
+
+```
+a = 1 2 3
+    4 5 6
+    7 8 9
+```
+
+Suma submatricei de la `(2,2)` la `(3,3)` (adică `5 6 / 8 9`) e `5+6+8+9 = 28`. Cu formula, după ce construiești `S`, obții direct `28` din patru valori.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 3, m = 3;
+    long long a[4][4] = {
+        {0,0,0,0},
+        {0,1,2,3},
+        {0,4,5,6},
+        {0,7,8,9}
+    };
+    long long S[4][4] = {0};   // rand si coloana 0 raman zero (santinele)
+
+    // construire
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            S[i][j] = a[i][j] + S[i-1][j] + S[i][j-1] - S[i-1][j-1];
+        }
+    }
+
+    // interogare: submatricea (2,2)-(3,3)
+    int r1 = 2, c1 = 2, r2 = 3, c2 = 3;
+    long long suma = S[r2][c2] - S[r1-1][c2] - S[r2][c1-1] + S[r1-1][c1-1];
+    cout << suma << "\n";   // 28
+    return 0;
+}
+```
+
+## Complexitate
+
+| Etapă | Timp | Spațiu |
+|-------|------|--------|
+| construire S | O(n·m) | O(n·m) |
+| o interogare | O(1) | O(1) |
+| q interogări naiv | O(q·n·m) | O(1) |
+| q interogări cu S | O(n·m + q) | O(n·m) |
+
+## Vizualizare
+
+Urmărește cum se construiește matricea de sume parțiale și cum cele patru colțuri dau răspunsul:
+
+<Visualizer name="prefix-sums-2d" />
+
+<HintBox>
+Folosește **←** și **→** pentru pași. Observă cele patru celule colorate care intră în formula de interogare.
+</HintBox>
+
+<MistakeBox>
+Capcane la sume parțiale 2D:
+
+- **Indexare de la 0 fără santinele**: termenii `S[i-1]` și `S[j-1]` ies din matrice. Lucrează de la 1, cu rândul/coloana 0 pe zero.
+- **Uiți `- S[r1-1][c1-1]` la interogare**: scazi de două ori colțul comun și obții rezultat greșit.
+- **Confuzi indicii interogării**: `r1,c1` e colțul stânga-sus (inclusiv), `r2,c2` cel dreapta-jos (inclusiv). Scăderile folosesc `r1-1` și `c1-1`.
+- **Overflow**: sumele de submatrice mari depășesc `int`. Folosește `long long`.
+</MistakeBox>
+
+## Recapitulare
+
+- `S[i][j]` = suma dreptunghiului de la (1,1) la (i,j); se construiește în O(n·m) cu incluziune-excluziune.
+- Orice sumă de submatrice se obține din 4 valori ale lui S, în O(1).
+- Folosește santinele (rând/coloană 0 pe zero) și `long long` pentru a evita erorile de indici și overflow.

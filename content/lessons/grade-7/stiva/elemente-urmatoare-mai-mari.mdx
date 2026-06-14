@@ -1,0 +1,151 @@
+---
+title: "Elemente următoare mai mari sau mai mici — stiva monotonă"
+slug: elemente-urmatoare-mai-mari
+grade: 7
+chapter: stiva
+difficulty: greu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["stiva", "monotona", "next-greater"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este o stivă monotonă?"
+    options:
+      - "O stivă care conține un singur element"
+      - "O stivă în care elementele rămân mereu ordonate (crescător sau descrescător) de la bază la vârf"
+      - "O stivă fără operația pop"
+      - "O stivă sortată la final"
+    correctIndex: 1
+    explanation: "Într-o stivă monotonă, înainte de fiecare push elimini elementele care ar strica ordinea, astfel încât conținutul rămâne mereu ordonat. Asta permite găsirea rapidă a vecinilor mai mari/mici."
+  - question: "Pentru problema „următorul element mai mare”, ce ții pe stivă?"
+    options:
+      - "Valorile deja procesate, în orice ordine"
+      - "Indici (sau valori) ale elementelor care încă își așteaptă următorul element mai mare"
+      - "Toate elementele vectorului"
+      - "Doar maximul"
+    correctIndex: 1
+    explanation: "Ții elementele „nerezolvate” — cele pentru care încă nu ai găsit un element mai mare la dreapta. Când apare unul mai mare, el rezolvă (și scoate) toate elementele mai mici din vârf."
+  - question: "Care e complexitatea totală a algoritmului cu stivă monotonă pentru n elemente?"
+    options:
+      - "O(n²)"
+      - "O(n), pentru că fiecare element intră și iese din stivă cel mult o dată"
+      - "O(n log n)"
+      - "O(1)"
+    correctIndex: 1
+    explanation: "Deși există o buclă interioară de pop, fiecare element e adăugat o dată și scos cel mult o dată pe tot parcursul. Suma operațiilor e O(n) — analiză amortizată."
+---
+
+<LessonHook>
+Stai la coadă și vrei să știi, pentru fiecare persoană, cine e prima persoană mai înaltă din fața ei. Naiv, te-ai uita înapoi la toți — lent. Mai isteț: ții o „stivă" doar cu cei care încă n-au găsit pe cineva mai înalt, și o cureți pe măsură ce înaintezi.
+</LessonHook>
+
+## Problema
+
+Pentru fiecare element al unui vector, găsește **următorul element mai mare** (primul element mai mare aflat la dreapta lui). Dacă nu există, răspunsul e `-1`.
+
+Exemplu: `v = {2, 1, 4, 3}`. Răspuns: `{4, 4, -1, -1}` (pentru 2 urmează 4; pentru 1 urmează 4; 4 și 3 n-au nimic mai mare la dreapta).
+
+Naiv: pentru fiecare element cauți la dreapta → O(n²). Cu o **stivă monotonă**, O(n).
+
+## Ideea stivei monotone
+
+Ții pe stivă elementele **încă nerezolvate** — cele care nu și-au găsit un element mai mare la dreapta. Parcurgi vectorul; la fiecare element nou:
+
+- cât timp vârful stivei e **mai mic** decât elementul curent, elementul curent e „următorul mai mare" pentru el → îl rezolvi și faci pop;
+- apoi pui elementul curent (indicele lui) pe stivă.
+
+<ObservationBox>
+Stiva rămâne mereu descrescătoare de la bază la vârf. Un element nou „mătură" din vârf toate valorile mai mici decât el — pentru toate, el este răspunsul. De aici câștigul de la O(n²) la O(n).
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`v = {2, 1, 4, 3}`, ținem indici pe stivă:
+
+```
+i=0 (2): stiva goala -> push 0          stiva(indici): [0]
+i=1 (1): v[varf]=2 > 1, nu pop -> push 1  stiva: [0,1]
+i=2 (4): v[1]=1 < 4 -> raspuns[1]=4, pop
+         v[0]=2 < 4 -> raspuns[0]=4, pop
+         push 2                          stiva: [2]
+i=3 (3): v[2]=4 > 3, nu pop -> push 3    stiva: [2,3]
+final: indicii ramasi (2,3) nu au urmator mai mare -> -1
+```
+
+Rezultat: `{4, 4, -1, -1}`.
+
+Vectorul de intrare și răspunsurile:
+
+<ArrayDiagram
+  values="2 1 4 3"
+  index="0 1 2 3"
+  caption="Vectorul de intrare v." />
+
+<ArrayDiagram
+  values="4 4 -1 -1"
+  index="0 1 2 3"
+  caption="Următorul element mai mare pentru fiecare poziție (-1 dacă nu există)." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int main() {
+    int v[4] = {2, 1, 4, 3};
+    int n = 4;
+    int raspuns[4];
+    stack<int> st;   // tine INDICI, nerezolvati
+
+    for (int i = 0; i < n; i++) {
+        // elementul curent rezolva toate valorile mai mici din varf
+        while (!st.empty() && v[st.top()] < v[i]) {
+            raspuns[st.top()] = v[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    // ce ramane nu are urmator mai mare
+    while (!st.empty()) {
+        raspuns[st.top()] = -1;
+        st.pop();
+    }
+
+    for (int i = 0; i < n; i++) cout << raspuns[i] << " ";  // 4 4 -1 -1
+    cout << "\n";
+    return 0;
+}
+```
+
+## Varianta „mai mic"
+
+Pentru **următorul element mai mic**, inversezi comparația: scoți din vârf cât timp `v[varf] > v[i]`. Stiva devine crescătoare. Aceeași schemă, alt semn.
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|--------|------|--------|
+| naivă | O(n²) | O(1) |
+| stivă monotonă | O(n) | O(n) |
+
+Deși există o buclă `while` interioară, fiecare element intră și iese din stivă cel mult o dată — analiză amortizată O(n).
+
+<MistakeBox>
+Capcane la stiva monotonă:
+
+- **Ții valori în loc de indici**: dacă vrei și poziția răspunsului, păstrează indici pe stivă, nu doar valori.
+- **Comparație greșită**: pentru „mai mare" scoți cât `v[varf] < v[i]`; pentru „mai mic", `v[varf] > v[i]`. Inversarea dă rezultatul opus.
+- **Uiți elementele rămase**: indicii rămași pe stivă la final nu au răspuns — setează-i pe `-1`.
+- **Crezi că e O(n²) din cauza buclei interne**: nu e; fiecare element se scoate o singură dată, deci total O(n).
+</MistakeBox>
+
+## Recapitulare
+
+- O stivă monotonă păstrează elementele ordonate eliminând, înainte de push, ce ar strica ordinea.
+- Pentru „următorul mai mare", ții indici nerezolvați; un element nou rezolvă și scoate toate valorile mai mici din vârf.
+- Complexitate O(n) amortizat — fiecare element intră și iese cel mult o dată; setează `-1` pentru cei rămași.

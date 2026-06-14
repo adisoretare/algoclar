@@ -1,0 +1,132 @@
+---
+title: "lower_bound — prima poziție ≥ valoare"
+slug: lower-bound
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "lower-bound", "cautare"]
+visualizers: ["cautare-binara"]
+relatedProblems: []
+quiz:
+  - question: "Ce returnează `lower_bound(v, v+n, x)`?"
+    options:
+      - "`true` dacă x există"
+      - "Un iterator spre primul element ≥ x"
+      - "Un iterator spre primul element > x"
+      - "Poziția ultimului element egal cu x"
+    correctIndex: 1
+    explanation: "`lower_bound` găsește primul element care NU e mai mic decât x, adică primul element ≥ x. Întoarce un iterator (pointer) spre el."
+  - question: "Cum obții indexul (poziția) din rezultatul lui `lower_bound` pe un vector clasic?"
+    options:
+      - "Direct, e deja un index"
+      - "Scazi începutul vectorului: `lower_bound(v, v+n, x) - v`"
+      - "Folosești `.size()`"
+      - "Nu se poate obține indexul"
+    correctIndex: 1
+    explanation: "Rezultatul e un pointer. Scăzând începutul vectorului (`- v`) obții poziția numerică: `int poz = lower_bound(v, v+n, x) - v;`."
+  - question: "Ce înseamnă dacă `lower_bound` întoarce `v + n` (capătul vectorului)?"
+    options:
+      - "x se află pe ultima poziție"
+      - "Toate elementele sunt mai mici decât x — niciunul nu e ≥ x"
+      - "Vectorul e gol"
+      - "x e pe prima poziție"
+    correctIndex: 1
+    explanation: "Dacă niciun element nu e ≥ x, rezultatul „cade” după ultimul element, adică `v + n`. Verifică acest caz înainte de a dereferenția."
+---
+
+<LessonHook>
+Într-o sală de cinema cu locuri numerotate crescător, vrei primul scaun liber cu numărul cel puțin 50. Nu te uiți la toate — sari direct la zona 50 și iei primul de acolo în sus. `lower_bound` face exact această săritură, prin căutare binară.
+</LessonHook>
+
+## Ce face `lower_bound`
+
+Pe un vector **sortat**, `lower_bound` găsește **prima poziție unde elementul este ≥ x** (primul element care nu e mai mic decât x). Întoarce un iterator (pe vector clasic, un pointer) spre acel element.
+
+```cpp
+int *p = lower_bound(v, v + n, x);
+```
+
+Spre deosebire de `binary_search` (care zice doar dacă x există), `lower_bound` îți dă **locul**.
+
+<ObservationBox>
+„Lower bound" = marginea de jos a zonei valorilor ≥ x. Dacă x există, e prima lui apariție; dacă nu, e locul unde *ar trebui* inserat ca vectorul să rămână sortat.
+</ObservationBox>
+
+## De la pointer la index
+
+Rezultatul e un pointer. Pe un vector clasic, scazi începutul ca să obții poziția numerică:
+
+```cpp
+int poz = lower_bound(v, v + n, x) - v;   // index 0-based
+```
+
+## Exemplu concret
+
+Vectorul sortat `v = {2, 4, 4, 6, 8}`. Câteva cazuri:
+
+```
+lower_bound(..., 4)  -> poz 1  (prima aparitie a lui 4)
+lower_bound(..., 5)  -> poz 3  (primul >= 5 este 6)
+lower_bound(..., 1)  -> poz 0  (toate sunt >= 1)
+lower_bound(..., 9)  -> poz 5  (= n, niciunul >= 9)
+```
+
+Observă cazul `5`: nu există în vector, dar `lower_bound` îți dă locul unde s-ar insera.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int v[5] = {2, 4, 4, 6, 8};   // SORTAT
+    int n = 5;
+
+    int poz = lower_bound(v, v + n, 5) - v;
+    cout << poz << "\n";   // 3
+
+    // verificare daca x exista chiar la acea pozitie
+    int x = 4;
+    int *p = lower_bound(v, v + n, x);
+    if (p != v + n && *p == x)
+        cout << "exista pe pozitia " << (p - v) << "\n";  // exista pe pozitia 1
+    else
+        cout << "nu exista\n";
+    return 0;
+}
+```
+
+`binary_search` se poate exprima prin `lower_bound`: x există dacă poziția e validă și elementul de acolo e chiar x.
+
+## Aplicații tipice
+
+- **Câte elemente sunt < x**: chiar `lower_bound(...) - v`.
+- **Verificare existență + poziție**: combinația de mai sus.
+- **Inserare ordonată**: locul corect e exact `lower_bound`.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `lower_bound` | O(log n) | O(1) |
+
+<MistakeBox>
+Capcane la `lower_bound`:
+
+- **Vector nesortat**: rezultat nedefinit. Sortează întâi.
+- **Dereferențiezi `v + n`**: dacă toate elementele sunt < x, `lower_bound` întoarce capătul. `*p` acolo e acces invalid. Verifică `p != v + n` înainte.
+- **Confuzi „există" cu „poziția"**: `lower_bound` dă locul primului ≥ x, nu garantează că x e acolo. Confirmă cu `*p == x`.
+- **Uiți `- v`**: rezultatul e un pointer, nu un index. Pentru poziție numerică scazi începutul.
+</MistakeBox>
+
+## Recapitulare
+
+- `lower_bound` întoarce un iterator spre primul element ≥ x, pe vector sortat, în O(log n).
+- Pentru index scazi începutul (`- v`); pentru existență verifici `p != v+n && *p == x`.
+- Dacă niciun element nu e ≥ x, rezultatul e capătul `v + n` — tratează acest caz înainte de a dereferenția.

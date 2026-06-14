@@ -1,0 +1,144 @@
+---
+title: "Secvența de sumă maximă — algoritmul lui Kadane"
+slug: secventa-suma-maxima
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["kadane", "secventa", "suma-maxima"]
+visualizers: ["kadane"]
+relatedProblems: []
+quiz:
+  - question: "Ce decide algoritmul lui Kadane la fiecare element?"
+    options:
+      - "Dacă să sorteze vectorul"
+      - "Dacă extinde secvența curentă sau o ia de la capăt cu elementul curent"
+      - "Dacă elimină elementul"
+      - "Dacă elementul e prim"
+    correctIndex: 1
+    explanation: "La fiecare pas alegi maximul dintre `v[i]` (pornești secvență nouă) și `sumaCurenta + v[i]` (extinzi secvența). Asta e esența lui Kadane."
+  - question: "Cu ce inițializezi răspunsul `maxim` ca să funcționeze și pe vectori cu toate elementele negative?"
+    options:
+      - "Cu 0"
+      - "Cu primul element `v[0]`"
+      - "Cu cel mai mare int posibil"
+      - "Cu suma totală"
+    correctIndex: 1
+    explanation: "Dacă inițializezi cu 0, pe un vector cu toate negativele răspunzi greșit 0 (secvență vidă). Inițializează cu `v[0]` pentru a forța cel puțin un element."
+  - question: "Care e complexitatea algoritmului lui Kadane?"
+    options:
+      - "O(n²)"
+      - "O(n log n)"
+      - "O(n)"
+      - "O(1)"
+    correctIndex: 2
+    explanation: "O singură parcurgere a vectorului, cu decizii O(1) la fiecare pas. Total O(n) timp și O(1) spațiu suplimentar."
+---
+
+<LessonHook>
+Urmărești soldul contului zi de zi. Dacă datoria adunată până acum te trage în jos mai mult decât câștigi azi, e mai bine să „uiți" trecutul și să pornești socoteala de azi. Așa găsești cea mai profitabilă perioadă continuă — exact ce face algoritmul lui Kadane.
+</LessonHook>
+
+## Problema
+
+Ai un vector cu numere (pozitive și negative). Cauți **subsecvența continuă** cu suma cea mai mare.
+
+Exemplu: `v = {-2, 1, -3, 4, -1, 2, 1, -5, 4}`. Răspunsul e secvența `{4, -1, 2, 1}` cu suma `6`.
+
+Naiv: încerci toate perechile (start, final) → O(n²). Kadane face același lucru în O(n).
+
+## Ideea lui Kadane
+
+Parcurgi vectorul ținând o `sumaCurenta` a celei mai bune secvențe care se termină în poziția curentă. La fiecare element ai o singură decizie:
+
+```
+sumaCurenta = max(v[i], sumaCurenta + v[i])
+```
+
+- Dacă `sumaCurenta + v[i]` e mai mare → **extinzi** secvența cu `v[i]`.
+- Dacă `v[i]` singur e mai mare → secvența veche te trăgea în jos, deci **pornești de la capăt** cu `v[i]`.
+
+Răspunsul final e cel mai mare `sumaCurenta` văzut pe parcurs.
+
+<ObservationBox>
+Intuiția cheie: dacă suma acumulată a devenit negativă, nu te mai ajută cu nimic — orice secvență viitoare e mai bună fără ea. De aceea „uiți" trecutul și reporneșți.
+</ObservationBox>
+
+## Pas cu pas
+
+Pe `v = {-2, 1, -3, 4, -1, 2, 1, -5, 4}`:
+
+```
+i=0: v=-2  curent = -2            max = -2
+i=1: v= 1  curent = max(1,-2+1)=1 max =  1
+i=2: v=-3  curent = max(-3,1-3)=-2 max = 1
+i=3: v= 4  curent = max(4,-2+4)=4 max =  4
+i=4: v=-1  curent = max(-1,4-1)=3 max =  4
+i=5: v= 2  curent = max(2,3+2)=5  max =  5
+i=6: v= 1  curent = max(1,5+1)=6  max =  6
+i=7: v=-5  curent = max(-5,6-5)=1 max =  6
+i=8: v= 4  curent = max(4,1+4)=5  max =  6
+```
+
+Răspuns: `6`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[9] = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+    int n = 9;
+
+    long long curent = v[0];   // secventa curenta
+    long long maxim = v[0];    // initializat cu v[0], nu cu 0
+    for (int i = 1; i < n; i++) {
+        curent = max((long long)v[i], curent + v[i]);
+        maxim = max(maxim, curent);
+    }
+
+    cout << maxim << "\n";   // 6
+    return 0;
+}
+```
+
+## Reținerea capetelor secvenței (opțional)
+
+Dacă vrei și pozițiile, reții `start` și `final`: când pornești secvență nouă (`v[i] > curent + v[i]`), setezi un `startTemp = i`; când actualizezi maximul, salvezi `start = startTemp`, `final = i`.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| oricare | O(n) | O(1) |
+| varianta naivă | O(n²) | O(1) |
+
+<MistakeBox>
+Capcane la Kadane:
+
+- **Inițializezi `maxim` cu 0**: pe un vector cu toate elementele negative, răspunzi greșit `0`. Inițializează cu `v[0]`.
+- **Pornești bucla de la `i = 0`** după ce ai pus deja `curent = v[0]`: dublezi primul element. Pornește de la `i = 1`.
+- **Overflow**: cu multe valori mari, suma depășește `int`. Folosește `long long`.
+- **Confuzi subsecvență continuă cu subșir**: Kadane cere elemente *consecutive*. Pentru subșiruri (cu sărituri) e altă problemă.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum se extinde sau repornește secvența la fiecare pas:
+
+<Visualizer name="kadane" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa. Observă momentele în care suma curentă „uită" trecutul și pornește de la zero.
+</HintBox>
+
+## Recapitulare
+
+- Kadane găsește subsecvența continuă de sumă maximă într-o singură parcurgere O(n).
+- Decizia la fiecare pas: `curent = max(v[i], curent + v[i])`; răspunsul e maximul acestor valori.
+- Inițializează `maxim` cu `v[0]` (nu cu 0) ca să tratezi corect vectorii doar cu numere negative.

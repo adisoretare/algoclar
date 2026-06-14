@@ -1,0 +1,148 @@
+---
+title: "Prefixe și sufixe pe linii și coloane"
+slug: prefixe-sufixe-matrice
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["prefixe", "sufixe", "matrice"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce stochează un vector de prefixe `pre` pentru o linie?"
+    options:
+      - "Suma sau extremul de la început până la fiecare poziție"
+      - "Doar primul element"
+      - "Elementele sortate"
+      - "Suma întregii linii în fiecare poziție"
+    correctIndex: 0
+    explanation: "Un prefix acumulează informația de la stânga: `pre[j]` rezumă elementele de la 0 la j (sumă, maxim, minim, după problemă)."
+  - question: "De ce calculezi separat un prefix (de la stânga) și un sufix (de la dreapta)?"
+    options:
+      - "Ca să sortezi linia"
+      - "Ca să răspunzi în O(1) la întrebări care au nevoie de informația din ambele părți ale unei poziții"
+      - "Pentru că prefixul singur e mereu greșit"
+      - "Ca să economisești memorie"
+    correctIndex: 1
+    explanation: "Multe probleme cer „ce e în stânga lui i” și „ce e în dreapta lui i” deodată. Prefixul dă stânga, sufixul dă dreapta, ambele precalculate."
+  - question: "Cum extinzi tehnica de la o linie la o matrice întreagă?"
+    options:
+      - "Nu se poate extinde"
+      - "Aplici prefixe/sufixe pe fiecare linie și, dacă e nevoie, și pe fiecare coloană"
+      - "Sortezi toată matricea"
+      - "Calculezi un singur prefix global"
+    correctIndex: 1
+    explanation: "Tratezi fiecare linie ca un vector independent (prefixe/sufixe pe linie); analog pe coloane. Așa obții, pentru fiecare celulă, rezumate în toate cele patru direcții."
+---
+
+<LessonHook>
+Mergi pe un coridor cu uși numerotate și vrei să știi, din orice punct, care e cea mai înaltă persoană întâlnită până acum (în spate) și care urmează în față. Dacă notezi pe măsură ce mergi „maximul de până aici" și separat, mergând invers, „maximul de aici încolo", răspunzi instant din orice poziție. Astea sunt prefixele și sufixele.
+</LessonHook>
+
+## Ce sunt prefixele și sufixele?
+
+Un **prefix** rezumă informația de la începutul vectorului până la fiecare poziție. Un **sufix** o rezumă de la sfârșit înapoi. „Informația" poate fi sumă, maxim, minim, produs — depinde de problemă.
+
+Pentru o linie `v`:
+
+```
+pre[j] = rezumat(v[0], v[1], ..., v[j])     // de la stanga
+suf[j] = rezumat(v[j], v[j+1], ..., v[n-1]) // de la dreapta
+```
+
+<ObservationBox>
+Le calculezi printr-o singură parcurgere fiecare: `pre[j] = combina(pre[j-1], v[j])`, iar `suf[j] = combina(suf[j+1], v[j])`. Total O(n) pentru ambele.
+</ObservationBox>
+
+## Exemplu: maxim pe prefix și pe sufix
+
+Linia `v = {3, 1, 4, 2, 5}`. Maximul pe prefix și pe sufix:
+
+<ArrayDiagram
+  values="3 1 4 2 5"
+  index="0 1 2 3 4"
+  caption="Linia originală v." />
+
+Prefix-maxim (cel mai mare element de la 0 până la fiecare poziție):
+
+<ArrayDiagram
+  values="3 3 4 4 5"
+  index="0 1 2 3 4"
+  caption="preMax[j] = max(v[0..j]). Crește sau rămâne constant spre dreapta." />
+
+Sufix-maxim (cel mai mare element de la fiecare poziție până la final):
+
+<ArrayDiagram
+  values="5 5 5 5 5"
+  index="0 1 2 3 4"
+  caption="sufMax[j] = max(v[j..n-1]). Aici 5 e maximul global, deci domină peste tot." />
+
+## La ce folosesc împreună
+
+Multe probleme întreabă ceva ce depinde de **ambele părți** ale unei poziții. Exemplu: „pentru fiecare `i`, care e maximul din vector ignorând `v[i]`?". Răspuns în O(1) per poziție:
+
+```
+raspuns[i] = max(preMax[i-1], sufMax[i+1])
+```
+
+Fără prefixe/sufixe ar fi O(n) per întrebare → O(n²) total. Cu ele, O(n).
+
+## Extinderea la matrice
+
+Tratezi fiecare **linie** ca un vector și calculezi prefixe/sufixe pe ea. La nevoie faci la fel pe fiecare **coloană**. Astfel, pentru orice celulă, ai rezumate în cele patru direcții (stânga, dreapta, sus, jos) — util la probleme de vizibilitate, „cea mai apropiată valoare mai mare", baleieri pe matrice.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[5] = {3, 1, 4, 2, 5};
+    int n = 5;
+    int preMax[5], sufMax[5];
+
+    preMax[0] = v[0];
+    for (int j = 1; j < n; j++)
+        preMax[j] = max(preMax[j-1], v[j]);   // prefix de la stanga
+
+    sufMax[n-1] = v[n-1];
+    for (int j = n-2; j >= 0; j--)
+        sufMax[j] = max(sufMax[j+1], v[j]);   // sufix de la dreapta
+
+    // maximul vectorului fara v[i], pentru fiecare i
+    for (int i = 0; i < n; i++) {
+        int st = (i > 0)   ? preMax[i-1] : -1000000000;
+        int dr = (i < n-1) ? sufMax[i+1] : -1000000000;
+        cout << max(st, dr) << " ";   // 5 5 5 5 4
+    }
+    cout << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| construire prefix + sufix (o linie) | O(n) | O(n) |
+| toată matricea (linii și coloane) | O(n·m) | O(n·m) |
+| o interogare după precalcul | O(1) | O(1) |
+
+<MistakeBox>
+Capcane la prefixe și sufixe:
+
+- **Indici la capete**: `preMax[i-1]` la `i=0` și `sufMax[i+1]` la `i=n-1` ies din vector. Tratează capetele cu o valoare neutră (−∞ pentru maxim, +∞ pentru minim, 0 pentru sumă).
+- **Direcția greșită la sufix**: sufixul se calculează de la dreapta la stânga (`j` descrescător). Dacă-l calculezi crescător, obții tot un prefix.
+- **Valoare neutră greșită**: pentru maxim folosește un număr foarte mic, nu 0 (vectorul poate avea negative).
+- **Confuzi cu sume parțiale**: prefixele de sumă permit suma pe interval prin scădere; prefixele de maxim NU — maximul nu se „scade". Alege rezumatul potrivit problemei.
+</MistakeBox>
+
+## Recapitulare
+
+- Prefixul rezumă de la stânga, sufixul de la dreapta; fiecare se calculează în O(n).
+- Împreună răspund în O(1) la întrebări care depind de ambele părți ale unei poziții.
+- În matrice aplici tehnica pe linii și/sau coloane; atenție la capete și la valoarea neutră.

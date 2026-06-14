@@ -1,0 +1,117 @@
+---
+title: "Aplicații specifice ale stivei"
+slug: aplicatii-stiva
+grade: 7
+chapter: stiva
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["stiva", "aplicatii", "lifo"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce semnal îți spune că o problemă se rezolvă cu o stivă?"
+    options:
+      - "Ai nevoie de acces aleator la elemente"
+      - "Trebuie să te întorci la cel mai recent element nerezolvat / să inversezi o ordine"
+      - "Datele sunt deja sortate"
+      - "Trebuie să cauți binar"
+    correctIndex: 1
+    explanation: "Stiva strălucește când contează cel mai recent element încă neînchis: paranteze, parcurgeri, anulări, evaluări de expresii. Toate cer „revino la ultimul nerezolvat”."
+  - question: "Cum inversezi o secvență folosind o stivă?"
+    options:
+      - "O sortezi descrescător"
+      - "Pui toate elementele cu push, apoi le scoți cu pop"
+      - "O parcurgi o singură dată"
+      - "Folosești două cozi"
+    correctIndex: 1
+    explanation: "Punând toate elementele pe stivă și scoțându-le, ies în ordine inversă (LIFO). E cel mai simplu mod de a inversa o secvență."
+  - question: "De ce e potrivită stiva pentru funcția Undo dintr-un editor?"
+    options:
+      - "Pentru că anulezi mereu cea mai recentă acțiune, adică ultima intrată"
+      - "Pentru că acțiunile sunt sortate alfabetic"
+      - "Pentru că ocupă puțină memorie"
+      - "Pentru că nu are nevoie de pop"
+    correctIndex: 0
+    explanation: "Undo anulează ultima acțiune făcută — exact comportamentul LIFO. Fiecare acțiune se pune pe stivă, iar Undo scoate vârful."
+---
+
+<LessonHook>
+Citești o carte și pui semne de carte de fiecare dată când deschizi o paranteză din poveste (un flashback, o digresiune). Când se închide, scoți ultimul semn pus. Creierul tău folosește o stivă ca să țină minte „unde am rămas" — și la fel fac multe programe.
+</LessonHook>
+
+## Când să te gândești la o stivă
+
+Stiva e unealta potrivită când:
+- contează **cel mai recent** element încă „deschis" / nerezolvat;
+- trebuie să **inversezi** o ordine;
+- trebuie să **revii pe pași** (înapoi, anulare).
+
+<ObservationBox>
+Semnalul mental: „am nevoie să mă întorc la ultimul lucru pe care l-am început și nu l-am terminat". Acel „ultimul nerezolvat" e exact vârful unei stive.
+</ObservationBox>
+
+## Aplicația 1: inversarea unei secvențe
+
+Pui totul cu push, scoți totul cu pop → ordine inversă:
+
+```cpp
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int main() {
+    int v[5] = {1, 2, 3, 4, 5};
+    stack<int> s;
+    for (int i = 0; i < 5; i++) s.push(v[i]);
+    while (!s.empty()) {
+        cout << s.top() << " ";   // 5 4 3 2 1
+        s.pop();
+    }
+    cout << "\n";
+    return 0;
+}
+```
+
+## Aplicația 2: stiva apelurilor (recursivitate)
+
+Fiecare apel recursiv se pune pe stiva apelurilor; când o funcție se termină, se scoate de sus. Recursivitatea *este* o stivă administrată automat de calculator. De aceea o recursivitate prea adâncă dă **stack overflow** — stiva apelurilor se umple.
+
+## Aplicația 3: evaluarea expresiilor
+
+La evaluarea expresiilor cu paranteze și operatori, o stivă ține operanzii sau operatorii încă neprocesați. Când întâlnești un operator, scoți de pe stivă operanzii de care ai nevoie. Forma postfixată (poloneză inversă) se evaluează direct cu o singură stivă.
+
+## Aplicația 4: anularea (Undo)
+
+Fiecare acțiune a utilizatorului se pune pe o stivă. La Undo, scoți vârful (ultima acțiune) și o anulezi. Comportamentul „anulează cea mai recentă" e LIFO pur.
+
+## Tiparul comun
+
+Aproape toate aplicațiile urmează același schelet:
+
+```cpp
+stack<...> s;
+for (fiecare element din intrare) {
+    if (elementul "deschide" ceva) s.push(...);
+    else if (elementul "inchide" ceva) {
+        // foloseste / verifica s.top(), apoi s.pop()
+    }
+}
+```
+
+<MistakeBox>
+Capcane la aplicațiile stivei:
+
+- **Folosești stiva când ai nevoie de acces aleator**: dacă trebuie să atingi elemente din mijloc, stiva nu e potrivită — folosește un vector.
+- **Uiți să verifici `empty()` înainte de `top()`/`pop()`**: în aplicații (paranteze, expresii) stiva se poate goli neașteptat. Verifică mereu.
+- **Confuzi stiva cu coada**: pentru „primul venit, primul servit" (procesare în ordine) ai nevoie de coadă, nu de stivă.
+- **Recursivitate prea adâncă**: stiva apelurilor are limită. Pentru adâncimi mari, transformă recursivitatea într-o stivă explicită.
+</MistakeBox>
+
+## Recapitulare
+
+- Stiva se potrivește când contează cel mai recent element nerezolvat, când inversezi o ordine sau revii pe pași.
+- Aplicații clasice: inversare, stiva apelurilor (recursivitate), evaluarea expresiilor, Undo.
+- Tiparul comun: push la „deschidere", verifici `top()` și `pop()` la „închidere" — mereu cu `empty()` verificat.

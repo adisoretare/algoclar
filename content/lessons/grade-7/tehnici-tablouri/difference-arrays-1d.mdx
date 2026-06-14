@@ -1,0 +1,150 @@
+---
+title: "Difference Arrays 1D — actualizări pe intervale în O(1)"
+slug: difference-arrays-1d
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["difference-array", "intervale", "tehnica"]
+visualizers: ["difference-array"]
+relatedProblems: []
+quiz:
+  - question: "Ce reprezintă vectorul de diferențe `d` față de vectorul `v`?"
+    options:
+      - "Suma elementelor de până la poziția i"
+      - "Diferența `v[i] - v[i-1]` dintre elemente vecine"
+      - "Maximul de pe prefix"
+      - "Vectorul sortat"
+    correctIndex: 1
+    explanation: "Vectorul de diferențe stochează `d[i] = v[i] - v[i-1]`. Reconstruind sumele parțiale ale lui `d` obții înapoi vectorul `v`."
+  - question: "Ca să adaugi valoarea `x` pe intervalul [a, b], ce modifici în vectorul de diferențe?"
+    options:
+      - "Toate pozițiile de la a la b"
+      - "`d[a] += x` și `d[b+1] -= x`"
+      - "Doar `d[a] += x`"
+      - "`d[a] += x` și `d[b] -= x`"
+    correctIndex: 1
+    explanation: "Adaugi x de la a încolo (`d[a] += x`) și anulezi efectul după b (`d[b+1] -= x`). Două operații O(1) pentru tot intervalul."
+  - question: "De ce e utilă tehnica când ai multe actualizări pe intervale și citești rezultatul o singură dată la final?"
+    options:
+      - "Reduce fiecare actualizare de la O(lungime interval) la O(1)"
+      - "Sortează automat vectorul"
+      - "Elimină nevoia de a citi datele"
+      - "Reduce memoria la O(1)"
+    correctIndex: 0
+    explanation: "Fiecare actualizare devine O(1) în loc de O(lungimea intervalului). La final reconstruiești vectorul printr-o singură parcurgere O(n)."
+---
+
+<LessonHook>
+Un controlor notează urcările și coborârile din autobuz la fiecare stație, nu numărul total de pasageri de fiecare dată. La capăt, adunând urcările minus coborârile pas cu pas, știe câți erau în autobuz la orice moment. Vectorul de diferențe lucrează exact așa: notezi doar schimbările.
+</LessonHook>
+
+## Problema
+
+Ai un vector inițial cu zerouri și primești multe operații de forma „adaugă `x` tuturor elementelor din intervalul `[a, b]`". La final vrei vectorul rezultat.
+
+Naiv: pentru fiecare operație parcurgi intervalul → O(lungime) per operație. Cu `q` operații pe intervale mari, ajungi la O(q·n) — prea lent.
+
+## Ideea vectorului de diferențe
+
+În loc să modifici tot intervalul, marchezi doar **unde începe** și **unde se termină** efectul.
+
+Definim `d[i] = v[i] - v[i-1]` (cu `d[0] = v[0]`). Atunci `v` se reconstruiește din sumele parțiale ale lui `d`:
+
+```
+v[i] = d[0] + d[1] + ... + d[i]
+```
+
+**Trucul:** ca să adaugi `x` pe `[a, b]`, faci:
+
+```
+d[a]   += x      // efectul porneste la a
+d[b+1] -= x      // efectul se opreste dupa b
+```
+
+Când reconstruiești prin sume parțiale, `x` „curge" de la `a` până la `b` și se anulează la `b+1`.
+
+<ObservationBox>
+Două operații O(1) acoperă tot intervalul, oricât de lung. Costul real (O(n)) îl plătești o singură dată la reconstruire, indiferent câte actualizări ai făcut.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+Vector de lungime 6, toate zero. Operații: `+5` pe `[1, 3]`, apoi `+2` pe `[2, 4]`.
+
+Vectorul de diferențe `d` (lungime 7, pentru `b+1`):
+
+```
+start:        d = [0, 0, 0, 0, 0, 0, 0]
++5 pe [1,3]:  d[1]+=5, d[4]-=5  -> [0, 5, 0, 0,-5, 0, 0]
++2 pe [2,4]:  d[2]+=2, d[5]-=2  -> [0, 5, 2, 0,-5,-2, 0]
+```
+
+Reconstruire (sume parțiale ale lui `d`):
+
+```
+v[0]=0
+v[1]=0+5      =5
+v[2]=5+2      =7
+v[3]=7+0      =7
+v[4]=7-5      =2
+v[5]=2-2      =0
+```
+
+Rezultat: `v = {0, 5, 7, 7, 2, 0}`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 6;
+    long long d[7] = {0};   // un loc in plus pentru b+1, long long evita overflow
+
+    // operatie: aduna x pe [a, b]
+    auto adauga = [&](int a, int b, long long x) {
+        d[a] += x;
+        d[b + 1] -= x;
+    };
+
+    adauga(1, 3, 5);
+    adauga(2, 4, 2);
+
+    long long v[6];
+    v[0] = d[0];
+    for (int i = 1; i < n; i++) {
+        v[i] = v[i - 1] + d[i];   // suma partiala = reconstruire
+    }
+
+    for (int i = 0; i < n; i++) cout << v[i] << " ";  // 0 5 7 7 2 0
+    cout << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Naiv | Difference array |
+|----------|------|------------------|
+| o actualizare pe interval | O(lungime) | O(1) |
+| q actualizări + citire | O(q·n) | O(q + n) |
+
+<MistakeBox>
+Capcane la difference arrays:
+
+- **Indice `b+1` în afara vectorului**: dacă `b = n-1`, accesezi `d[n]`. Alocă vectorul cu o poziție în plus.
+- **Confuzi cu sume parțiale**: sumele parțiale răspund la *interogări* de sumă pe interval; vectorul de diferențe face *actualizări* pe interval. Sunt operații inverse.
+- **Aplici tehnica când ai interogări intercalate cu actualizări**: difference array merge când toate actualizările vin întâi, apoi citești o dată. Pentru update + query intercalate ai nevoie de structuri mai avansate (AIB/segment tree).
+- **Overflow**: multe adunări mari depășesc `int`. Folosește `long long`.
+</MistakeBox>
+
+## Recapitulare
+
+- Vectorul de diferențe transformă o actualizare pe interval în două operații O(1): `d[a]+=x`, `d[b+1]-=x`.
+- Vectorul real se reconstruiește o singură dată prin sume parțiale ale lui `d`, în O(n).
+- E ideal când toate actualizările vin înainte de citirea finală; altfel folosești AIB/segment tree.

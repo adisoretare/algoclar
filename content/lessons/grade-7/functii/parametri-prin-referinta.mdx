@@ -1,0 +1,174 @@
+---
+title: "Parametri prin referință — funcția modifică originalul"
+slug: parametri-prin-referinta
+grade: 7
+chapter: functii
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "parametri", "referinta", "swap"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce simbol marchează un parametru transmis prin referință în C++?"
+    options:
+      - "* înainte de nume"
+      - "& înainte de nume"
+      - "# înainte de tip"
+      - "Niciun simbol, se deduce automat"
+    correctIndex: 1
+    explanation: "Un `&` lipit de tip (`int &x`) face parametrul o referință: el devine un alt nume pentru variabila originală, nu o copie."
+  - question: "O funcție `void creste(int &x) { x++; }` e apelată cu `creste(a)`. Ce devine `a`?"
+    options:
+      - "Rămâne neschimbat"
+      - "Crește cu 1"
+      - "Devine 0"
+      - "Programul nu compilează"
+    correctIndex: 1
+    explanation: "Prin referință, `x` ESTE `a` (alt nume pentru aceeași cutie). `x++` modifică direct `a`, deci `a` crește cu 1."
+  - question: "De ce un `swap` corect are nevoie de parametri prin referință?"
+    options:
+      - "Ca să fie mai rapid"
+      - "Pentru că trebuie să schimbe efectiv variabilele din apel, nu niște copii"
+      - "Pentru că folosește un vector"
+      - "Pentru că întoarce o valoare"
+    correctIndex: 1
+    explanation: "Un `swap` trebuie să modifice cele două variabile originale. Cu parametri prin valoare ar interschimba doar copiile, iar originalele ar rămâne neschimbate."
+---
+
+<LessonHook>
+Îi dai prietenului cheia de la casa ta, nu o poză cu casa. Cu cheia, el poate intra și muta mobila — schimbările se văd în casa reală. Transmiterea prin referință e cheia: funcția primește acces la variabila originală și o poate modifica direct.
+</LessonHook>
+
+## Ce înseamnă transmiterea prin referință?
+
+Când un parametru e transmis **prin referință**, el nu e o copie — e un **alt nume** pentru variabila din apel. Tot ce face funcția cu el se întâmplă direct pe original.
+
+În C++ marchezi referința cu `&` lipit de tip:
+
+```cpp
+void creste(int &x) {   // & = referinta
+    x++;                // modifica direct originalul
+}
+```
+
+<ObservationBox>
+Diferența de o singură literă: `int x` (prin valoare, copie) vs. `int &x` (prin referință, originalul însuși). Acest `&` schimbă complet comportamentul funcției.
+</ObservationBox>
+
+## Comparație directă
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void prinValoare(int x) { x++; }    // modifica copia
+void prinReferinta(int &x) { x++; } // modifica originalul
+
+int main() {
+    int a = 5;
+    prinValoare(a);
+    cout << a << "\n";   // 5  (neschimbat)
+
+    prinReferinta(a);
+    cout << a << "\n";   // 6  (modificat!)
+    return 0;
+}
+```
+
+Aceeași operație `x++`, două rezultate — totul ține de prezența lui `&`.
+
+## Aplicația vedetă: `swap`
+
+Interschimbarea a două variabile e exemplul clasic care *cere* referințe. Vrem ca după apel ambele variabile din `main` să fie schimbate:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void interschimba(int &a, int &b) {
+    int aux = a;   // salvez a
+    a = b;         // a primeste b
+    b = aux;       // b primeste vechiul a
+}
+
+int main() {
+    int x = 3, y = 8;
+    interschimba(x, y);
+    cout << x << " " << y << "\n";   // 8 3
+    return 0;
+}
+```
+
+Vizual, înainte de `interschimba`:
+
+<ArrayDiagram
+  values="3 8"
+  index="x y"
+  caption="Înainte de apel: x = 3, y = 8." />
+
+După `interschimba(x, y)`, valorile reale din `main` s-au schimbat:
+
+<ArrayDiagram
+  values="8 3"
+  index="x y"
+  highlight="0 1"
+  caption="După apel: x = 8, y = 3. Referințele au modificat direct variabilele originale." />
+
+<ObservationBox>
+Dacă `interschimba` ar primi parametrii prin valoare (fără `&`), ar interschimba doar copiile interne, iar în `main` `x` și `y` ar rămâne `3` și `8`. Un `swap` fără referințe e o capcană clasică.
+</ObservationBox>
+
+## A doua utilizare: întorci mai multe rezultate
+
+`return` întoarce o singură valoare. Dacă o funcție trebuie să producă două rezultate (de exemplu minimul și maximul deodată), le poți scoate prin parametri-referință:
+
+```cpp
+void minMax(int v[], int n, int &mini, int &maxi) {
+    mini = v[0];
+    maxi = v[0];
+    for (int i = 1; i < n; i++) {
+        if (v[i] < mini) mini = v[i];
+        if (v[i] > maxi) maxi = v[i];
+    }
+}
+
+int main() {
+    int v[5] = {4, 1, 7, 2, 9};
+    int mn, mx;
+    minMax(v, 5, mn, mx);
+    cout << mn << " " << mx << "\n";   // 1 9
+    return 0;
+}
+```
+
+`mn` și `mx` din `main` se umplu prin referințe, fără niciun `return`.
+
+## Referință constantă — acces fără copiere, dar fără modificare
+
+Pentru obiecte mari (un `string` lung) vrei să eviți copierea, dar să nu permiți modificarea. Folosești `const &`:
+
+```cpp
+int lungime(const string &s) {   // nu copiaza, nu modifica
+    return s.size();
+}
+```
+
+E rapid (fără copie) și sigur (`const` interzice modificarea).
+
+<MistakeBox>
+Capcane la transmiterea prin referință:
+
+- **Uiți `&` la `swap`**: funcția schimbă doar copiile, iar variabilele din `main` rămân neschimbate. Cel mai frecvent bug aici.
+- **Pasezi o constantă unei referințe non-const**: `creste(5)` nu compilează — nu poți modifica un literal `5`. Referința non-const cere o variabilă reală.
+- **Modifici din greșeală un parametru pe care voiai doar să-l citești**: dacă nu vrei modificări, folosește `const &`.
+- **Crezi că vectorul `int v[]` se copiază**: vectorii pasați la funcții se comportă oricum ca o referință (modificările pe elemente persistă). `&` e necesar pentru tipurile simple, nu pentru vectorii pasați așa.
+</MistakeBox>
+
+## Recapitulare
+
+- Prin referință (`&`), parametrul e alt nume pentru variabila originală; modificările se văd în apel.
+- E indispensabil pentru `swap` și pentru a întoarce mai multe rezultate dintr-o funcție.
+- `const &` dă acces rapid (fără copie) la obiecte mari, fără a permite modificarea lor.

@@ -1,0 +1,137 @@
+---
+title: "Tipul struct — date diferite, ținute împreună"
+slug: tipul-struct
+grade: 7
+chapter: structuri-neomogene
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["struct", "tipuri", "campuri"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce e o structură (`struct`) în C++?"
+    options:
+      - "Un vector de elemente de același tip"
+      - "Un tip nou care grupează mai multe câmpuri, posibil de tipuri diferite"
+      - "O funcție specială"
+      - "O buclă"
+    correctIndex: 1
+    explanation: "`struct` definește un tip nou care adună sub un singur nume mai multe câmpuri, fiecare cu tipul lui — de exemplu un nume (string) și o notă (int)."
+  - question: "Cum accesezi câmpul `nota` al unei variabile `elev` de tip struct?"
+    options:
+      - "elev->nota"
+      - "elev[nota]"
+      - "elev.nota"
+      - "nota(elev)"
+    correctIndex: 2
+    explanation: "Pentru o variabilă obișnuită de tip struct folosești operatorul punct: `elev.nota`. Săgeata `->` se folosește la pointeri."
+  - question: "De ce folosești o structură în loc de mai mulți vectori paraleli?"
+    options:
+      - "E mereu mai rapid"
+      - "Ține datele care descriu același lucru împreună, deci e greu să le încurci sau să le desincronizezi"
+      - "Ocupă mai puțină memorie întotdeauna"
+      - "Permite mai multe elemente"
+    correctIndex: 1
+    explanation: "Cu vectori paraleli (`nume[i]`, `nota[i]`) e ușor să sortezi unul și să uiți de celălalt. O structură leagă câmpurile aceluiași element, eliminând riscul de desincronizare."
+---
+
+<LessonHook>
+O fișă de bibliotecă ține laolaltă titlul, autorul și anul unei cărți — pe aceeași foaie, nu pe trei foi separate care s-ar putea amesteca. Structura (`struct`) e fișa: o singură „cutie" cu mai multe rubrici care descriu același lucru.
+</LessonHook>
+
+## Problema vectorilor paraleli
+
+Vrei să ții, pentru fiecare elev, numele și nota. Fără structuri, ai folosi doi vectori „paraleli":
+
+```cpp
+string nume[100];
+int nota[100];
+```
+
+Elevul `i` e `nume[i]` + `nota[i]`. Merge — dar e fragil: dacă sortezi `nota` și uiți să rearanjezi `nume`, datele se desincronizează și totul devine greșit.
+
+## Ce este o structură
+
+O **structură** definește un **tip nou** care grupează mai multe câmpuri, posibil de tipuri diferite, sub un singur nume:
+
+```cpp
+struct Elev {
+    string nume;
+    int nota;
+};
+```
+
+Acum `Elev` e un tip, ca `int` sau `string`. O variabilă de acest tip ține numele și nota *împreună*:
+
+```cpp
+Elev e;
+e.nume = "Ana";
+e.nota = 9;
+```
+
+<ObservationBox>
+Accesezi câmpurile cu operatorul punct: `e.nume`, `e.nota`. Fiecare câmp se comportă exact ca o variabilă obișnuită de tipul lui.
+</ObservationBox>
+
+## Inițializare
+
+Poți seta câmpurile pe rând sau dintr-o dată, în ordinea declarării:
+
+```cpp
+Elev a;
+a.nume = "Bogdan";
+a.nota = 8;
+
+Elev b = {"Carmen", 10};   // in ordinea campurilor: nume, apoi nota
+```
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct Elev {
+    string nume;
+    int nota;
+};
+
+int main() {
+    Elev e = {"Ana", 9};
+    cout << e.nume << " are nota " << e.nota << "\n";  // Ana are nota 9
+
+    e.nota = 10;   // modific un camp
+    cout << e.nume << " are acum " << e.nota << "\n";  // Ana are acum 10
+    return 0;
+}
+```
+
+## Structuri ca parametri de funcție
+
+O structură se transmite ca orice variabilă. Pentru a evita copierea (mai ales dacă are câmpuri mari), o dai prin referință constantă:
+
+```cpp
+void afiseaza(const Elev &e) {   // const & = fara copie, fara modificare
+    cout << e.nume << ": " << e.nota << "\n";
+}
+```
+
+Dacă vrei ca funcția să modifice structura originală, folosești referință fără `const`.
+
+<MistakeBox>
+Capcane la tipul struct:
+
+- **Uiți `;` după acolada de închidere**: `struct Elev { ... };` — punctul și virgula final e obligatoriu, altfel eroare de compilare.
+- **Confuzi `.` cu `->`**: pentru o variabilă obișnuită folosești `e.nota`; `->` e doar pentru pointeri.
+- **Ordinea greșită la inițializarea cu acolade**: `{"Ana", 9}` pune valorile în ordinea câmpurilor declarate. Inversarea lor dă erori sau date greșite.
+- **Copiezi structuri mari inutil**: transmiterea prin valoare copiază toate câmpurile. Pentru structuri mari folosește `const &`.
+</MistakeBox>
+
+## Recapitulare
+
+- `struct` creează un tip nou care grupează câmpuri (posibil de tipuri diferite) sub un nume.
+- Accesezi câmpurile cu operatorul punct (`e.nume`); structura se comportă ca orice variabilă.
+- Față de vectori paraleli, structura ține datele aceluiași element împreună și elimină riscul de desincronizare.

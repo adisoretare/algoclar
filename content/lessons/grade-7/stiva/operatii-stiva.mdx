@@ -1,0 +1,133 @@
+---
+title: "Operații cu stiva — push, pop, top și stack din STL"
+slug: operatii-stiva
+grade: 7
+chapter: stiva
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["stiva", "stl", "operatii"]
+visualizers: ["stack"]
+relatedProblems: []
+quiz:
+  - question: "Ce face `top()` la un `stack` din STL?"
+    options:
+      - "Scoate elementul din vârf"
+      - "Întoarce elementul din vârf fără să-l scoată"
+      - "Golește stiva"
+      - "Adaugă un element"
+    correctIndex: 1
+    explanation: "`top()` doar citește vârful, fără să-l elimine. Ca să-l scoți efectiv, folosești `pop()`."
+  - question: "Ce întoarce `pop()` la `std::stack`?"
+    options:
+      - "Elementul scos"
+      - "Nimic (void) — doar elimină vârful; valoarea o iei separat cu top()"
+      - "Numărul de elemente"
+      - "true sau false"
+    correctIndex: 1
+    explanation: "La `std::stack`, `pop()` e `void`: doar elimină vârful. Dacă vrei valoarea, o citești cu `top()` ÎNAINTE de `pop()`."
+  - question: "Ce se întâmplă dacă apelezi `top()` sau `pop()` pe o stivă goală?"
+    options:
+      - "Întoarce 0"
+      - "Comportament nedefinit — trebuie verificat `empty()` întâi"
+      - "Golește programul în siguranță"
+      - "Adaugă automat un element"
+    correctIndex: 1
+    explanation: "Operațiile pe o stivă goală au comportament nedefinit (posibil crash). Verifică mereu `!s.empty()` înainte de `top()`/`pop()`."
+---
+
+<LessonHook>
+La un teanc de farfurii ai trei mișcări: pui una deasupra, te uiți care e deasupra, sau o iei pe cea de deasupra. Atât. Stiva din STL îți dă fix aceste trei operații, gata făcute, ca să nu mai scrii nimic de mână.
+</LessonHook>
+
+## Operațiile fundamentale
+
+Orice stivă oferă patru operații, toate la vârf:
+
+| Operație | Ce face | Cost |
+|----------|---------|------|
+| `push(x)` | adaugă x în vârf | O(1) |
+| `pop()` | elimină vârful | O(1) |
+| `top()` | citește vârful (fără a-l scoate) | O(1) |
+| `empty()` | spune dacă e goală | O(1) |
+
+<ObservationBox>
+Toate operațiile sunt O(1) — instantanee, indiferent câte elemente are stiva. Asta o face foarte eficientă acolo unde se potrivește.
+</ObservationBox>
+
+## `std::stack` din STL
+
+În loc să implementezi stiva de mână, folosești `stack` din STL — testat și fără bug-uri de indici:
+
+```cpp
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int main() {
+    stack<int> s;
+
+    s.push(10);
+    s.push(20);
+    s.push(30);
+
+    cout << s.top() << "\n";   // 30 (varful, nescos)
+    s.pop();                   // scot 30
+    cout << s.top() << "\n";   // 20
+    cout << s.size() << "\n";  // 2
+    cout << s.empty() << "\n"; // 0 (nu e goala)
+    return 0;
+}
+```
+
+## Atenție: `top()` și `pop()` sunt separate
+
+La `std::stack`, `pop()` **nu întoarce** valoarea — e `void`. Dacă vrei valoarea scoasă, o citești cu `top()` **înainte** de `pop()`:
+
+```cpp
+int x = s.top();   // citesc valoarea
+s.pop();           // apoi o elimin
+cout << x << "\n";
+```
+
+E o sursă frecventă de confuzie pentru cei veniți din alte limbaje, unde `pop` întoarce elementul.
+
+## Golirea unei stive
+
+Nu există o funcție `clear`. Scoți elementele cât timp nu e goală:
+
+```cpp
+while (!s.empty()) {
+    cout << s.top() << " ";   // 20 10 (in ordine inversa)
+    s.pop();
+}
+```
+
+Asta afișează elementele în ordine inversă intrării — comportamentul LIFO.
+
+## Vizualizare
+
+Urmărește efectul fiecărei operații asupra vârfului:
+
+<Visualizer name="stack" />
+
+<HintBox>
+Folosește **←** și **→** pentru a urmări fiecare push/pop. `top()` doar evidențiază vârful, fără să-l mute.
+</HintBox>
+
+<MistakeBox>
+Capcane la operațiile cu stiva:
+
+- **Aștepți ca `pop()` să întoarcă valoarea**: la `std::stack` e `void`. Citește cu `top()` înainte de `pop()`.
+- **`top()`/`pop()` pe stivă goală**: comportament nedefinit. Verifică `!s.empty()` întâi.
+- **Cauți `clear()`**: nu există; golești cu o buclă `while (!empty()) pop()`.
+- **Uiți `#include <stack>`**: `std::stack` nu e recunoscut fără el.
+</MistakeBox>
+
+## Recapitulare
+
+- Stiva are patru operații O(1): `push`, `pop`, `top`, `empty`.
+- La `std::stack`, `pop()` e `void` — ia valoarea cu `top()` înainte de a o scoate.
+- Verifică mereu `!empty()` înainte de `top()`/`pop()`; golești printr-o buclă.

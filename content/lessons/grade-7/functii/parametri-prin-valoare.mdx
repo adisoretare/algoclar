@@ -1,0 +1,130 @@
+---
+title: "Parametri prin valoare — funcția lucrează pe o copie"
+slug: parametri-prin-valoare
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "parametri", "prin-valoare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce primește un parametru transmis prin valoare?"
+    options:
+      - "Variabila originală însăși"
+      - "O copie a valorii argumentului"
+      - "Adresa variabilei originale"
+      - "Doar tipul, nu și valoarea"
+    correctIndex: 1
+    explanation: "La transmiterea prin valoare, parametrul e o copie independentă a argumentului. Funcția lucrează pe copie, nu pe original."
+  - question: "O funcție `void creste(int x) { x++; }` e apelată cu `creste(a)`. Ce devine `a` după apel?"
+    options:
+      - "a crește cu 1"
+      - "a rămâne neschimbat"
+      - "a devine 0"
+      - "Depinde de valoarea inițială"
+    correctIndex: 1
+    explanation: "`x` e o copie a lui `a`. `x++` modifică doar copia, care se distruge la finalul funcției. `a` rămâne exact cum era."
+  - question: "Când e potrivită transmiterea prin valoare?"
+    options:
+      - "Când vrei ca funcția să modifice variabila originală"
+      - "Când funcția doar citește valoarea și nu trebuie să schimbe originalul"
+      - "Niciodată, e mereu mai lentă"
+      - "Doar pentru tipul `void`"
+    correctIndex: 1
+    explanation: "Prin valoare e ideal când funcția folosește valoarea pentru calcul, dar nu trebuie să atingă originalul. E sigur: originalul e protejat."
+---
+
+<LessonHook>
+Îi dai unui prieten o fotocopie a temei, nu caietul tău. El poate scrie pe copie, o poate mototoli — caietul tău rămâne intact. Transmiterea prin valoare e exact asta: funcția primește o fotocopie a valorii și nu poate strica originalul.
+</LessonHook>
+
+## Ce înseamnă transmiterea prin valoare?
+
+Când un parametru e transmis **prin valoare**, funcția primește o **copie** a argumentului. Orice modificare făcută pe parametru afectează doar copia, nu variabila originală din apel.
+
+Aceasta e comportarea implicită în C++ pentru tipuri simple (`int`, `double`, `char`, ...): dacă scrii `int x` în antet, e prin valoare.
+
+<ObservationBox>
+La apel se creează o copie nouă a valorii și se pune în parametru. Când funcția se termină, copia se distruge. Originalul nici nu „știe" că s-a întâmplat ceva.
+</ObservationBox>
+
+## Exemplul clasic
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void creste(int x) {
+    x++;                 // modifica doar copia
+    cout << "in functie: " << x << "\n";
+}
+
+int main() {
+    int a = 5;
+    creste(a);           // in functie: 6
+    cout << "in main: " << a << "\n";  // in main: 5
+    return 0;
+}
+```
+
+În funcție, `x` ajunge `6`. Dar în `main`, `a` e tot `5` — modificarea a atins doar copia.
+
+Privit ca diagramă, la apel argumentul `a` se copiază în parametrul `x`:
+
+<ArrayDiagram
+  values="5 5"
+  index="a copie-x"
+  caption="La apel, x primește o copie a lui a. Sunt două cutii separate în memorie." />
+
+După `x++`, doar a doua cutie se schimbă:
+
+<ArrayDiagram
+  values="5 6"
+  index="a copie-x"
+  highlight="1"
+  caption="x++ schimbă doar copia. a rămâne 5; la finalul funcției copia dispare." />
+
+## Urmărire pas cu pas
+
+```
+main: a = 5
+main: apel creste(a)  -> se copiaza 5 in x
+  creste: x = 5
+  creste: x++  -> x = 6   (a NU se atinge)
+  creste: afiseaza 6
+  creste: se termina -> x se distruge
+main: afiseaza a = 5
+```
+
+## De ce e util
+
+Transmiterea prin valoare e **sigură**: garantezi că funcția nu strică datele apelantului. E alegerea potrivită când funcția doar *citește* valoarea ca să calculeze ceva — `maxim(a, b)`, `patrat(n)`, `esteParfect(x)`. Originalul rămâne protejat.
+
+```cpp
+int patrat(int n) {
+    return n * n;   // foloseste n, nu-l modifica in afara
+}
+```
+
+## Și atunci cum modific originalul?
+
+Dacă chiar vrei ca funcția să schimbe variabila din apel (de exemplu un `swap`), prin valoare nu merge — modifici doar copia. Pentru asta există transmiterea **prin referință**, subiectul lecției următoare.
+
+<MistakeBox>
+Capcane la transmiterea prin valoare:
+
+- **Te aștepți ca funcția să modifice argumentul**: `creste(a)` cu parametru prin valoare nu schimbă `a`. Ai nevoie de referință.
+- **Copiezi obiecte mari fără motiv**: pentru un `string` lung sau o structură mare, copierea costă timp. Acolo se folosește referința (eventual constantă), nu valoarea.
+- **Crezi că `return`-ul nu mai e necesar**: dacă lucrezi pe copie, singurul mod de a scoate rezultatul afară e prin `return`.
+- **Confuzi parametrul cu argumentul**: au valori egale la pornire, dar sunt cutii diferite în memorie.
+</MistakeBox>
+
+## Recapitulare
+
+- Prin valoare, parametrul e o copie a argumentului; modificările nu ating originalul.
+- E comportarea implicită pentru tipurile simple și e sigură — protejează datele apelantului.
+- Pentru a modifica efectiv variabila din apel, ai nevoie de transmitere prin referință.

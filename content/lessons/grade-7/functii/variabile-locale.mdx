@@ -1,0 +1,144 @@
+---
+title: "Variabile locale — fiecare funcție cu lumea ei"
+slug: variabile-locale
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "variabile-locale", "domeniu"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Unde este vizibilă o variabilă locală declarată într-o funcție?"
+    options:
+      - "În tot programul"
+      - "Doar în funcția (sau blocul) unde a fost declarată"
+      - "În toate funcțiile apelate după ea"
+      - "Doar în `main`"
+    correctIndex: 1
+    explanation: "O variabilă locală există doar în interiorul funcției sau blocului unde e declarată. În afară, e ca și cum nu ar exista."
+  - question: "Ce se întâmplă cu o variabilă locală când funcția se termină?"
+    options:
+      - "Rămâne în memorie pentru următorul apel"
+      - "Se distruge; la următorul apel se creează din nou de la zero"
+      - "Devine globală"
+      - "Se salvează automat în `main`"
+    correctIndex: 1
+    explanation: "Variabilele locale trăiesc doar cât rulează funcția. La fiecare apel nou se creează proaspete, fără memoria apelului anterior."
+  - question: "Două funcții au fiecare o variabilă locală numită `i`. Se influențează reciproc?"
+    options:
+      - "Da, e aceeași variabilă"
+      - "Nu, sunt variabile complet independente, deși au același nume"
+      - "Doar dacă au aceeași valoare"
+      - "Programul nu compilează cu două variabile cu același nume"
+    correctIndex: 1
+    explanation: "Numele local aparține funcției lui. Doi `i` din funcții diferite sunt obiecte separate, fără nicio legătură."
+---
+
+<LessonHook>
+Fiecare elev are propriul caiet de ciorne. Doi colegi pot avea amândoi o pagină cu „x = 5", dar ciornele lor nu se amestecă — ce scrie unul nu apare la celălalt. Variabilele locale sunt exact aceste ciorne private ale fiecărei funcții.
+</LessonHook>
+
+## Ce este o variabilă locală?
+
+O variabilă **locală** este declarată în interiorul unei funcții (sau al unui bloc `{ }`). Ea există și e vizibilă **doar acolo**. În afara funcției, numele ei nu înseamnă nimic.
+
+```cpp
+void f() {
+    int x = 10;   // x e local in f
+    cout << x;
+}
+// aici, in afara lui f, x nu exista
+```
+
+## Domeniul de vizibilitate (scope)
+
+Regula e simplă: o variabilă locală trăiește între linia unde e declarată și acolada care închide blocul ei. Parametrii unei funcții sunt și ei variabile locale.
+
+<ObservationBox>
+Variabilele locale se **creează din nou** la fiecare apel și **se distrug** când funcția se termină. Nu păstrează valoarea între apeluri — fiecare apel pornește cu ciorna goală.
+</ObservationBox>
+
+## Nume identice, variabile diferite
+
+Pentru că fiecare funcție are lumea ei, poți folosi același nume în funcții diferite fără conflict:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void a() {
+    int x = 1;
+    cout << "a: " << x << "\n";
+}
+
+void b() {
+    int x = 99;   // alt x, total independent
+    cout << "b: " << x << "\n";
+}
+
+int main() {
+    a();   // a: 1
+    b();   // b: 99
+    return 0;
+}
+```
+
+Cei doi `x` nu au nicio legătură — ocupă locuri diferite în memorie.
+
+## Urmărire pas cu pas
+
+Vedem cum variabilele locale apar și dispar:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int dublu(int n) {
+    int rez = n * 2;   // rez e local in dublu
+    return rez;
+}
+
+int main() {
+    int x = 5;         // x e local in main
+    int y = dublu(x);  // n = 5, rez = 10
+    cout << y << "\n"; // 10
+    return 0;
+}
+```
+
+Firul execuției:
+
+```
+main: x = 5
+main: apel dublu(5)
+  dublu: n = 5        (parametru, local)
+  dublu: rez = 10     (local)
+  dublu: return 10    -> n si rez se distrug
+main: y = 10
+main: afiseaza 10
+```
+
+După `return`, `n` și `rez` dispar. Dacă ai încerca să le folosești în `main`, ai primi eroare — nu există acolo.
+
+## De ce e bine așa?
+
+Localitatea îți permite să scrii o funcție fără să te temi că strici variabile din alte funcții. Poți numi liber `i`, `s`, `temp` în fiecare funcție. Asta face codul mai sigur și mai ușor de combinat.
+
+<MistakeBox>
+Capcane cu variabile locale:
+
+- **Încerci să folosești o locală în afara funcției ei**: dă eroare de compilare — variabila nu e vizibilă acolo.
+- **Te aștepți să-și păstreze valoarea între apeluri**: nu o face. La fiecare apel se reinițializează.
+- **Folosești o variabilă locală neinițializată**: `int s; s += 5;` — `s` are o valoare „de gunoi" la pornire. Inițializează mereu (`int s = 0;`).
+- **Confuzi un `i` local de buclă cu unul din altă funcție**: sunt independenți; modificarea unuia nu-l atinge pe celălalt.
+</MistakeBox>
+
+## Recapitulare
+
+- O variabilă locală e vizibilă doar în funcția (sau blocul) unde e declarată.
+- Se creează la fiecare apel și se distruge la final — nu păstrează valori între apeluri.
+- Nume identice în funcții diferite sunt variabile complet separate.

@@ -1,0 +1,143 @@
+---
+title: "Lecție-punte: cum împarți o problemă mare în funcții mici"
+slug: punte-problema-in-functii
+grade: 7
+chapter: functii
+difficulty: mediu
+estimatedTime: 11
+free: true
+status: draft
+isBridge: true
+tags: ["functii", "descompunere", "design"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e semnul bun că o bucată de cod ar trebui scoasă într-o funcție?"
+    options:
+      - "Apare o singură dată în program"
+      - "Se repetă în mai multe locuri sau rezolvă o sub-sarcină cu nume clar"
+      - "Are mai puțin de 3 linii"
+      - "Folosește doar variabile globale"
+    correctIndex: 1
+    explanation: "Cod repetat sau o sub-sarcină pe care o poți numi („citește datele”, „verifică dacă e prim”) sunt candidate naturale pentru o funcție separată."
+  - question: "Ce înseamnă ca o funcție să facă „un singur lucru”?"
+    options:
+      - "Să aibă o singură linie"
+      - "Să rezolve o sarcină clară, ușor de denumit, fără să amestece mai multe roluri"
+      - "Să nu aibă parametri"
+      - "Să nu apeleze alte funcții"
+    correctIndex: 1
+    explanation: "O funcție bună are o responsabilitate clară pe care o poți rezuma în câteva cuvinte. Dacă numele ei ar trebui să conțină „și”, probabil face prea multe."
+  - question: "Cum decizi ce intră în parametri și ce iese prin `return`?"
+    options:
+      - "Tot prin variabile globale, mereu"
+      - "Intrarea de care are nevoie funcția = parametri; rezultatul produs = return (sau referință)"
+      - "Totul prin parametri, niciodată return"
+      - "La întâmplare, nu contează"
+    correctIndex: 1
+    explanation: "Gândește funcția ca o cutie: ce-i dai (datele de care depinde) sunt parametri; ce-ți dă înapoi (rezultatul) e prin `return` sau prin parametri-referință."
+---
+
+<LessonHook>
+Nu construiești o casă turnând tot betonul deodată. O împarți pe etape: fundație, pereți, acoperiș — fiecare cu echipa și planul ei. Un program mare e la fel: îl spargi în funcții mici, fiecare cu o treabă clară, ca să-l poți construi și verifica bucată cu bucată.
+</LessonHook>
+
+## De ce să împarți deloc?
+
+Un `main` de 200 de linii e greu de citit, greu de depanat și imposibil de refolosit. Împărțit în funcții mici cu nume clare, același program devine o listă de pași pe care îi înțelegi dintr-o privire:
+
+```cpp
+int main() {
+    citesteDate();
+    proceseaza();
+    afiseazaRezultat();
+    return 0;
+}
+```
+
+Nu mai trebuie să citești tot codul ca să înțelegi *ce face* programul — numele funcțiilor îți spun.
+
+## Cum recunoști o funcție ascunsă în cod
+
+Trei semnale că o bucată de cod merită scoasă într-o funcție:
+
+1. **Se repetă.** Dacă același calcul apare în trei locuri, fă-l o funcție și apeleaz-o de trei ori. Repararea unui bug se face apoi într-un singur loc.
+2. **Are un nume clar.** Dacă poți rezuma o secvență în câteva cuvinte („verifică dacă e prim", „suma cifrelor"), aceea e o funcție.
+3. **E un nivel de detaliu diferit.** `main` ar trebui să spună *ce* se întâmplă; detaliile lui *cum* coboară în funcții.
+
+<ObservationBox>
+Test rapid: dacă, ca să denumești o funcție, trebuie să folosești „și" („citește și sortează și afișează"), probabil ar trebui să fie trei funcții. O funcție = o responsabilitate.
+</ObservationBox>
+
+## Ce intră, ce iese
+
+Gândește fiecare funcție ca o cutie cu intrare și ieșire:
+
+- **Intrarea** = datele de care are nevoie ca să lucreze → **parametri**.
+- **Ieșirea** = rezultatul pe care îl produce → **`return`** (un singur rezultat) sau **parametri prin referință** (mai multe rezultate).
+
+```cpp
+// intrare: doua numere -> iesire: cmmdc-ul lor
+int cmmdc(int a, int b) {
+    while (b != 0) {
+        int r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+```
+
+Funcția nu depinde de nimic din afară: îi dai `a` și `b`, îți dă cmmdc-ul. O poți muta în orice program.
+
+<ObservationBox>
+O funcție care primește tot ce-i trebuie prin parametri și întoarce rezultatul prin `return` e **independentă** și ușor de testat: o apelezi cu valori concrete și verifici răspunsul, fără să rulezi tot programul.
+</ObservationBox>
+
+## Exemplu: o problemă spartă bine
+
+Problemă: „câte numere prime sunt într-un vector?". Spargem în două funcții cu roluri clare:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+bool estePrim(int x) {
+    if (x < 2) return false;
+    for (int d = 2; d * d <= x; d++) {  // pana la radacina lui x
+        if (x % d == 0) return false;
+    }
+    return true;
+}
+
+int cateprime(int v[], int n) {
+    int cnt = 0;
+    for (int i = 0; i < n; i++) {
+        if (estePrim(v[i])) cnt++;   // refolosesc estePrim
+    }
+    return cnt;
+}
+
+int main() {
+    int v[6] = {4, 7, 9, 11, 2, 15};
+    cout << cateprime(v, 6) << "\n";  // 3  (7, 11, 2)
+    return 0;
+}
+```
+
+`cateprime` nu se ocupă de *cum* verifici primalitatea — deleagă lui `estePrim`. Fiecare funcție e scurtă, clară și ușor de verificat singură.
+
+<MistakeBox>
+Capcane când împarți în funcții:
+
+- **Funcție care face prea multe**: citește, calculează și afișează în același loc. Greu de refolosit. Sparge după responsabilitate.
+- **Prea multe variabile globale ca scurtătură**: în loc să pasezi datele prin parametri, le lași globale „să fie mai ușor". Pe termen lung face fluxul de date imposibil de urmărit. Preferă parametri + `return`.
+- **Despici excesiv**: o funcție de o linie apelată o singură dată poate adăuga zgomot fără folos. Împarte unde câștigi claritate sau refolosire, nu de dragul împărțirii.
+- **Funcții care depind de ordinea apelului prin globale**: dacă `proceseaza()` merge doar dacă `citesteDate()` a rulat înainte și a setat globale, ai cuplaj ascuns. Fă dependențele explicite prin parametri.
+</MistakeBox>
+
+## Recapitulare
+
+- Sparge un program în funcții când codul se repetă, are un nume clar sau ține de un alt nivel de detaliu.
+- O funcție = o responsabilitate; intrarea ei sunt parametrii, ieșirea e `return`-ul (sau referințele).
+- Preferă parametri și `return` în locul globalelor — fac funcțiile independente și ușor de testat.

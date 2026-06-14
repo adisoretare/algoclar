@@ -1,0 +1,107 @@
+---
+title: "Alegerea locală optimă — inima unui Greedy"
+slug: alegere-locala-optima
+grade: 7
+chapter: greedy
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["greedy", "alegere-locala", "criteriu"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este criteriul de alegere locală într-un Greedy?"
+    options:
+      - "Regula după care selectezi cea mai bună opțiune la fiecare pas"
+      - "Numărul de pași ai algoritmului"
+      - "Condiția de oprire"
+      - "Dimensiunea datelor de intrare"
+    correctIndex: 0
+    explanation: "Criteriul de alegere locală e regula concretă (cel mai mic, cel mai scurt, cel mai devreme etc.) după care alegi opțiunea la fiecare pas. El definește comportamentul Greedy-ului."
+  - question: "Două criterii diferite pe aceeași problemă pot da rezultate diferite?"
+    options:
+      - "Nu, rezultatul e mereu același"
+      - "Da, criteriul ales determină dacă Greedy e corect sau greșit"
+      - "Doar dacă datele sunt sortate"
+      - "Doar pentru numere negative"
+    correctIndex: 1
+    explanation: "Alegerea criteriului e decisivă: același cadru Greedy poate fi corect cu un criteriu și complet greșit cu altul. De aceea găsirea criteriului potrivit e partea esențială."
+  - question: "Cum verifici rapid dacă un criteriu de alegere locală e plauzibil?"
+    options:
+      - "Îl rulezi o singură dată pe un exemplu mare"
+      - "Cauți un contraexemplu mic unde alegerea lacomă duce la un rezultat suboptim"
+      - "Verifici dacă programul compilează"
+      - "Numeri câte opțiuni există"
+    correctIndex: 1
+    explanation: "Un contraexemplu mic care doboară criteriul îți arată instant că nu e corect. Dacă nu găsești niciunul după încercări serioase, criteriul devine credibil (dar tot trebuie justificat)."
+---
+
+<LessonHook>
+La bufet, cu farfuria limitată, vrei să mănânci cât mai mult din ce-ți place. Strategia ta de alegere — iei întâi cele mai gustoase? cele mai mici, ca să încapă mai multe? — decide cât de bine ieși. Această strategie, regula după care alegi la fiecare pas, este alegerea locală optimă.
+</LessonHook>
+
+## Ce este alegerea locală optimă
+
+Inima oricărui Greedy e **criteriul de alegere locală**: regula concretă după care, la fiecare pas, selectezi cea mai bună opțiune disponibilă. Tot algoritmul se reduce la „repetă: alege după criteriu, fixează, mergi mai departe".
+
+Exemple de criterii:
+- ia **cel mai mic** element rămas;
+- ia intervalul care **se termină cel mai devreme**;
+- ia obiectul cu **cel mai bun raport** valoare/greutate.
+
+<ObservationBox>
+Schimbi criteriul, schimbi algoritmul. Cadrul Greedy e mereu același; ceea ce decide corectitudinea e *ce* alegi la fiecare pas.
+</ObservationBox>
+
+## Criteriul potrivit vs. criteriul greșit
+
+Problemă: ai activități cu (început, sfârșit) și vrei să faci **cât mai multe** care nu se suprapun.
+
+Criteriu tentant dar **greșit**: „alege mereu activitatea cea mai scurtă". Pare bun (ocupă puțin timp), dar o activitate scurtă plasată prost poate bloca două activități lungi.
+
+Criteriu **corect**: „alege mereu activitatea care **se termină cel mai devreme**". Aceasta eliberează resursa cât mai repede, lăsând loc maxim pentru următoarele.
+
+<ObservationBox>
+Intuiția criteriului corect: terminând cât mai devreme, păstrezi cel mai mult „spațiu liber" pentru deciziile viitoare. Asta e exact ce nu strică optimul global.
+</ObservationBox>
+
+## Exemplu numeric
+
+Activități (început–sfârșit): `A(1-4)`, `B(3-5)`, `C(0-6)`, `D(5-7)`, `E(5-9)`, `F(8-9)`.
+
+Sortate după sfârșit: `A(4), B(5), C(6), D(7), E(9), F(9)`.
+
+```
+ultimul_sfarsit = -inf
+A(1-4): 1 >= -inf  -> ia A, ultimul = 4
+B(3-5): 3 <  4     -> sare (se suprapune)
+C(0-6): 0 <  4     -> sare
+D(5-7): 5 >= 4     -> ia D, ultimul = 7
+E(5-9): 5 <  7     -> sare
+F(8-9): 8 >= 7     -> ia F, ultimul = 9
+```
+
+Rezultat: `A, D, F` — 3 activități. Criteriul „cel mai devreme sfârșit" a dat optimul.
+
+## Cum cauți criteriul
+
+1. **Enumeră criterii candidate**: cel mai mic/mare, cel mai scurt/lung, cel mai devreme/târziu, cel mai bun raport.
+2. **Caută contraexemple mici** pentru fiecare. Cele care cad sunt eliminate.
+3. **Criteriul care supraviețuiește** devine candidatul serios — apoi îl justifici (lecția-punte).
+
+<MistakeBox>
+Capcane la alegerea locală:
+
+- **Primul criteriu care „pare logic"**: de obicei există mai multe candidate; cel evident nu e mereu cel corect (vezi „cea mai scurtă activitate").
+- **Nu cauți contraexemple**: fără ele, riști să implementezi un criteriu greșit și să pici testele.
+- **Confunzi criteriul cu sortarea**: sortarea e doar mijlocul prin care aplici criteriul ușor; criteriul e regula de prioritate.
+- **Criteriu cu departajare lipsă**: la egalități, un criteriu ambiguu poate alege prost. Definește și regula de departajare.
+</MistakeBox>
+
+## Recapitulare
+
+- Alegerea locală optimă e regula după care selectezi cea mai bună opțiune la fiecare pas — inima Greedy-ului.
+- Același cadru cu criterii diferite dă rezultate diferite; criteriul potrivit decide corectitudinea.
+- Găsește criteriul enumerând candidate și doborându-le cu contraexemple mici, apoi justifică-l pe cel rămas.

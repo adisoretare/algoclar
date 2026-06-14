@@ -1,0 +1,134 @@
+---
+title: "Noțiunea de stivă — ultimul intrat, primul ieșit"
+slug: notiunea-de-stiva
+grade: 7
+chapter: stiva
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["stiva", "lifo", "structuri"]
+visualizers: ["stack"]
+relatedProblems: []
+quiz:
+  - question: "Ce principiu respectă o stivă?"
+    options:
+      - "Primul intrat, primul ieșit (FIFO)"
+      - "Ultimul intrat, primul ieșit (LIFO)"
+      - "Cel mai mare iese primul"
+      - "Ordinea alfabetică"
+    correctIndex: 1
+    explanation: "Stiva e LIFO (Last In, First Out): elementul adăugat cel mai recent este primul care iese, ca o stivă de farfurii."
+  - question: "Unde se fac toate operațiile pe o stivă?"
+    options:
+      - "La ambele capete"
+      - "Doar la vârf (capătul de sus)"
+      - "Doar la bază"
+      - "În mijloc"
+    correctIndex: 1
+    explanation: "O stivă lucrează exclusiv la vârf: adaugi (push) și scoți (pop) doar de acolo. Nu ai acces direct la elementele de dedesubt."
+  - question: "Dacă adaugi în ordine 1, 2, 3 într-o stivă goală, ce element iese primul la o extragere?"
+    options:
+      - "1"
+      - "2"
+      - "3"
+      - "Niciunul"
+    correctIndex: 2
+    explanation: "Ultimul adăugat (3) este în vârf, deci iese primul. Ordinea de ieșire ar fi 3, 2, 1 — inversul celei de intrare."
+---
+
+<LessonHook>
+Un teanc de farfurii: pui farfuria nouă deasupra și tot de deasupra o iei pe prima. Nu tragi una din mijloc fără să dărâmi tot. Stiva e exact acest teanc — adaugi și scoți doar din vârf.
+</LessonHook>
+
+## Ce este o stivă
+
+O **stivă** (stack) e o structură de date în care adaugi și scoți elemente **doar de la un capăt**, numit **vârf**. Respectă principiul **LIFO**: *Last In, First Out* — ultimul intrat e primul ieșit.
+
+Cele două operații de bază:
+- **push** — adaugi un element în vârf.
+- **pop** — scoți elementul din vârf.
+
+<ObservationBox>
+Spre deosebire de un vector, nu ai acces liber la orice poziție. Vezi și atingi doar vârful. Această restricție pare un dezavantaj, dar e exact ce face stiva utilă pentru anumite probleme (paranteze, recursivitate, parcurgeri).
+</ObservationBox>
+
+## Ordinea inversă
+
+Consecința directă a LIFO: ce intră ultimul iese primul. Dacă adaugi `1, 2, 3`:
+
+```
+push 1: [1]
+push 2: [1, 2]
+push 3: [1, 2, 3]   <- 3 e in varf
+pop -> 3            [1, 2]
+pop -> 2            [1]
+pop -> 1            []
+```
+
+Ies în ordinea `3, 2, 1` — inversul intrării. De aceea stiva e unealta naturală pentru a inversa o secvență sau a reveni pe pașii deja făcuți.
+
+## Unde apare stiva „pe ascuns"
+
+- **Apelurile de funcții**: fiecare apel se pune pe o stivă (stiva apelurilor); când o funcție se termină, se scoate de sus. De aici și termenul „stack overflow".
+- **Butonul Înapoi** din browser: ultima pagină vizitată e prima la care te întorci.
+- **Anularea (Undo)**: ultima acțiune făcută e prima anulată.
+
+## Stivă cu un simplu vector
+
+Cel mai simplu, o stivă se implementează cu un vector și un indice `varf` care arată câte elemente sunt:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int stiva[100];
+int varf = 0;        // numarul de elemente; varful e stiva[varf-1]
+
+void push(int x) {
+    stiva[varf++] = x;     // pun in varf si cresc
+}
+
+int pop() {
+    return stiva[--varf];  // scad si returnez fostul varf
+}
+
+bool gol() {
+    return varf == 0;
+}
+
+int main() {
+    push(1); push(2); push(3);
+    while (!gol()) cout << pop() << " ";   // 3 2 1
+    cout << "\n";
+    return 0;
+}
+```
+
+`varf` e și numărul de elemente, și poziția unde scrii următorul push. Vârful efectiv e `stiva[varf-1]`.
+
+## Vizualizare
+
+Urmărește cum cresc și scad elementele, mereu din vârf:
+
+<Visualizer name="stack" />
+
+<HintBox>
+Folosește **←** și **→** pentru a urmări fiecare push și pop. Observă că doar vârful se mișcă vreodată.
+</HintBox>
+
+<MistakeBox>
+Capcane la noțiunea de stivă:
+
+- **Confuzi LIFO cu FIFO**: stiva scoate ultimul intrat; coada (queue) scoate primul intrat. Nu le amesteca.
+- **Încerci să accesezi un element din mijloc**: stiva nu permite asta direct. Dacă ai nevoie de acces aleator, folosește un vector obișnuit.
+- **`pop` pe stivă goală**: `--varf` cu `varf = 0` duce la indice negativ → acces invalid. Verifică `!gol()` înainte.
+- **Confuzi `varf` cu indicele vârfului**: dacă `varf` e numărul de elemente, vârful e `stiva[varf-1]`, nu `stiva[varf]`.
+</MistakeBox>
+
+## Recapitulare
+
+- Stiva e o structură LIFO: adaugi (push) și scoți (pop) doar de la vârf.
+- Ordinea de ieșire e inversul celei de intrare — utilă pentru a reveni pe pași sau a inversa secvențe.
+- Se implementează simplu cu un vector și un indice `varf`; verifică mereu că nu e goală înainte de pop.

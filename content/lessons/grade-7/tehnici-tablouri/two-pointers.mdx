@@ -1,0 +1,137 @@
+---
+title: "Two Pointers — doi indici care mătură vectorul"
+slug: two-pointers
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["two-pointers", "vectori", "tehnica"]
+visualizers: ["two-pointers"]
+relatedProblems: []
+quiz:
+  - question: "Pe ce tip de vector funcționează tehnica clasică two pointers pentru a găsi o pereche cu sumă dată?"
+    options:
+      - "Pe orice vector, indiferent de ordine"
+      - "Pe un vector sortat"
+      - "Doar pe vectori cu elemente pozitive"
+      - "Doar pe vectori de lungime pară"
+    correctIndex: 1
+    explanation: "Mutarea deterministă a celor doi indici (stânga crește dacă suma e prea mică, dreapta scade dacă e prea mare) funcționează doar dacă vectorul e sortat."
+  - question: "Care e complexitatea căutării unei perechi cu sumă dată prin two pointers, pe un vector deja sortat?"
+    options:
+      - "O(n²)"
+      - "O(n log n)"
+      - "O(n)"
+      - "O(1)"
+    correctIndex: 2
+    explanation: "Fiecare pas mută cel puțin un indice, iar cei doi indici se întâlnesc o singură dată. Total: O(n) după sortare."
+  - question: "Suma curentă e mai mare decât ținta. Ce indice muți?"
+    options:
+      - "Indicele din stânga, spre dreapta"
+      - "Indicele din dreapta, spre stânga (scazi suma)"
+      - "Ambele spre centru simultan"
+      - "Niciunul, te oprești"
+    correctIndex: 1
+    explanation: "Pe vector sortat, ca să scazi suma trebuie o valoare mai mică în dreapta: muți indicele drept spre stânga. Dacă suma e prea mică, muți stângul spre dreapta."
+---
+
+<LessonHook>
+Cauți două cărți pe un raft ordonat după grosime, care împreună să aibă exact 30 cm. Pui un deget pe cea mai subțire și unul pe cea mai groasă. Dacă suma e prea mare, muți degetul de la cea groasă spre interior; dacă e prea mică, muți degetul de la cea subțire. Asta e tehnica two pointers.
+</LessonHook>
+
+## Ce este tehnica two pointers?
+
+**Two pointers** (doi indici) folosește doi indici care parcurg vectorul în mod coordonat, în loc de două bucle imbricate. Înlocuiește deseori un algoritm O(n²) cu unul O(n).
+
+Cei doi indici pot:
+- **porni de la capete** și se apropie (perechi cu sumă dată, palindrom);
+- **porni amândoi din stânga** și avansa, unul mai repede (ferestre, eliminarea duplicatelor).
+
+## Problema clasică: pereche cu sumă dată
+
+Avem un vector **sortat** și o țintă `S`. Vrem două elemente cu suma `S`.
+
+Exemplu concret: `v = {1, 3, 4, 6, 8, 11}`, `S = 10`.
+
+Punem `st = 0` (stânga) și `dr = 5` (dreapta) și comparăm suma `v[st] + v[dr]` cu `S`:
+
+```
+st=0 dr=5: 1 + 11 = 12 > 10  -> dr--
+st=0 dr=4: 1 +  8 =  9 < 10  -> st++
+st=1 dr=4: 3 +  8 = 11 > 10  -> dr--
+st=1 dr=3: 3 +  6 =  9 < 10  -> st++
+st=2 dr=3: 4 +  6 = 10 = 10  -> gasit!
+```
+
+**De ce merge?** Pe vector sortat, dacă suma e prea mare, singura cale să o micșorezi e o valoare mai mică în dreapta (`dr--`). Dacă e prea mică, ai nevoie de o valoare mai mare în stânga (`st++`). Nicio pereche nu e ratată.
+
+<ObservationBox>
+Cheia e că vectorul e **sortat**. Fără ordine, mișcarea indicilor n-ar mai fi sigură și ai putea sări peste soluție.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[6] = {1, 3, 4, 6, 8, 11};  // vector sortat
+    int n = 6, S = 10;
+
+    int st = 0, dr = n - 1;
+    bool gasit = false;
+    while (st < dr) {
+        int suma = v[st] + v[dr];
+        if (suma == S) {
+            cout << v[st] << " + " << v[dr] << " = " << S << "\n";  // 4 + 6 = 10
+            gasit = true;
+            break;
+        } else if (suma < S) {
+            st++;    // suma prea mica -> creste stanga
+        } else {
+            dr--;    // suma prea mare -> scade dreapta
+        }
+    }
+    if (!gasit) cout << "Nu exista pereche\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| vector deja sortat | O(n) | O(1) |
+| vector nesortat (sortezi întâi) | O(n log n) | O(1) |
+| varianta naivă (două bucle) | O(n²) | O(1) |
+
+La fiecare pas, `st` crește sau `dr` scade, deci se fac cel mult `n` pași.
+
+## Vizualizare
+
+Urmărește cum se mișcă cei doi indici spre centru:
+
+<Visualizer name="two-pointers" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas. Observă că suma celor două capete decide mereu care indice se mută.
+</HintBox>
+
+<MistakeBox>
+Capcane la two pointers:
+
+- **Uiți să sortezi**: pe vector nesortat, mutarea indicilor nu mai e validă și ratezi soluții.
+- **Condiția buclei greșită**: `while (st <= dr)` poate folosi același element de două ori. Folosește `st < dr` dacă cele două elemente trebuie să fie distincte.
+- **Overflow la sumă**: dacă elementele sunt mari (până la 10⁹), `v[st] + v[dr]` poate depăși `int`. Folosește `long long`.
+- **Muți ambii indici deodată „ca să meargă mai repede"**: poți sări peste perechea corectă. Muți exact unul, în funcție de comparație.
+</MistakeBox>
+
+## Recapitulare
+
+- Two pointers înlocuiește două bucle imbricate cu doi indici coordonați — deseori O(n²) → O(n).
+- Varianta cu indici la capete cere vector sortat; comparația sumă vs. țintă decide ce indice muți.
+- Atenție la condiția buclei (`st < dr`) și la overflow-ul sumei (`long long`).

@@ -1,0 +1,152 @@
+---
+title: "Sortarea structurilor — ordonezi după ce câmp vrei"
+slug: sortarea-structurilor
+grade: 7
+chapter: structuri-neomogene
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["struct", "sortare", "comparator"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce rol are funcția de comparare (comparatorul) dată lui `sort`?"
+    options:
+      - "Numără elementele"
+      - "Spune, pentru două elemente, care trebuie să stea înaintea celuilalt"
+      - "Elimină duplicatele"
+      - "Schimbă tipul elementelor"
+    correctIndex: 1
+    explanation: "Comparatorul primește două elemente și întoarce `true` dacă primul trebuie să stea înaintea celui de-al doilea. Așa `sort` știe criteriul de ordonare."
+  - question: "Cum sortezi crescător un vector de structuri după câmpul `nota`?"
+    options:
+      - "return a.nota > b.nota;"
+      - "return a.nota < b.nota;"
+      - "return a.nota == b.nota;"
+      - "return a < b;"
+    correctIndex: 1
+    explanation: "Pentru ordine crescătoare după `nota`, comparatorul întoarce `a.nota < b.nota` — adică a stă înaintea lui b când are nota mai mică."
+  - question: "Vrei să sortezi după notă descrescător, iar la note egale alfabetic după nume. Cum faci?"
+    options:
+      - "Sortezi de două ori, independent"
+      - "În comparator: dacă notele diferă, compari notele; altfel compari numele"
+      - "Nu se poate cu un singur sort"
+      - "Folosești două vectoare"
+    correctIndex: 1
+    explanation: "Comparatorul tratează criteriile în ordine: întâi nota (descrescător); dacă notele sunt egale, departajează după nume (crescător). Un singur `sort` rezolvă tot."
+---
+
+<LessonHook>
+Un clasament sportiv se ordonează după puncte — dar la egalitate de puncte, contează golaverajul, apoi numele. Nu rearanjezi de trei ori; spui o singură regulă de departajare și aplici. Sortarea structurilor face exact asta: îi dai criteriul, iar restul se aranjează singur.
+</LessonHook>
+
+## De ce avem nevoie de un criteriu
+
+Un `int` se sortează „de la sine" — știm că 3 < 7. Dar un `Elev` cu nume și notă? După ce-l ordonezi: nume sau notă? Crescător sau descrescător? Tu decizi, printr-un **comparator**.
+
+## Funcția `sort` din STL
+
+`sort` ordonează un vector în O(n log n). Pentru tipuri simple îi dai doar capetele:
+
+```cpp
+#include <algorithm>
+sort(v, v + n);   // crescator, pentru int/double/string
+```
+
+Pentru structuri, adaugi un al treilea argument: **comparatorul**, care spune cine stă primul.
+
+## Comparatorul
+
+Comparatorul e o funcție care primește două elemente, `a` și `b`, și întoarce `true` dacă `a` trebuie să stea **înaintea** lui `b`:
+
+```cpp
+bool dupaNota(const Elev &a, const Elev &b) {
+    return a.nota < b.nota;   // crescator dupa nota
+}
+```
+
+`a.nota < b.nota` → ordine crescătoare. Inversezi semnul (`>`) pentru descrescător.
+
+<ObservationBox>
+Regula de aur: comparatorul descrie relația „strict înainte". Folosește `<` pentru crescător, `>` pentru descrescător. Nu folosi `<=` sau `>=` — pot deruta algoritmul de sortare.
+</ObservationBox>
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct Elev {
+    string nume;
+    int nota;
+};
+
+bool dupaNota(const Elev &a, const Elev &b) {
+    return a.nota < b.nota;   // crescator dupa nota
+}
+
+int main() {
+    Elev v[4] = {{"Ana", 9}, {"Bogdan", 7}, {"Carmen", 10}, {"Dan", 8}};
+    int n = 4;
+
+    sort(v, v + n, dupaNota);
+
+    for (int i = 0; i < n; i++)
+        cout << v[i].nume << " " << v[i].nota << "\n";
+    // Bogdan 7 / Dan 8 / Ana 9 / Carmen 10
+    return 0;
+}
+```
+
+Înainte de sortare, după câmpul `nota`:
+
+<ArrayDiagram
+  values="9 7 10 8"
+  index="Ana Bogdan Carmen Dan"
+  caption="Înainte: ordine de citire. Numele (eticheta) călătorește cu nota lui." />
+
+După `sort` cu `dupaNota` (crescător):
+
+<ArrayDiagram
+  values="7 8 9 10"
+  index="Bogdan Dan Ana Carmen"
+  caption="După: ordonat crescător după notă. Fiecare nume a rămas lipit de nota lui — structura a mutat câmpurile împreună." />
+
+## Mai multe criterii (departajare)
+
+La note egale, vrei ordine alfabetică. Comparatorul tratează criteriile în ordine de prioritate:
+
+```cpp
+bool dupaNotaApoiNume(const Elev &a, const Elev &b) {
+    if (a.nota != b.nota) return a.nota > b.nota;  // 1) nota descrescator
+    return a.nume < b.nume;                         // 2) la egalitate, nume crescator
+}
+```
+
+Întâi compari nota; **doar dacă** notele sunt egale treci la nume. Așa obții un clasament corect, dintr-un singur `sort`.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `sort` (STL) | O(n log n) | O(log n) |
+| comparator | O(1) per comparație | O(1) |
+
+<MistakeBox>
+Capcane la sortarea structurilor:
+
+- **Comparator cu `<=` sau `>=`**: relația „înainte" trebuie să fie strictă. `<=` poate produce comportament nedefinit la sortare.
+- **Uiți `#include <algorithm>`**: `sort` nu e recunoscut fără el.
+- **Sortezi două vectori paraleli separat**: se desincronizează. De aceea ții datele într-o structură și sortezi vectorul de structuri o singură dată.
+- **Departajare greșită**: dacă tratezi al doilea criteriu chiar și când primul diferă, strici ordinea. Departajează *numai* la egalitate pe criteriul anterior.
+</MistakeBox>
+
+## Recapitulare
+
+- Structurile se sortează cu `sort` plus un comparator care spune cine stă înainte (`a.camp < b.camp` = crescător).
+- Sortarea unui vector de structuri mută toate câmpurile fiecărui element împreună — fără desincronizare.
+- Pentru mai multe criterii, departajezi în comparator: treci la criteriul următor doar la egalitate pe cel anterior.

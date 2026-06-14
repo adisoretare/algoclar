@@ -1,0 +1,109 @@
+---
+title: "Lecție-punte: stiva ca memorie a elementelor nerezolvate"
+slug: punte-stiva-memorie
+grade: 7
+chapter: stiva
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["stiva", "modelare", "nerezolvate"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e ideea unificatoare din spatele problemelor cu stivă?"
+    options:
+      - "Sortarea elementelor"
+      - "Stiva ține elementele „deschise / nerezolvate”, în așteptarea celui care le va închide"
+      - "Stiva numără elementele"
+      - "Stiva caută binar"
+    correctIndex: 1
+    explanation: "Fie că e vorba de paranteze, de următorul element mai mare sau de recursivitate, stiva reține lucrurile începute dar neterminate, până când apare ceva care le rezolvă."
+  - question: "Ce „rezolvă” un element din vârful stivei?"
+    options:
+      - "Trecerea timpului"
+      - "Apariția elementului care îl închide / îl depășește, moment în care se face pop"
+      - "Sortarea finală"
+      - "Numărul de elemente"
+    correctIndex: 1
+    explanation: "Elementul din vârf rămâne acolo până apare perechea (paranteza închisă) sau elementul mai mare/mic. Atunci e rezolvat și scos."
+  - question: "De ce ordinea LIFO e potrivită pentru aceste probleme?"
+    options:
+      - "Pentru că e mai rapidă la sortare"
+      - "Pentru că cel mai recent element deschis este, de regulă, primul care trebuie închis"
+      - "Pentru că folosește mai puțină memorie decât orice altceva"
+      - "Pentru că elimină duplicatele"
+    correctIndex: 1
+    explanation: "În paranteze, recursivitate sau stive monotone, închiderea se face în ordine inversă deschiderii: ultimul deschis, primul închis. Exact LIFO."
+---
+
+<LessonHook>
+Un chelner ține minte comenzile încă neaduse la mese. Când vine un fel de mâncare, îl duce la cea mai recentă comandă potrivită și o bifează. Stiva e exact acest carnețel de „comenzi nerezolvate" — ții ce ai început și nu ai terminat, până apare ce le rezolvă.
+</LessonHook>
+
+## Ideea care leagă toate problemele cu stivă
+
+Privite separat, parantezele, recursivitatea și „următorul element mai mare" par fără legătură. Au însă același miez:
+
+> **Stiva reține elementele deschise / nerezolvate, în ordinea în care au apărut, până când întâlnești ceva care le închide.**
+
+Când apare „rezolvatorul", el acționează asupra **celui mai recent** element nerezolvat — vârful. De aici LIFO.
+
+<ObservationBox>
+Întreabă-te mereu: *ce înseamnă aici „nerezolvat"?* și *ce element îl rezolvă?* Dacă răspunsul e „cel mai recent deschis se închide primul", problema e o stivă.
+</ObservationBox>
+
+## Aceeași schemă, trei probleme
+
+| Problemă | Ce e „nerezolvat" (pe stivă) | Ce îl „rezolvă" (pop) |
+|----------|------------------------------|------------------------|
+| paranteze corecte | paranteză deschisă | paranteza închisă care i se potrivește |
+| următorul mai mare | element fără vecin mai mare la dreapta | un element mai mare care apare |
+| recursivitate | apel de funcție neîncheiat | revenirea (return) din apel |
+
+În toate, scheletul codului e identic: pui pe stivă când „deschizi", verifici/scoți vârful când „închizi".
+
+## Scheletul comun
+
+```cpp
+stack<...> s;
+for (fiecare element) {
+    // cat timp varful e "rezolvat" de elementul curent:
+    while (!s.empty() && seRezolva(s.top(), element)) {
+        // foloseste s.top() (raspuns, verificare)
+        s.pop();
+    }
+    if (elementul "deschide" ceva) s.push(element);
+}
+// ce ramane pe stiva = nerezolvat la final (paranteze lipsa, -1 la next-greater)
+```
+
+Diferă doar `seRezolva` și ce faci la pop — restul e mereu la fel.
+
+## Cum recunoști o problemă de stivă
+
+1. Procesezi elementele **în ordine**, o singură trecere.
+2. Unele elemente „așteaptă" un partener viitor.
+3. Partenerul rezolvă **cel mai recent** element care aștepta.
+
+Dacă bifezi aceste trei, gândește stivă.
+
+<ObservationBox>
+Stiva monotonă (următorul mai mare/mic) e doar acest tipar cu o condiție de „rezolvare" bazată pe comparație. Odată ce vezi scheletul comun, problemele aparent grele devin variații pe aceeași temă.
+</ObservationBox>
+
+<MistakeBox>
+Capcane când modelezi cu stivă:
+
+- **Nu identifici clar „nerezolvatul"**: dacă nu poți spune ce ține stiva, probabil structura nu e potrivită.
+- **Folosești stiva când rezolvarea nu e LIFO**: dacă partenerul rezolvă *cel mai vechi* element care așteaptă (nu cel mai recent), ai nevoie de coadă, nu de stivă.
+- **Uiți elementele rămase**: ce e pe stivă la final nu a fost rezolvat — tratează-l (eroare la paranteze, `-1` la next-greater).
+- **Pui prea mult pe stivă**: ține doar ce e strict necesar (de obicei indici sau parteneri deschiși), nu tot vectorul.
+</MistakeBox>
+
+## Recapitulare
+
+- Toate problemele cu stivă au același miez: stiva ține elementele nerezolvate până apare ce le închide.
+- Rezolvarea acționează mereu asupra vârfului (cel mai recent nerezolvat) — de aceea ordinea e LIFO.
+- Recunoști tiparul când procesezi în ordine, unele elemente așteaptă un partener, iar partenerul rezolvă cel mai recent element în așteptare.

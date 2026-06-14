@@ -1,0 +1,126 @@
+---
+title: "sort — sortare gata făcută din STL"
+slug: stl-sort
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "sort", "sortare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce complexitate are `sort` din STL?"
+    options:
+      - "O(n²)"
+      - "O(n log n)"
+      - "O(n)"
+      - "O(log n)"
+    correctIndex: 1
+    explanation: "`sort` folosește un algoritm hibrid eficient (introsort) cu complexitate O(n log n) — mult mai bun decât sortările pătratice scrise de mână."
+  - question: "Cum sortezi crescător un vector clasic `int v[n]`?"
+    options:
+      - "sort(v);"
+      - "sort(v, n);"
+      - "sort(v, v + n);"
+      - "sort(v[0], v[n]);"
+    correctIndex: 2
+    explanation: "Pentru un vector clasic dai intervalul `[v, v + n)`: începutul și poziția de după ultimul element. `sort(v, v + n)` sortează crescător."
+  - question: "Ce header trebuie inclus pentru a folosi `sort`?"
+    options:
+      - "<vector>"
+      - "<algorithm>"
+      - "<iostream>"
+      - "<cmath>"
+    correctIndex: 1
+    explanation: "`sort` e declarat în `<algorithm>`. Fără acest include, compilatorul nu recunoaște funcția."
+---
+
+<LessonHook>
+Ai un teanc de hârtii amestecate și vrei să le pui în ordine. Poți să le aranjezi una câte una, ore întregi — sau poți da teancul unei mașini de sortat care le scoate gata ordonate. `sort` din STL e acea mașină: îi dai datele, primești ordinea.
+</LessonHook>
+
+## De ce `sort` și nu sortare scrisă de mână
+
+Sortările scrise manual (bubble, selecție, inserție) sunt O(n²) — lente pentru `n` mare și o sursă constantă de bug-uri. STL îți oferă `sort`, un algoritm O(n log n) testat și optimizat. La concurs, asta înseamnă cod mai scurt, mai rapid și mai sigur.
+
+<ObservationBox>
+Reține `sort` ca prima alegere ori de câte ori ai nevoie de ordine. Sortările pătratice rămân utile doar ca exercițiu de înțelegere, nu ca soluție practică.
+</ObservationBox>
+
+## Cum se folosește
+
+`sort` primește **intervalul** de sortat: începutul și poziția de **după** ultimul element. Pentru un vector clasic:
+
+```cpp
+sort(v, v + n);   // sorteaza crescator v[0..n-1]
+```
+
+Pentru un `vector<int> a`:
+
+```cpp
+sort(a.begin(), a.end());
+```
+
+Implicit, ordinea e **crescătoare**.
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+#include <algorithm>   // pentru sort
+using namespace std;
+
+int main() {
+    int v[6] = {5, 3, 8, 1, 9, 2};
+    int n = 6;
+
+    sort(v, v + n);   // crescator
+
+    for (int i = 0; i < n; i++) cout << v[i] << " ";  // 1 2 3 5 8 9
+    cout << "\n";
+    return 0;
+}
+```
+
+## Sortare descrescătoare
+
+Cel mai simplu, folosești `greater`:
+
+```cpp
+sort(v, v + n, greater<int>());   // descrescator: 9 8 5 3 2 1
+```
+
+`greater<int>()` e un comparator gata făcut care inversează ordinea. Pentru criterii proprii (după câmp, după mai multe reguli) îți scrii propriul comparator — subiectul lecției următoare.
+
+## Doar o parte din vector
+
+Intervalul poate fi orice porțiune. Ca să sortezi doar primele 4 elemente:
+
+```cpp
+sort(v, v + 4);   // ordoneaza doar v[0..3], restul ramane
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `sort` | O(n log n) | O(log n) |
+| sortare pătratică manuală | O(n²) | O(1) |
+
+<MistakeBox>
+Capcane la `sort`:
+
+- **Uiți `#include <algorithm>`**: `sort` nu e recunoscut.
+- **Capătul greșit al intervalului**: `sort(v, v + n)` e corect (`v + n` = după ultimul). `sort(v, v + n - 1)` lasă ultimul element nesortat.
+- **Amesteci stiluri**: pentru vector clasic folosești `v, v + n`; pentru `vector<>` folosești `.begin(), .end()`. Nu le combina.
+- **Crezi că `sort` păstrează ordinea elementelor egale**: nu garantează asta (nu e stabil). Dacă ai nevoie de stabilitate, folosești `stable_sort`.
+</MistakeBox>
+
+## Recapitulare
+
+- `sort(v, v + n)` ordonează crescător în O(n log n); e prima alegere pentru orice sortare.
+- Pentru descrescător folosești `greater<int>()`; pentru criterii proprii, un comparator.
+- Necesită `#include <algorithm>`; intervalul e `[început, după-ultimul)`.

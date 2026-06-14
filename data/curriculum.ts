@@ -319,9 +319,9 @@ export const CURRICULUM: Grade[] = [
         lessons: [
           { id: 'stl-sort', title: 'sort' },
           { id: 'comparatori', title: 'Comparatori' },
-          { id: 'stl-binary-search', title: 'binary_search' },
-          { id: 'lower-bound', title: 'lower_bound' },
-          { id: 'upper-bound', title: 'upper_bound' },
+          { id: 'stl-binary-search', title: 'binary_search', visualizer: 'cautare-binara' },
+          { id: 'lower-bound', title: 'lower_bound', visualizer: 'cautare-binara' },
+          { id: 'upper-bound', title: 'upper_bound', visualizer: 'cautare-binara' },
           { id: 'punte-sortare-criterii', title: 'Lecție-punte: sortare după mai multe criterii', isBridge: true },
         ],
       },

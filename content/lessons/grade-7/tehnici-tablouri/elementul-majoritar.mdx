@@ -1,0 +1,142 @@
+---
+title: "Elementul majoritar — algoritmul de vot Boyer-Moore"
+slug: elementul-majoritar
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["majoritar", "boyer-moore", "vot"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă „element majoritar” într-un vector cu n elemente?"
+    options:
+      - "Cel mai mare element"
+      - "Un element care apare de mai mult de n/2 ori"
+      - "Elementul din mijloc"
+      - "Cel mai frecvent element, oricât de des ar apărea"
+    correctIndex: 1
+    explanation: "Elementul majoritar apare strict de mai mult de n/2 ori. De aceea cel mult unul singur poate exista — două elemente cu peste n/2 apariții ar însemna peste n elemente."
+  - question: "Cum funcționează ideea de vot a lui Boyer-Moore?"
+    options:
+      - "Sortează vectorul și ia elementul din mijloc"
+      - "Ține un candidat și un contor; elementele egale cu candidatul îl cresc, restul îl scad; la 0 schimbi candidatul"
+      - "Numără toate aparițiile cu un vector de frecvență"
+      - "Compară fiecare element cu toate celelalte"
+    correctIndex: 1
+    explanation: "Candidatul „supraviețuiește” dacă apare mai des decât toate celelalte la un loc. Anulările reciproce lasă în picioare exact majoritarul, dacă există."
+  - question: "De ce e nevoie de o a doua parcurgere după ce găsești candidatul?"
+    options:
+      - "Ca să sortezi vectorul"
+      - "Pentru că algoritmul de vot garantează doar candidatul; trebuie verificat că apare cu adevărat de peste n/2 ori"
+      - "Ca să-l afișezi"
+      - "Nu e nevoie niciodată"
+    correctIndex: 1
+    explanation: "Dacă vectorul nu are element majoritar, votul tot returnează un candidat. A doua parcurgere numără aparițiile și confirmă (sau infirmă) majoritatea."
+---
+
+<LessonHook>
+La o alegere, doi susținători ai unor candidați diferiți se anulează reciproc și pleacă acasă. Dacă un candidat are mai mulți susținători decât toți ceilalți la un loc, vor rămâne în sală doar oameni de-ai lui — oricât de multe anulări ar avea loc. Așa găsești majoritarul fără să numeri tot.
+</LessonHook>
+
+## Ce este elementul majoritar?
+
+Într-un vector cu `n` elemente, **majoritarul** e valoarea care apare strict de mai mult de `n/2` ori. Dacă există, e unic — două valori cu peste `n/2` apariții ar depăși împreună `n` elemente.
+
+Exemplu: `v = {2, 2, 1, 2, 3, 2, 2}`, `n = 7`. Valoarea `2` apare de 5 ori (5 > 3), deci e majoritară.
+
+## Soluția simplă cu vector de frecvență
+
+Dacă valorile sunt mici, numeri aparițiile într-un vector `frecv` și cauți una cu `frecv[x] > n/2`. Costă O(n) timp și O(valoare_maximă) spațiu. Funcționează, dar consumă memorie când valorile sunt mari.
+
+## Algoritmul de vot Boyer-Moore — O(1) memorie
+
+Ideea: ții un **candidat** și un **contor**.
+
+- Contor `0` → candidat nou = elementul curent, contor `1`.
+- Element egal cu candidatul → contor `+1`.
+- Element diferit → contor `-1` (o anulare reciprocă).
+
+La final, candidatul rămas e singurul posibil majoritar.
+
+<ObservationBox>
+Fiecare element diferit „anulează" o apariție a candidatului. Dacă majoritarul apare de peste n/2 ori, are mai multe apariții decât toate celelalte la un loc, deci nu poate fi anulat complet — supraviețuiește ca ultim candidat.
+</ObservationBox>
+
+## Pas cu pas
+
+Pe `v = {2, 2, 1, 2, 3, 2, 2}`:
+
+```
+i=0: x=2  contor 0 -> candidat=2, contor=1
+i=1: x=2  ==cand   -> contor=2
+i=2: x=1  !=cand   -> contor=1
+i=3: x=2  ==cand   -> contor=2
+i=4: x=3  !=cand   -> contor=1
+i=5: x=2  ==cand   -> contor=2
+i=6: x=2  ==cand   -> contor=3
+```
+
+Candidat final: `2`. Starea contorului ca diagramă, urmărind „energia" candidatului:
+
+<ArrayDiagram
+  values="1 2 1 2 1 2 3"
+  index="off"
+  caption="Valoarea contorului după fiecare pas: scade la întâlnirea altui element, crește la regăsirea candidatului. Nu ajunge niciodată la 0 aici, deci 2 rezistă." />
+
+## A doua parcurgere: verificarea
+
+Votul dă mereu un candidat, chiar dacă vectorul nu are majoritar. Confirmă numărând:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int v[7] = {2, 2, 1, 2, 3, 2, 2};
+    int n = 7;
+
+    // pasul 1: gaseste candidatul
+    int candidat = v[0], contor = 0;
+    for (int i = 0; i < n; i++) {
+        if (contor == 0) candidat = v[i];
+        if (v[i] == candidat) contor++;
+        else contor--;
+    }
+
+    // pasul 2: verifica majoritatea
+    int aparitii = 0;
+    for (int i = 0; i < n; i++) {
+        if (v[i] == candidat) aparitii++;
+    }
+
+    if (aparitii > n / 2) cout << candidat << "\n";  // 2
+    else cout << "Nu exista element majoritar\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|--------|------|--------|
+| vector de frecvență | O(n) | O(valoare maximă) |
+| Boyer-Moore | O(n) | O(1) |
+
+<MistakeBox>
+Capcane la elementul majoritar:
+
+- **Omiterea verificării finale**: fără a doua parcurgere, returnezi un candidat fals când nu există majoritar.
+- **Confuzi „majoritar" cu „cel mai frecvent"**: cel mai frecvent element poate apărea de mai puțin de n/2 ori; majoritarul cere strict peste n/2.
+- **Compari `aparitii >= n/2`**: pentru `n` par, `n/2` apariții nu sunt majoritate. Condiția corectă e `> n/2`.
+- **Resetezi contorul greșit**: candidatul se schimbă doar când contorul e exact 0, înainte de a procesa elementul curent.
+</MistakeBox>
+
+## Recapitulare
+
+- Majoritarul apare strict de peste n/2 ori; dacă există, e unic.
+- Boyer-Moore găsește candidatul în O(n) timp și O(1) memorie, prin anulări reciproce.
+- E obligatorie o a doua parcurgere care confirmă că aparițiile candidatului depășesc n/2.

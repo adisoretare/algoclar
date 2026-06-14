@@ -1,0 +1,109 @@
+---
+title: "Ideea metodei Greedy — alegerea care pare cea mai bună acum"
+slug: ideea-greedy
+grade: 7
+chapter: greedy
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["greedy", "metoda", "optim"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce face un algoritm Greedy la fiecare pas?"
+    options:
+      - "Încearcă toate variantele și o alege pe cea mai bună la final"
+      - "Alege opțiunea care pare cea mai bună în acel moment, fără să dea înapoi"
+      - "Alege la întâmplare"
+      - "Sortează datele și se oprește"
+    correctIndex: 1
+    explanation: "Greedy ia decizia local optimă la fiecare pas și nu o mai revizuiește. De aceea e rapid, dar corectitudinea trebuie demonstrată."
+  - question: "Care e principalul risc al unei abordări Greedy?"
+    options:
+      - "E mereu prea lentă"
+      - "Alegerea local optimă poate să nu ducă la optimul global"
+      - "Consumă prea multă memorie"
+      - "Nu poate folosi sortarea"
+    correctIndex: 1
+    explanation: "O alegere bună pe moment poate bloca o soluție mai bună pe ansamblu. Greedy e corect doar pentru probleme cu o anumită structură, care trebuie verificată."
+  - question: "Prin ce diferă Greedy de a încerca toate combinațiile (brute force)?"
+    options:
+      - "Greedy verifică toate soluțiile, brute force doar una"
+      - "Greedy ia o singură cale de decizii, deci e mult mai rapid, dar nu mereu corect"
+      - "Sunt identice ca viteză"
+      - "Greedy e mereu corect, brute force nu"
+    correctIndex: 1
+    explanation: "Brute force explorează toate variantele (corect, dar lent). Greedy urmează o singură cale de decizii local optime — rapid, însă corect numai dacă problema o permite."
+---
+
+<LessonHook>
+Cobori un munte pe ceață și, la fiecare pas, mergi în direcția care coboară cel mai abrupt. De cele mai multe ori ajungi jos repede — dar uneori nimerești într-o vale mică și rămâi blocat. Asta e metoda Greedy: alegi cel mai bun pas local și speri că te duce la cel mai bun rezultat global.
+</LessonHook>
+
+## Ce este metoda Greedy
+
+Un algoritm **Greedy** (lacom) construiește soluția pas cu pas, alegând la fiecare moment opțiunea care pare cea mai bună **acum**, fără să revină asupra deciziilor luate.
+
+Tiparul e simplu:
+1. Privești opțiunile disponibile la pasul curent.
+2. O alegi pe cea mai bună după un criteriu local.
+3. O fixezi definitiv și treci mai departe.
+
+<ObservationBox>
+Greedy nu dă niciodată înapoi. Asta îl face foarte rapid — dar și riscant: o decizie bună pe moment poate bloca o soluție mai bună pe ansamblu.
+</ObservationBox>
+
+## Un exemplu unde merge: restul cu monede
+
+Vrei să dai rest de `R` lei cu cât mai puține monede, din monede de `1`, `5`, `10`, `50`. Greedy: la fiecare pas dai cea mai mare monedă care încape.
+
+Pentru `R = 67`:
+
+```
+67: dau 50 -> ramane 17  (1 moneda)
+17: dau 10 -> ramane  7  (2 monede)
+ 7: dau  5 -> ramane  2  (3 monede)
+ 2: dau  1 -> ramane  1  (4 monede)
+ 1: dau  1 -> ramane  0  (5 monede)
+```
+
+5 monede. Pentru acest set de monede, Greedy dă mereu numărul minim.
+
+## Un exemplu unde NU merge
+
+Cu monede de `1`, `3`, `4` și `R = 6`, Greedy dă: `4 + 1 + 1 = 3 monede`. Dar optimul e `3 + 3 = 2 monede`. Alegerea lacomă (`4`) a blocat soluția mai bună.
+
+<ObservationBox>
+Aceeași strategie, două rezultate. De aceea Greedy nu e o rețetă universală: funcționează doar pentru probleme cu structura potrivită. A demonstra că merge e partea grea — vezi lecția-punte de la finalul capitolului.
+</ObservationBox>
+
+## Greedy vs. alte metode
+
+| Metodă | Cum lucrează | Viteză | Corectitudine |
+|--------|--------------|--------|---------------|
+| brute force | încearcă toate variantele | lent | mereu corect |
+| Greedy | o cale de decizii locale | foarte rapid | doar dacă problema o permite |
+| programare dinamică | combină subprobleme | mediu | corect pe probleme cu suprapuneri |
+
+## Când să te gândești la Greedy
+
+- Problema cere un **optim** (minim/maxim, cât mai multe/puține).
+- Pare că o **regulă simplă de prioritate** ar putea funcționa (cel mai mare, cel mai scurt, cel mai devreme).
+- Poți **argumenta** că alegerea locală nu strică soluția globală.
+
+<MistakeBox>
+Capcane la metoda Greedy:
+
+- **Presupui că Greedy e corect fără să verifici**: cel mai frecvent mod de a pierde puncte. Testează pe contraexemple mici.
+- **Confunzi „pare optim" cu „este optim"**: o decizie atractivă local poate fi greșită global (vezi monedele 1, 3, 4).
+- **Alegi criteriul de prioritate greșit**: ordinea după care alegi schimbă totul. Gândește ce criteriu nu strică viitorul.
+- **Renunți la Greedy când de fapt criteriul era greșit**: uneori problema chiar e Greedy, dar cu alt criteriu de sortare.
+</MistakeBox>
+
+## Recapitulare
+
+- Greedy construiește soluția alegând la fiecare pas opțiunea local optimă, fără să revină.
+- E foarte rapid, dar corect doar pentru probleme cu structura potrivită — alegerea locală poate rata optimul global.
+- Înainte de a-l folosi, argumentează (sau testează pe contraexemple) că alegerea lacomă nu strică soluția finală.

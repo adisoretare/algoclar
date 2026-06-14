@@ -1,0 +1,146 @@
+---
+title: "Comparatori — tu decizi ordinea"
+slug: comparatori
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "comparatori", "sortare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce trebuie să întoarcă un comparator `cmp(a, b)`?"
+    options:
+      - "`true` dacă a și b sunt egale"
+      - "`true` dacă a trebuie să stea strict înaintea lui b"
+      - "Diferența a - b"
+      - "Poziția lui a în vector"
+    correctIndex: 1
+    explanation: "Comparatorul întoarce `true` exact când `a` trebuie să apară înaintea lui `b` în rezultatul sortat. `sort` se bazează pe această relație de ordine strictă."
+  - question: "De ce e periculos un comparator care întoarce `a <= b`?"
+    options:
+      - "E mai lent"
+      - "Nu e o ordine strictă; poate produce comportament nedefinit la sortare"
+      - "Sortează descrescător din greșeală"
+      - "Nu compilează"
+    correctIndex: 1
+    explanation: "`sort` cere o relație strictă („strict înainte”). Cu `<=`, două elemente egale ar fi „fiecare înaintea celuilalt”, ceea ce încalcă regula și poate da crash sau rezultat greșit."
+  - question: "Cum departajezi în comparator după două criterii (întâi nota descrescător, apoi nume crescător)?"
+    options:
+      - "Compari ambele câmpuri deodată cu &&"
+      - "Dacă notele diferă întorci comparația notelor; altfel întorci comparația numelor"
+      - "Faci două sortări separate"
+      - "Nu se poate"
+    correctIndex: 1
+    explanation: "Tratezi criteriile în ordinea priorității: rezolvi după primul criteriu; doar la egalitate pe el treci la al doilea. Un singur `sort` aplică toată regula."
+---
+
+<LessonHook>
+La un concurs de gătit, juriul are o regulă clară de departajare: întâi gustul, la egalitate prezentarea, apoi rapiditatea. Nu reevaluează totul de trei ori — aplică regula o dată, în ordine. Comparatorul este exact această regulă scrisă în cod.
+</LessonHook>
+
+## Ce este un comparator
+
+Un **comparator** e o funcție care îi spune lui `sort` cum să ordoneze. Primește două elemente, `a` și `b`, și întoarce `true` dacă `a` trebuie să stea **înaintea** lui `b`:
+
+```cpp
+bool cmp(int a, int b) {
+    return a > b;   // a inaintea lui b cand e mai mare -> descrescator
+}
+```
+
+- `return a < b;` → crescător.
+- `return a > b;` → descrescător.
+
+<ObservationBox>
+Regula de aur: comparatorul descrie relația „strict înainte". Folosește `<` sau `>`, niciodată `<=`/`>=`. O ordine non-strictă poate produce comportament nedefinit la sortare.
+</ObservationBox>
+
+## Folosirea cu `sort`
+
+Comparatorul e al treilea argument al lui `sort`:
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+bool descrescator(int a, int b) {
+    return a > b;
+}
+
+int main() {
+    int v[6] = {5, 3, 8, 1, 9, 2};
+    sort(v, v + 6, descrescator);
+    for (int i = 0; i < 6; i++) cout << v[i] << " ";  // 9 8 5 3 2 1
+    cout << "\n";
+    return 0;
+}
+```
+
+## Comparator pentru structuri
+
+Aici comparatorii devin esențiali: un tip propriu nu are ordine „implicită".
+
+```cpp
+struct Elev {
+    string nume;
+    int nota;
+};
+
+bool dupaNota(const Elev &a, const Elev &b) {
+    return a.nota < b.nota;   // crescator dupa nota
+}
+
+// sort(v, v + n, dupaNota);
+```
+
+Transmiterea prin `const &` evită copierea structurilor la fiecare comparație.
+
+## Mai multe criterii (departajare)
+
+Tratezi criteriile în ordinea priorității. Rezolvi după primul; **doar la egalitate** treci la următorul:
+
+```cpp
+bool clasament(const Elev &a, const Elev &b) {
+    if (a.nota != b.nota) return a.nota > b.nota;  // 1) nota descrescator
+    return a.nume < b.nume;                         // 2) la egalitate, nume crescator
+}
+```
+
+## Lambda — comparator pe scurt
+
+Pentru comparatori folosiți o singură dată, scrii o funcție anonimă (lambda) direct la apel:
+
+```cpp
+sort(v, v + n, [](const Elev &a, const Elev &b) {
+    return a.nota > b.nota;
+});
+```
+
+E același comparator, scris mai compact, fără să-i dai un nume separat.
+
+## Complexitate
+
+| Element | Cost |
+|---------|------|
+| `sort` cu comparator | O(n log n) |
+| un apel de comparator | O(1) (dacă logica e simplă) |
+
+<MistakeBox>
+Capcane la comparatori:
+
+- **`<=` în loc de `<`**: încalcă ordinea strictă → comportament nedefinit. Folosește mereu comparație strictă.
+- **Departajare aplicată mereu**: dacă tratezi al doilea criteriu chiar și când primul diferă, strici ordinea. Treci la criteriul următor *numai* la egalitate.
+- **Comparator inconsistent**: rezultatul lui `cmp(a,b)` trebuie să fie opusul lui `cmp(b,a)` pentru elemente diferite. Logică contradictorie → crash.
+- **Copiere inutilă**: comparator pe structuri cu parametri prin valoare copiază la fiecare comparație. Folosește `const &`.
+</MistakeBox>
+
+## Recapitulare
+
+- Comparatorul întoarce `true` când primul element trebuie să stea înaintea celui de-al doilea (`<` crescător, `>` descrescător).
+- Pentru structuri e obligatoriu — tipurile proprii n-au ordine implicită; folosește `const &`.
+- Mai multe criterii: rezolvi în ordinea priorității și departajezi numai la egalitate pe criteriul anterior.

@@ -1,0 +1,108 @@
+---
+title: "Lecție-punte: invariantul unui algoritm"
+slug: punte-invariant
+grade: 7
+chapter: tehnici-tablouri
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["invariant", "corectitudine", "rationament"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este un invariant de buclă?"
+    options:
+      - "O variabilă care nu se schimbă niciodată"
+      - "O proprietate adevărată înainte și după fiecare iterație a buclei"
+      - "Numărul de iterații"
+      - "Condiția de oprire a buclei"
+    correctIndex: 1
+    explanation: "Invariantul e o afirmație despre starea programului care rămâne adevărată la fiecare trecere prin buclă. El leagă „ce am făcut până acum” de „ce vreau la final”."
+  - question: "La ce te ajută un invariant?"
+    options:
+      - "Să faci programul mai rapid"
+      - "Să fii sigur că algoritmul e corect și să găsești bug-uri de inițializare sau de capăt"
+      - "Să economisești memorie"
+      - "Să eviți folosirea funcțiilor"
+    correctIndex: 1
+    explanation: "Dacă invariantul e adevărat la start, se păstrează la fiecare pas și implică rezultatul la oprire, atunci algoritmul e corect. Locurile unde se strică sunt exact bug-urile."
+  - question: "Care e invariantul tehnicii two pointers pentru pereche cu sumă dată (vector sortat)?"
+    options:
+      - "Vectorul rămâne mereu sortat"
+      - "Orice pereche soluție validă are ambii indici în intervalul rămas [st, dr]"
+      - "Suma curentă e mereu egală cu ținta"
+      - "st e mereu egal cu dr"
+    correctIndex: 1
+    explanation: "Mutarea indicilor elimină doar elemente care nu pot face parte din nicio soluție. Astfel, dacă există o pereche, ea rămâne mereu între st și dr — invariantul care garantează că n-o ratezi."
+---
+
+<LessonHook>
+Un alpinist legat în coardă verifică la fiecare pas: „sunt încă asigurat?". Atâta timp cât răspunsul rămâne „da" la fiecare mișcare, știe că nu va cădea, indiferent cât urcă. Invariantul unui algoritm e exact această verificare care rămâne adevărată pas cu pas.
+</LessonHook>
+
+## Ce este un invariant?
+
+Un **invariant** este o proprietate care rămâne **adevărată înainte și după fiecare iterație** a unei bucle. Nu e o valoare fixă — variabilele se schimbă — ci o *relație* între ele care nu se strică.
+
+Invariantul leagă trei momente:
+1. **La start**: e adevărat înainte de prima iterație (inițializare corectă).
+2. **La fiecare pas**: dacă era adevărat înainte, rămâne adevărat după (pasul îl păstrează).
+3. **La final**: combinat cu condiția de oprire, garantează rezultatul corect.
+
+<ObservationBox>
+Dacă toate trei punctele țin, algoritmul e corect — nu prin testare pe exemple, ci prin raționament. De aceea invariantul e cea mai puternică unealtă de a *demonstra* că o soluție merge, nu doar de a spera.
+</ObservationBox>
+
+## Exemplu 1: maximul unui vector
+
+```cpp
+int maxim = v[0];
+for (int i = 1; i < n; i++) {
+    if (v[i] > maxim) maxim = v[i];
+}
+```
+
+**Invariant:** „după ce am procesat poziția `i`, `maxim` e cel mai mare dintre `v[0..i]`".
+
+- Start: `maxim = v[0]` e maximul lui `v[0..0]`. ✓
+- Pas: dacă era maximul lui `v[0..i-1]`, comparația cu `v[i]` îl face maximul lui `v[0..i]`. ✓
+- Final: la `i = n-1`, `maxim` e maximul lui `v[0..n-1]` — tot vectorul. ✓
+
+De aici vine și capcana clasică: dacă inițializezi `maxim = 0`, invariantul de la start e fals pentru vectori cu negative — și tot algoritmul cade.
+
+## Exemplu 2: invariantul lui Kadane
+
+La secvența de sumă maximă, invariantul e: „`curent` e suma maximă a unei secvențe care **se termină exact la poziția curentă**, iar `maxim` e cel mai bun `curent` văzut până acum". Pasul `curent = max(v[i], curent + v[i])` păstrează exact această proprietate.
+
+## Exemplu 3: invariantul two pointers
+
+Pentru pereche cu sumă dată pe vector sortat, invariantul e: „orice pereche-soluție are ambii indici în intervalul rămas `[st, dr]`". Când suma e prea mare și faci `dr--`, elimini un element care nu putea face parte din nicio soluție (era prea mare cu orice partener din stânga). Invariantul se păstrează, deci nu ratezi soluția.
+
+<ObservationBox>
+Aproape orice tehnică pe tablouri (two pointers, fereastră glisantă, sume parțiale, Kadane) are în spate un invariant. Dacă-l poți enunța, ai înțeles de ce funcționează — nu doar cum se scrie.
+</ObservationBox>
+
+## Cum folosești invariantul în practică
+
+Când scrii sau depanezi un algoritm cu buclă, întreabă-te:
+
+1. **Ce vreau să fie adevărat la final?** (rezultatul)
+2. **Ce proprietate, păstrată la fiecare pas, mă duce acolo?** (invariantul)
+3. **Inițializarea o face adevărată de la start?** (cel mai frecvent loc de bug)
+
+<MistakeBox>
+Capcane legate de invariant:
+
+- **Inițializare care nu respectă invariantul**: `maxim = 0` pentru un vector cu negative, `suma` neresetată între teste. Invariantul fals la start strică totul.
+- **Pas care strică invariantul**: muți ambii indici în two pointers și sari peste soluții; actualizezi `maxim` înainte de `curent` în Kadane.
+- **Greșeli de capăt (off-by-one)**: condiția de oprire nu se potrivește cu invariantul (`<` vs `<=`), lăsând un element neprocesat sau procesându-l de două ori.
+- **Crezi că testele pe exemple înlocuiesc invariantul**: un exemplu care merge nu dovedește corectitudinea; un invariant care ține, da.
+</MistakeBox>
+
+## Recapitulare
+
+- Invariantul e o proprietate adevărată înainte și după fiecare iterație, care leagă inițializarea de rezultatul final.
+- Dacă ține la start, se păstrează la fiecare pas și implică rezultatul la oprire, algoritmul e corect — prin raționament, nu prin noroc.
+- Cele mai multe bug-uri stau în inițializarea care încalcă invariantul sau în condiția de capăt nepotrivită.

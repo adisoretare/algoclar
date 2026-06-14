@@ -1,0 +1,144 @@
+---
+title: "Adunarea numerelor mari — cu transport, ca pe hârtie"
+slug: adunare-numere-mari
+grade: 7
+chapter: numere-mari
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["numere-mari", "adunare", "transport"]
+visualizers: ["big-numbers"]
+relatedProblems: []
+quiz:
+  - question: "Ce este transportul (carry) la adunarea numerelor mari?"
+    options:
+      - "Cifra care se mută la operația următoare când suma pe o poziție depășește 9"
+      - "Numărul total de cifre"
+      - "Poziția unităților"
+      - "Diferența dintre cele două numere"
+    correctIndex: 0
+    explanation: "Când suma cifrelor de pe o poziție trece de 9, partea care depășește (suma împărțită la 10) se transportă la poziția următoare, exact ca la adunarea pe hârtie."
+  - question: "Pe o poziție i, cifra rezultatului și noul transport se calculează din suma `s = a[i] + b[i] + carry`. Cum?"
+    options:
+      - "cifra = s * 10, carry = s / 10"
+      - "cifra = s % 10, carry = s / 10"
+      - "cifra = s / 10, carry = s % 10"
+      - "cifra = s, carry = 0"
+    correctIndex: 1
+    explanation: "Cifra scrisă pe poziție este `s % 10` (restul la 10), iar transportul către poziția următoare este `s / 10` (câtul întreg)."
+  - question: "Ce faci dacă mai rămâne transport după ce ai parcurs ambele numere?"
+    options:
+      - "Îl ignori"
+      - "Îl adaugi ca o nouă cifră la sfârșit (numărul a crescut cu o cifră)"
+      - "Îl scazi din rezultat"
+      - "Reiei adunarea de la capăt"
+    correctIndex: 1
+    explanation: "Un transport rămas la final (de exemplu 99 + 1 = 100) înseamnă o cifră nouă în față. O adaugi la coada vectorului de cifre."
+---
+
+<LessonHook>
+Aduni 4859 + 367 pe hârtie: începi de la unități, scrii cifra și „ții minte" transportul când treci de 9. Programul face exact la fel, doar că „hârtia" e un vector de cifre, iar „ții minte" e o variabilă `carry`.
+</LessonHook>
+
+## Algoritmul adunării cu transport
+
+Aduni două numere mari, reprezentate ca vectori de cifre (unitățile primele), exact ca pe hârtie:
+
+1. Pornești de la unități (indexul 0) cu `carry = 0`.
+2. Pe fiecare poziție: `s = a[i] + b[i] + carry`.
+3. Scrii cifra `s % 10` în rezultat.
+4. Noul transport e `carry = s / 10`.
+5. La final, dacă mai e `carry`, îl adaugi ca o cifră nouă.
+
+<ObservationBox>
+Lucrul cu unitățile pe indexul 0 face transportul natural: el merge mereu de la poziția `i` la `i+1`, în ordinea crescătoare a indicilor.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`4859 + 367`. Inversate: `a = [9,5,8,4]`, `b = [7,6,3]`.
+
+```
+i=0: 9 + 7 + 0 = 16 -> cifra 6, carry 1
+i=1: 5 + 6 + 1 = 12 -> cifra 2, carry 1
+i=2: 8 + 3 + 1 = 12 -> cifra 2, carry 1
+i=3: 4 + 0 + 1 =  5 -> cifra 5, carry 0
+rezultat invers: [6,2,2,5] -> 5226
+```
+
+Verificare: `4859 + 367 = 5226`. ✓
+
+Rezultatul, ca vector de cifre (inversat):
+
+<ArrayDiagram
+  values="6 2 2 5"
+  index="0 1 2 3"
+  caption="Suma stocată invers: unitățile (6) pe poziția 0. Citit de la dreapta: 5226." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+vector<int> aduna(const vector<int> &a, const vector<int> &b) {
+    vector<int> rez;
+    int carry = 0;
+    int n = max(a.size(), b.size());
+    for (int i = 0; i < n; i++) {
+        int s = carry;
+        if (i < (int)a.size()) s += a[i];
+        if (i < (int)b.size()) s += b[i];
+        rez.push_back(s % 10);   // cifra curenta
+        carry = s / 10;          // transport
+    }
+    if (carry) rez.push_back(carry);   // cifra noua din transportul ramas
+    return rez;
+}
+
+int main() {
+    vector<int> a = {9,5,8,4};   // 4859
+    vector<int> b = {7,6,3};     // 367
+    vector<int> r = aduna(a, b);
+    for (int i = r.size() - 1; i >= 0; i--) cout << r[i];  // 5226
+    cout << "\n";
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| adunare | O(max(n, m)) | O(max(n, m)) |
+
+unde `n`, `m` sunt numerele de cifre. Linear în lungimea numerelor — imposibil de bătut, fiindcă trebuie să atingi fiecare cifră.
+
+## Vizualizare
+
+Urmărește cum se adună cifrele și cum „curge" transportul de la o poziție la alta:
+
+<Visualizer name="big-numbers" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas. Observă momentele când suma pe o poziție depășește 9 și apare transportul.
+</HintBox>
+
+<MistakeBox>
+Capcane la adunarea numerelor mari:
+
+- **Uiți transportul final**: `99 + 1` dă `[0,0]` plus un `carry` neadăugat → afișezi `00` în loc de `100`. Adaugă transportul rămas.
+- **Parcurgi doar până la lungimea celui mai scurt**: numerele pot avea lungimi diferite. Mergi până la `max(n, m)`.
+- **Confuzi `%` cu `/`**: cifra e `s % 10`, transportul e `s / 10`. Inversarea lor strică totul.
+- **Citești numerele ca tip standard**: depășesc `long long`. Reține-le ca vectori de cifre.
+</MistakeBox>
+
+## Recapitulare
+
+- Aduni cifră cu cifră de la unități, ținând un transport: `cifra = s % 10`, `carry = s / 10`.
+- Mergi până la lungimea celui mai lung număr și adaugă la final transportul rămas (o cifră nouă).
+- Complexitatea e O(numărul de cifre) — liniară în lungimea numerelor.

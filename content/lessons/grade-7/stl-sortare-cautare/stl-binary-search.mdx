@@ -1,0 +1,119 @@
+---
+title: "binary_search — există elementul?"
+slug: stl-binary-search
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "binary-search", "cautare"]
+visualizers: ["cautare-binara"]
+relatedProblems: []
+quiz:
+  - question: "Ce condiție trebuie să îndeplinească vectorul ca `binary_search` să funcționeze?"
+    options:
+      - "Să aibă elemente distincte"
+      - "Să fie sortat"
+      - "Să aibă lungime pară"
+      - "Să conțină doar numere pozitive"
+    correctIndex: 1
+    explanation: "Căutarea binară împarte mereu intervalul în jumătate pe baza ordinii. Fără vector sortat, decizia „stânga sau dreapta” nu mai e validă."
+  - question: "Ce întoarce `binary_search(v, v + n, x)`?"
+    options:
+      - "Poziția lui x"
+      - "`true` dacă x există în interval, altfel `false`"
+      - "Numărul de apariții ale lui x"
+      - "Cel mai apropiat element de x"
+    correctIndex: 1
+    explanation: "`binary_search` răspunde doar la întrebarea de existență: `true`/`false`. Dacă vrei poziția, folosești `lower_bound`."
+  - question: "Care e complexitatea lui `binary_search` pe un vector sortat cu n elemente?"
+    options:
+      - "O(n)"
+      - "O(log n)"
+      - "O(1)"
+      - "O(n log n)"
+    correctIndex: 1
+    explanation: "Fiecare pas înjumătățește intervalul de căutare, deci sunt necesari cel mult log₂(n) pași — O(log n)."
+---
+
+<LessonHook>
+Cauți un cuvânt în dicționar. Nu o iei de la prima pagină — deschizi la mijloc, vezi dacă ești prea în față sau prea în spate, și înjumătățești de fiecare dată. În câțiva pași ai ajuns. `binary_search` face exact asta, automat.
+</LessonHook>
+
+## Ce face `binary_search`
+
+`binary_search` verifică dacă o valoare **există** într-un vector **sortat**. Întoarce `true` sau `false`. E versiunea gata făcută din STL a căutării binare.
+
+```cpp
+bool gasit = binary_search(v, v + n, x);
+```
+
+<ObservationBox>
+Condiția obligatorie: vectorul trebuie să fie **sortat**. Pe un vector neordonat, rezultatul lui `binary_search` e nedefinit — poate spune „nu există" deși elementul e acolo.
+</ObservationBox>
+
+## De ce e atât de rapid
+
+Căutarea liniară verifică element cu element: O(n). Căutarea binară înjumătățește intervalul la fiecare pas: O(log n). Pentru un milion de elemente, asta înseamnă ~20 de pași în loc de un milion.
+
+| Metodă | Pași pentru n = 1.000.000 |
+|--------|---------------------------|
+| căutare liniară | până la 1.000.000 |
+| căutare binară | ~20 |
+
+## Cum decide la fiecare pas
+
+Pe vectorul sortat `v = {1, 3, 4, 6, 8, 11}`, cauți `8`:
+
+```
+interval [0..5], mij=2: v[2]=4 < 8  -> mergi dreapta, [3..5]
+interval [3..5], mij=4: v[4]=8 == 8 -> gasit!
+```
+
+Compară cu mijlocul; dacă ținta e mai mare, elimină jumătatea stângă; dacă e mai mică, jumătatea dreaptă.
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int v[6] = {1, 3, 4, 6, 8, 11};   // SORTAT
+    int n = 6;
+
+    cout << binary_search(v, v + n, 8) << "\n";  // 1 (exista)
+    cout << binary_search(v, v + n, 5) << "\n";  // 0 (nu exista)
+    return 0;
+}
+```
+
+Dacă vectorul nu e deja sortat, sortează-l întâi: `sort(v, v + n);`.
+
+## Vizualizare
+
+Urmărește cum se înjumătățește intervalul de căutare la fiecare pas:
+
+<Visualizer name="cautare-binara" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas. Observă cum mijlocul comparat decide care jumătate dispare.
+</HintBox>
+
+<MistakeBox>
+Capcane la `binary_search`:
+
+- **Vector nesortat**: cea mai frecventă greșeală. Sortează întâi sau garantează ordinea.
+- **Te aștepți la poziție**: `binary_search` întoarce doar `true`/`false`. Pentru poziție folosește `lower_bound`.
+- **Cauți într-un interval greșit**: `v, v + n` acoperă tot vectorul; un capăt greșit lasă elemente neverificate.
+- **Crezi că e mai rapid decât liniar pe vector mic nesortat**: dacă oricum trebuie să sortezi pentru o singură căutare, sortarea costă O(n log n) — pentru o căutare unică, liniar (O(n)) poate fi mai ieftin. Binary search câștigă la *multe* căutări.
+</MistakeBox>
+
+## Recapitulare
+
+- `binary_search` spune dacă o valoare există într-un vector sortat, în O(log n).
+- Cere obligatoriu vector sortat; întoarce `true`/`false`, nu poziția.
+- Merită mai ales la multe căutări repetate; pentru o singură căutare pe vector mic, liniar poate fi suficient.

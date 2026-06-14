@@ -1,0 +1,105 @@
+---
+title: "Lecție-punte: sortare după mai multe criterii"
+slug: punte-sortare-criterii
+grade: 7
+chapter: stl-sortare-cautare
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["sortare", "criterii", "comparator"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e regula corectă pentru un comparator cu mai multe criterii?"
+    options:
+      - "Compari toate criteriile deodată și aduni rezultatele"
+      - "Rezolvi după primul criteriu; treci la următorul doar la egalitate pe cel anterior"
+      - "Faci câte un sort separat pentru fiecare criteriu, în orice ordine"
+      - "Folosești mereu doar primul criteriu"
+    correctIndex: 1
+    explanation: "Criteriile au priorități. Departajezi după al doilea numai când primul e egal, după al treilea numai când primele două sunt egale, ș.a.m.d."
+  - question: "Dacă faci sortări separate, în ce ordine trebuie aplicate pentru a respecta prioritățile?"
+    options:
+      - "De la criteriul cel mai important la cel mai puțin important"
+      - "De la cel mai puțin important la cel mai important, folosind o sortare STABILĂ"
+      - "Ordinea nu contează"
+      - "Doar criteriul principal contează"
+    correctIndex: 1
+    explanation: "Cu sortări succesive stabile, sortezi întâi după criteriul secundar, apoi după cel principal. Stabilitatea păstrează ordinea secundară la egalitate pe cel principal. Un singur comparator e însă mai sigur."
+  - question: "Ce înseamnă că o sortare e „stabilă”?"
+    options:
+      - "Nu dă crash niciodată"
+      - "Păstrează ordinea relativă a elementelor egale"
+      - "E mereu O(n log n)"
+      - "Sortează doar numere"
+    correctIndex: 1
+    explanation: "O sortare stabilă nu schimbă ordinea dintre două elemente considerate egale de comparator. `stable_sort` garantează asta; `sort` obișnuit, nu."
+---
+
+<LessonHook>
+Un clasament de fotbal nu se face dintr-o singură regulă: întâi puncte, la egalitate golaveraj, apoi goluri marcate. Fiecare regulă intră în joc doar când cele dinainte n-au departajat. Sortarea după mai multe criterii e exact acest lanț de reguli de rezervă.
+</LessonHook>
+
+## Problema
+
+Rar sortezi după un singur criteriu. „Ordonează elevii după medie descrescător, iar la medii egale alfabetic" — două criterii cu priorități diferite. Cum le combini corect?
+
+## Soluția curată: un singur comparator
+
+Tratezi criteriile **în ordinea priorității**. Rezolvi după primul; treci la al doilea **numai la egalitate** pe primul; la al treilea numai la egalitate pe primele două:
+
+```cpp
+bool cmp(const Elev &a, const Elev &b) {
+    if (a.media != b.media) return a.media > b.media;  // 1) media descrescator
+    if (a.nume  != b.nume)  return a.nume  < b.nume;   // 2) nume crescator
+    return a.varsta < b.varsta;                         // 3) ultima departajare
+}
+```
+
+<ObservationBox>
+Tiparul e mereu același: pentru fiecare criteriu, „dacă diferă, decide acum; altfel coboară la următorul". Ultimul criteriu decide fără `if`, fiindcă nu mai are pe cine să paseze.
+</ObservationBox>
+
+## De ce ordinea criteriilor contează
+
+Schimbând ordinea, schimbi clasamentul. „Întâi media, apoi numele" e diferit de „întâi numele, apoi media". Pune criteriul cel mai important primul — el domină; restul doar departajează egalitățile.
+
+## Alternativa: sortări succesive stabile
+
+Poți obține același rezultat cu mai multe `stable_sort`, dar **în ordine inversă a priorității**: întâi după criteriul secundar, apoi după cel principal.
+
+```cpp
+stable_sort(v, v + n, dupaNume);   // criteriul secundar intai
+stable_sort(v, v + n, dupaMedie);  // criteriul principal la final
+```
+
+Funcționează doar cu sortare **stabilă**: a doua sortare nu strică ordinea după nume la medii egale, fiindcă stabilitatea păstrează ordinea elementelor considerate egale.
+
+<ObservationBox>
+Un singur comparator e de obicei mai sigur și mai clar decât sortări succesive. Folosește sortările stabile multiple doar când criteriile sunt greu de combinat într-o singură funcție.
+</ObservationBox>
+
+## Cum alegi între cele două
+
+| Situație | Alegere |
+|----------|---------|
+| criterii simple, cunoscute dinainte | un singur comparator |
+| multe criterii sau adăugate dinamic | sortări succesive stabile |
+| ai nevoie de viteză maximă | un singur comparator (o singură sortare) |
+
+<MistakeBox>
+Capcane la sortarea după mai multe criterii:
+
+- **Departajare aplicată mereu**: tratezi al doilea criteriu și când primul diferă → ordine greșită. Coboară la criteriul următor *numai* la egalitate.
+- **Ordinea inversă la sortări succesive**: cu `stable_sort` multiplu, criteriul principal trebuie aplicat ULTIMUL, nu primul.
+- **Folosești `sort` în loc de `stable_sort` la sortări succesive**: `sort` nu e stabil, deci strică ordinea criteriului anterior.
+- **`<=`/`>=` în comparator**: ordinea trebuie strictă; non-strict → comportament nedefinit.
+</MistakeBox>
+
+## Recapitulare
+
+- Pentru mai multe criterii, un singur comparator: decizi după primul, departajezi la următorul doar la egalitate pe cel anterior.
+- Alternativă: `stable_sort`-uri succesive în ordinea inversă a priorității (principal la final).
+- Ordinea criteriilor schimbă rezultatul; preferă un comparator unic pentru claritate și viteză.

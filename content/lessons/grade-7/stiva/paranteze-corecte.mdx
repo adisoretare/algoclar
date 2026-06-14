@@ -1,0 +1,144 @@
+---
+title: "Paranteze corecte — verificarea cu stivă"
+slug: paranteze-corecte
+grade: 7
+chapter: stiva
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["stiva", "paranteze", "verificare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce pui pe stivă la verificarea parantezelor?"
+    options:
+      - "Doar numărul de paranteze"
+      - "Fiecare paranteză deschisă, ca să o potrivești mai târziu cu o închisă"
+      - "Pozițiile tuturor caracterelor"
+      - "Nimic, numeri doar"
+    correctIndex: 1
+    explanation: "La fiecare paranteză deschisă faci push. La una închisă, verifici că vârful e perechea ei și faci pop. Stiva ține parantezele deschise încă neînchise."
+  - question: "Pentru un singur tip de paranteze, când este expresia incorectă?"
+    options:
+      - "Doar dacă e prea lungă"
+      - "Dacă întâlnești o paranteză închisă cu stiva goală, sau la final stiva nu e goală"
+      - "Doar dacă începe cu paranteză închisă"
+      - "Niciodată"
+    correctIndex: 1
+    explanation: "O paranteză închisă fără pereche (stivă goală) e eroare. La final, paranteze deschise rămase (stivă negoală) înseamnă și ele eroare."
+  - question: "Pentru mai multe tipuri ( ), [ ], { }, ce verifici în plus la o paranteză închisă?"
+    options:
+      - "Doar că stiva nu e goală"
+      - "Că vârful stivei este exact tipul deschis care se potrivește cu paranteza închisă curentă"
+      - "Că expresia e palindrom"
+      - "Numărul total de paranteze"
+    correctIndex: 1
+    explanation: "Nu e de ajuns ca stiva să nu fie goală: tipul din vârf trebuie să fie perechea corectă. `(]` e greșit chiar dacă numărul de paranteze se potrivește."
+---
+
+<LessonHook>
+Când deschizi o paranteză într-o propoziție, ții minte că trebuie închisă — și ultima deschisă trebuie închisă prima. Dacă cineva îți cere să verifici o expresie lungă, instinctiv folosești o stivă mentală. Algoritmul face exact la fel.
+</LessonHook>
+
+## Problema
+
+Verifici dacă o expresie cu paranteze e **corect închisă**: fiecare paranteză deschisă are o pereche, în ordinea potrivită. `(())` e corect, `(()` nu, `([)]` nu.
+
+## Ideea cu stivă
+
+Parcurgi caracterele:
+- **paranteză deschisă** → push pe stivă;
+- **paranteză închisă** → trebuie să se potrivească cu vârful: dacă stiva e goală sau vârful nu e perechea ei, e **incorect**; altfel pop.
+- la final, stiva trebuie să fie **goală** (nicio paranteză deschisă rămasă).
+
+<ObservationBox>
+Stiva reține parantezele deschise care încă nu au fost închise. „Ultima deschisă, prima închisă" e fix comportamentul LIFO — de aceea stiva e structura perfectă aici.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+Expresia `([])`:
+
+```
+'(' deschisa -> push '('     stiva: ( 
+'[' deschisa -> push '['     stiva: ( [
+']' inchisa  -> varf '[' se potriveste -> pop   stiva: (
+')' inchisa  -> varf '(' se potriveste -> pop   stiva: (goala)
+final: stiva goala -> CORECT
+```
+
+Contraexemplu `([)]`:
+
+```
+'(' -> push     stiva: (
+'[' -> push     stiva: ( [
+')' inchisa -> varf e '[', NU se potriveste cu ')' -> INCORECT
+```
+
+## Implementare C++ (mai multe tipuri)
+
+```cpp
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+bool potrivesc(char d, char i) {
+    return (d == '(' && i == ')') ||
+           (d == '[' && i == ']') ||
+           (d == '{' && i == '}');
+}
+
+bool corect(const string &s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == '(' || c == '[' || c == '{') {
+            st.push(c);                  // deschisa
+        } else if (c == ')' || c == ']' || c == '}') {
+            if (st.empty() || !potrivesc(st.top(), c))
+                return false;            // inchisa fara pereche corecta
+            st.pop();
+        }
+    }
+    return st.empty();                   // nicio deschisa ramasa
+}
+
+int main() {
+    cout << corect("([])") << "\n";   // 1
+    cout << corect("([)]") << "\n";   // 0
+    cout << corect("(()")  << "\n";   // 0
+    return 0;
+}
+```
+
+## Cazul unui singur tip de paranteze
+
+Dacă ai doar `(` și `)`, nu mai ai nevoie de stivă — un simplu contor ajunge: `+1` la deschisă, `-1` la închisă. Dacă scade sub 0 sau nu e 0 la final, e incorect. Stiva devine necesară când ai **mai multe tipuri**, fiindcă trebuie să verifici și potrivirea tipului.
+
+<ObservationBox>
+Pentru un singur tip, contorul e mai eficient (O(1) memorie). Stiva e indispensabilă la tipuri multiple, unde contează *ce* paranteză închizi, nu doar câte.
+</ObservationBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| verificare | O(n) | O(n) (stiva) |
+| un singur tip (contor) | O(n) | O(1) |
+
+<MistakeBox>
+Capcane la verificarea parantezelor:
+
+- **Uiți verificarea finală**: dacă stiva nu e goală la final, există paranteze deschise neînchise — expresia e incorectă.
+- **`pop()` pe stivă goală**: o paranteză închisă cu stiva goală e eroare; verifică `empty()` înainte.
+- **Ignori tipul la potrivire**: pentru tipuri multiple, nu e destul ca stiva să nu fie goală — vârful trebuie să fie perechea corectă (`(]` e greșit).
+- **Folosești contor pentru tipuri multiple**: contorul nu vede tipul; `([)]` ar trece greșit. Folosește stiva.
+</MistakeBox>
+
+## Recapitulare
+
+- Faci push la fiecare paranteză deschisă, iar la una închisă verifici potrivirea cu vârful și faci pop.
+- Expresia e corectă dacă nu apare nicio nepotrivire și stiva e goală la final.
+- Un singur tip → contor (O(1) spațiu); tipuri multiple → stivă obligatorie.

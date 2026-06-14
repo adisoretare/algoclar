@@ -1,0 +1,144 @@
+---
+title: "Împărțirea unui număr mare la un număr natural"
+slug: impartire-numar-mare
+grade: 7
+chapter: numere-mari
+difficulty: greu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["numere-mari", "impartire", "rest"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "În ce direcție parcurgi cifrele la împărțirea unui număr mare la un natural?"
+    options:
+      - "De la unități spre stânga, ca la adunare"
+      - "De la cea mai semnificativă cifră spre unități (ca împărțirea pe hârtie)"
+      - "În orice ordine"
+      - "De la mijloc spre capete"
+    correctIndex: 1
+    explanation: "Împărțirea „lungă" pe hârtie pornește de la cifra cea mai semnificativă. La fel în program: parcurgi cifrele de la stânga, ducând restul mai departe."
+  - question: "Ce reține variabila `rest` pe parcursul împărțirii?"
+    options:
+      - "Câtul final"
+      - "Numărul format din restul precedent concatenat cu cifra curentă, înainte de a împărți la k"
+      - "Numărul de cifre"
+      - "Transportul de la înmulțire"
+    correctIndex: 1
+    explanation: "La fiecare pas formezi `rest = rest * 10 + cifra_curenta`, împarți la k pentru cifra câtului și păstrezi `rest % k` pentru pasul următor."
+  - question: "Cum obții cifra câtului și noul rest dintr-un `rest` curent și împărțitorul k?"
+    options:
+      - "cifra = rest % k, rest = rest / k"
+      - "cifra = rest / k, rest = rest % k"
+      - "cifra = rest * k, rest = 0"
+      - "cifra = rest + k, rest = rest - k"
+    correctIndex: 1
+    explanation: "Cifra câtului pe poziția curentă este `rest / k` (câtul), iar restul care se duce mai departe este `rest % k`."
+---
+
+<LessonHook>
+Împarți 1234 la 7 prin împărțirea „lungă" de pe hârtie: iei cifrele de la stânga, vezi de câte ori încape 7, scrii cifra câtului și duci restul mai departe. Programul reproduce fix acest procedeu, cu o variabilă `rest` care călătorește spre dreapta.
+</LessonHook>
+
+## Împărțirea la un număr „mic"
+
+Împărțim un număr **mare** (vector de cifre) la un număr **natural mic** `k` (care încape în `long long`). Spre deosebire de celelalte operații, aici e mai natural să lucrăm de la **cifra cea mai semnificativă** spre unități — exact ca împărțirea lungă pe hârtie.
+
+Algoritmul:
+
+1. `rest = 0`.
+2. Parcurgi cifrele de la stânga (cea mai semnificativă) la dreapta.
+3. `rest = rest * 10 + cifra_curenta`.
+4. Cifra câtului = `rest / k`; noul `rest = rest % k`.
+5. La final, `rest` e restul împărțirii; câtul e format din cifrele calculate (normalizat).
+
+<ObservationBox>
+Pentru că lucrăm de la stânga la dreapta, e mai comod să ținem numărul în ordine normală (cea mai semnificativă cifră prima) pentru această operație, sau să parcurgem vectorul invers stocat de la coadă spre cap.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`1234 ÷ 7`. Cifre în ordine normală: `1, 2, 3, 4`.
+
+```
+rest=0
+cifra 1: rest = 0*10+1 = 1   -> cat 1/7 = 0, rest 1
+cifra 2: rest = 1*10+2 = 12  -> cat 12/7 = 1, rest 5
+cifra 3: rest = 5*10+3 = 53  -> cat 53/7 = 7, rest 4
+cifra 4: rest = 4*10+4 = 44  -> cat 44/7 = 6, rest 2
+cat: 0176 -> normalizat 176, rest 2
+```
+
+Verificare: `7 × 176 + 2 = 1234`. ✓
+
+Câtul (cifre în ordine normală, înainte de normalizare):
+
+<ArrayDiagram
+  values="0 1 7 6"
+  index="0 1 2 3"
+  highlight="0"
+  caption="Câtul brut 0176; zeroul din față se elimină la normalizare → 176. Restul final e 2." />
+
+## Implementare C++
+
+Aici lucrez cu cifrele în ordine **normală** (cea mai semnificativă prima) pentru claritate:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// a are cifrele in ordine normala; intoarce catul (ordine normala), seteaza rest
+vector<int> imparte(const vector<int> &a, long long k, long long &rest) {
+    vector<int> cat;
+    rest = 0;
+    for (int i = 0; i < (int)a.size(); i++) {
+        rest = rest * 10 + a[i];
+        cat.push_back(rest / k);   // cifra catului
+        rest = rest % k;           // restul dus mai departe
+    }
+    // normalizare: scot zerourile din fata catului
+    int poz = 0;
+    while (poz + 1 < (int)cat.size() && cat[poz] == 0) poz++;
+    return vector<int>(cat.begin() + poz, cat.end());
+}
+
+int main() {
+    vector<int> a = {1,2,3,4};   // 1234, ordine normala
+    long long rest;
+    vector<int> c = imparte(a, 7, rest);
+    for (int x : c) cout << x;          // 176
+    cout << " rest " << rest << "\n";   // rest 2
+    return 0;
+}
+```
+
+## Verificarea divizibilității
+
+Un număr mare e divizibil cu `k` dacă restul împărțirii e `0`. Aceeași funcție răspunde: după apel, verifici `rest == 0`.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| împărțire la natural | O(n) | O(n) |
+
+unde `n` e numărul de cifre. Restul curent rămâne mereu mai mic decât `k`, deci `rest * 10 + cifra` încape în `long long` dacă `k` e rezonabil.
+
+<MistakeBox>
+Capcane la împărțirea numerelor mari:
+
+- **Parcurgi de la unități**: împărțirea lungă merge de la cifra cea mai semnificativă. Inversarea direcției dă rezultat greșit.
+- **`rest` ca `int`**: `rest * 10 + cifra` poate depăși `int` pentru `k` mare. Folosește `long long`.
+- **Uiți normalizarea câtului**: câtul poate începe cu zerouri (ex. `0176`). Elimină-le, păstrând o cifră.
+- **Confuzi câtul cu restul**: cifra câtului e `rest / k`, restul dus mai departe e `rest % k`. Nu le inversa.
+</MistakeBox>
+
+## Recapitulare
+
+- Împarți de la cifra cea mai semnificativă, ținând un `rest` care călătorește spre dreapta: `rest = rest*10 + cifra`.
+- Cifra câtului e `rest / k`, noul rest e `rest % k`; la final `rest` e restul împărțirii.
+- Folosește `long long` pentru `rest`, normalizează câtul și verifică `rest == 0` pentru divizibilitate.

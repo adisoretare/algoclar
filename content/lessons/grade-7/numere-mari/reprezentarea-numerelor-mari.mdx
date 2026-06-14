@@ -1,0 +1,132 @@
+---
+title: "Reprezentarea numerelor mari — cifră cu cifră"
+slug: reprezentarea-numerelor-mari
+grade: 7
+chapter: numere-mari
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["numere-mari", "vectori", "cifre"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce avem nevoie de numere mari (big integers)?"
+    options:
+      - "Pentru că sunt mai rapide decât int"
+      - "Pentru că unele rezultate (de exemplu 100!) depășesc orice tip întreg standard"
+      - "Pentru că ocupă mai puțină memorie"
+      - "Pentru că int nu există în C++"
+    correctIndex: 1
+    explanation: "Tipurile standard (int, long long) au limite. 100! sau un număr cu sute de cifre nu încape în ele, așa că reprezentăm numărul ca un vector de cifre."
+  - question: "De ce e convenabil să stocăm cifrele în ordine inversă (unitățile pe poziția 0)?"
+    options:
+      - "Ca să afișăm mai ușor"
+      - "Pentru că adunarea și transportul (carry) merg de la unități spre stânga, exact în ordinea crescătoare a indicilor"
+      - "Pentru că ocupă mai puțin"
+      - "Nu contează ordinea"
+    correctIndex: 1
+    explanation: "Operațiile aritmetice pornesc de la unități. Dacă unitățile sunt pe indexul 0, adunarea și transportul cresc indicele natural, fără calcule de poziție inversă."
+  - question: "Cum reprezinți numărul 4072 ca vector de cifre, unitățile primele?"
+    options:
+      - "[4, 0, 7, 2]"
+      - "[2, 7, 0, 4]"
+      - "[2, 0, 7, 4]"
+      - "[4, 7, 2]"
+    correctIndex: 1
+    explanation: "În ordine inversă, de la unități: 2 (unități), 7 (zeci), 0 (sute), 4 (mii) — adică [2, 7, 0, 4]."
+---
+
+<LessonHook>
+Un calculator de buzunar se blochează la numere prea mari, dar tu poți aduna pe hârtie numere de o sută de cifre, cifră cu cifră, cu transport. Exact asta facem în program: dacă numărul nu încape într-un tip standard, îl ținem ca pe o listă de cifre și lucrăm ca pe hârtie.
+</LessonHook>
+
+## De ce numere mari
+
+Tipurile standard au limite: `int` ajunge până la ~2·10⁹, `long long` până la ~9·10¹⁸. Dar `100!` are 158 de cifre, iar multe probleme cer numere cu sute de cifre. Acolo niciun tip nu ajunge — trebuie să ne construim propriul „număr".
+
+<ObservationBox>
+Ideea de bază: un număr mare e doar un șir de cifre. Îl stocăm într-un vector și implementăm operațiile (adunare, scădere, înmulțire) imitând algoritmii de pe hârtie.
+</ObservationBox>
+
+## Stocarea: vector de cifre, unitățile primele
+
+Reprezentăm numărul ca un vector în care **fiecare element e o cifră**, în **ordine inversă**: unitățile pe poziția 0, zecile pe 1, etc.
+
+Numărul `4072` devine:
+
+<ArrayDiagram
+  values="2 7 0 4"
+  index="0 1 2 3"
+  caption="4072 stocat invers: v[0]=2 (unități), v[1]=7 (zeci), v[2]=0 (sute), v[3]=4 (mii)." />
+
+**De ce invers?** Operațiile aritmetice pornesc de la unități și „transportă" spre stânga. Cu unitățile pe indexul 0, transportul crește indicele natural — fără socoteli de poziție inversă. În plus, când numărul crește (o cifră în plus), doar adaugi la coada vectorului.
+
+## Citirea dintr-un șir de caractere
+
+Numărul mare se citește de obicei ca `string` (poate avea sute de cifre), apoi îl convertim în vector de cifre inversat:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+vector<int> citeste() {
+    string s;
+    cin >> s;
+    vector<int> nr;
+    // parcurg de la dreapta (unitati) la stanga
+    for (int i = s.size() - 1; i >= 0; i--) {
+        nr.push_back(s[i] - '0');   // caracter cifra -> valoare
+    }
+    return nr;
+}
+```
+
+`s[i] - '0'` transformă caracterul `'7'` în valoarea `7`.
+
+## Afișarea
+
+Afișezi în ordine inversă față de stocare — de la cea mai semnificativă cifră (ultimul index) la unități:
+
+```cpp
+void afiseaza(const vector<int> &nr) {
+    for (int i = nr.size() - 1; i >= 0; i--) {
+        cout << nr[i];
+    }
+    cout << "\n";
+}
+```
+
+## Eliminarea zerourilor din față
+
+După operații (mai ales scădere), pot rămâne zerouri nesemnificative la coada vectorului (adică în fața numărului). Le elimini, dar lași măcar o cifră pentru numărul `0`:
+
+```cpp
+void normalizeaza(vector<int> &nr) {
+    while (nr.size() > 1 && nr.back() == 0) {
+        nr.pop_back();   // scot zero nesemnificativ din fata numarului
+    }
+}
+```
+
+<ObservationBox>
+Vectorul de cifre poate folosi și „cifre" mai mari decât baza 10 (de exemplu grupuri de 9 cifre în baza 10⁹) pentru viteză. La început rămânem însă la baza 10 — o cifră zecimală pe poziție — fiindcă e cel mai ușor de înțeles.
+</ObservationBox>
+
+<MistakeBox>
+Capcane la reprezentarea numerelor mari:
+
+- **Citești numărul ca `int`/`long long`**: depășește tipul înainte să apuci să-l procesezi. Citește-l ca `string`.
+- **Confuzi ordinea de stocare cu cea de afișare**: stochezi invers (unitățile primele), dar afișezi de la cea mai mare cifră. Inversarea greșită produce numărul oglindit.
+- **Uiți `s[i] - '0'`**: dacă pui caracterul direct, lucrezi cu codul ASCII (`'7'` = 55), nu cu valoarea 7.
+- **Lași zerouri în față**: după scădere rămân zerouri nesemnificative la coada vectorului; normalizează, dar păstrează o cifră pentru numărul 0.
+</MistakeBox>
+
+## Recapitulare
+
+- Numerele care depășesc `long long` se reprezintă ca vector de cifre.
+- Stochezi cifrele invers (unitățile pe indexul 0), ca transportul să crească indicele natural; afișezi în ordine inversă.
+- Citești numărul ca `string`, converteșți cu `s[i] - '0'` și normalizează zerourile nesemnificative din față.

@@ -1,0 +1,159 @@
+---
+title: "Înmulțirea unui număr mare cu un număr natural"
+slug: inmultire-numar-mare
+grade: 7
+chapter: numere-mari
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["numere-mari", "inmultire", "transport"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La înmulțirea unui număr mare cu un număr natural `k`, ce poate fi diferit față de adunare?"
+    options:
+      - "Nu există transport"
+      - "Transportul poate fi mai mare decât o cifră (mai mare ca 9)"
+      - "Cifrele se scad"
+      - "Nu se folosește vector"
+    correctIndex: 1
+    explanation: "La înmulțire, produsul pe o poziție (`a[i] * k + carry`) poate fi mare, deci transportul nu mai e doar 0 sau 1, ci poate avea mai multe cifre."
+  - question: "Cum calculezi cifra și noul transport din `p = a[i] * k + carry`?"
+    options:
+      - "cifra = p / 10, carry = p % 10"
+      - "cifra = p % 10, carry = p / 10"
+      - "cifra = p, carry = p"
+      - "cifra = p * 10, carry = 0"
+    correctIndex: 1
+    explanation: "La fel ca la adunare: cifra scrisă e `p % 10`, transportul către poziția următoare e `p / 10` — dar aici `p / 10` poate fi mai mare ca 9."
+  - question: "Ce faci cu transportul rămas la finalul înmulțirii?"
+    options:
+      - "Îl ignori"
+      - "Adaugi cifrele lui rând pe rând, cât timp transportul e diferit de zero"
+      - "Îl scazi"
+      - "Reiei de la capăt"
+    correctIndex: 1
+    explanation: "Transportul final poate avea mai multe cifre, deci nu adaugi o singură cifră, ci continui să extragi `carry % 10` și să împarți `carry / 10` până când transportul devine 0."
+---
+
+<LessonHook>
+Înmulțești 1234 cu 7 pe hârtie: iei fiecare cifră, o înmulțești cu 7, scrii unitatea și „ții minte" restul. Diferența față de adunare e că aici restul poate fi mai mare de 9 — dar ideea de transport rămâne aceeași.
+</LessonHook>
+
+## Înmulțirea cu un număr „mic"
+
+Aici înmulțim un număr **mare** (vector de cifre) cu un număr **natural mic** `k` (care încape într-un `int`/`long long`). E mai simplu decât înmulțirea a două numere mari și apare des (de exemplu la calculul lui `n!`).
+
+Algoritmul, cifră cu cifră de la unități:
+
+1. `carry = 0`.
+2. Pe fiecare poziție: `p = a[i] * k + carry`.
+3. Scrii cifra `p % 10`; noul transport e `carry = p / 10`.
+4. La final, cât timp `carry > 0`: adaugi `carry % 10` și faci `carry /= 10`.
+
+<ObservationBox>
+Diferența cheie față de adunare: transportul poate avea **mai multe cifre**. De aceea la final nu adaugi o singură cifră, ci „desfaci" tot transportul rămas, cifră cu cifră.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`1234 × 7`. Invers: `a = [4,3,2,1]`, `k = 7`.
+
+```
+i=0: 4*7 + 0 = 28 -> cifra 8, carry 2
+i=1: 3*7 + 2 = 23 -> cifra 3, carry 2
+i=2: 2*7 + 2 = 16 -> cifra 6, carry 1
+i=3: 1*7 + 1 =  8 -> cifra 8, carry 0
+rezultat invers: [8,3,6,8] -> 8638
+```
+
+Verificare: `1234 × 7 = 8638`. ✓
+
+Rezultatul, ca vector invers:
+
+<ArrayDiagram
+  values="8 3 6 8"
+  index="0 1 2 3"
+  caption="Produsul stocat invers; citit de la dreapta: 8638." />
+
+## Când transportul are mai multe cifre
+
+`99 × 12`. Invers `a = [9,9]`, `k = 12`.
+
+```
+i=0: 9*12 + 0 = 108 -> cifra 8, carry 10
+i=1: 9*12 + 10 = 118 -> cifra 8, carry 11
+final carry = 11: adaug 1 (carry->1), adaug 1 (carry->0)
+rezultat invers: [8,8,1,1] -> 1188
+```
+
+Verificare: `99 × 12 = 1188`. ✓ La final, transportul `11` a produs două cifre, nu una.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> inmultesteCuNatural(const vector<int> &a, long long k) {
+    vector<int> rez;
+    long long carry = 0;   // long long: produsul poate fi mare
+    for (int i = 0; i < (int)a.size(); i++) {
+        long long p = (long long)a[i] * k + carry;
+        rez.push_back(p % 10);
+        carry = p / 10;
+    }
+    while (carry > 0) {        // transportul ramas poate avea multe cifre
+        rez.push_back(carry % 10);
+        carry /= 10;
+    }
+    // normalizare (pentru k = 0 -> rezultat 0)
+    while (rez.size() > 1 && rez.back() == 0) rez.pop_back();
+    return rez;
+}
+
+int main() {
+    vector<int> a = {9,9};   // 99
+    vector<int> r = inmultesteCuNatural(a, 12);
+    for (int i = r.size() - 1; i >= 0; i--) cout << r[i];  // 1188
+    cout << "\n";
+    return 0;
+}
+```
+
+## Aplicație: factorialul unui număr mare
+
+Înmulțind repetat un număr mare cu `2, 3, ..., n` calculezi `n!` chiar și pentru `n` mare:
+
+```cpp
+vector<int> nr = {1};   // 1
+for (int k = 2; k <= 100; k++) {
+    nr = inmultesteCuNatural(nr, k);   // nr *= k
+}
+// nr = 100! (158 de cifre)
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| înmulțire cu natural | O(n) | O(n) |
+| factorial n (n înmulțiri) | O(n · cifre) | O(cifre) |
+
+<MistakeBox>
+Capcane la înmulțirea cu un număr natural:
+
+- **`carry` ca `int`**: produsul `a[i] * k` poate depăși `int` dacă `k` e mare. Folosește `long long` pentru `p` și `carry`.
+- **Adaugi o singură cifră la final**: transportul rămas poate avea mai multe cifre. Folosește o buclă `while (carry > 0)`.
+- **Confuzi `%` cu `/`**: cifra e `p % 10`, transportul `p / 10`.
+- **Uiți normalizarea la `k = 0`**: rezultatul trebuie să fie `0`, cu o singură cifră.
+</MistakeBox>
+
+## Recapitulare
+
+- Înmulțești fiecare cifră cu `k`, adaugi transportul, scrii `p % 10` și transporți `p / 10`.
+- Transportul final poate avea mai multe cifre — îl desfaci cifră cu cifră printr-o buclă.
+- Folosește `long long` pentru produs și transport; aplicație tipică: factorialul numerelor mari.

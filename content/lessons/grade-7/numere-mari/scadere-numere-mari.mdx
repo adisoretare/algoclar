@@ -1,0 +1,153 @@
+---
+title: "Scăderea numerelor mari — cu împrumut"
+slug: scadere-numere-mari
+grade: 7
+chapter: numere-mari
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["numere-mari", "scadere", "imprumut"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este împrumutul (borrow) la scăderea numerelor mari?"
+    options:
+      - "O cifră luată de la poziția următoare când cifra de jos e mai mare decât cea de sus"
+      - "Numărul de cifre al rezultatului"
+      - "Transportul de la adunare"
+      - "Cifra unităților"
+    correctIndex: 0
+    explanation: "Când cifra scăzătorului depășește cifra descăzutului pe o poziție, „împrumuți” 10 de la poziția următoare, exact ca la scăderea pe hârtie."
+  - question: "Pentru ca rezultatul scăderii a - b să fie corect (nenegativ), ce condiție pui?"
+    options:
+      - "a și b să aibă același număr de cifre"
+      - "a ≥ b (altfel rezultatul ar fi negativ)"
+      - "b ≥ a"
+      - "Niciuna, merge mereu"
+    correctIndex: 1
+    explanation: "Algoritmul cu împrumut presupune a ≥ b. Dacă a < b, rezultatul e negativ; atunci calculezi b - a și pui semnul minus separat."
+  - question: "Ce trebuie făcut neapărat la finalul scăderii?"
+    options:
+      - "Să adaugi un transport"
+      - "Să elimini zerourile nesemnificative din fața rezultatului"
+      - "Să dublezi rezultatul"
+      - "Să inversezi cifrele de două ori"
+    correctIndex: 1
+    explanation: "Scăderea poate produce zerouri în față (de exemplu 1000 - 999 = 0001 stocat invers). Le elimini, păstrând o cifră dacă rezultatul e 0."
+---
+
+<LessonHook>
+Scazi 1000 − 367 pe hârtie: la unități, 0 minus 7 nu merge, așa că împrumuți un 10 de la vecin. Programul face exact la fel — doar că „împrumutul" e o variabilă, iar cifrele stau într-un vector.
+</LessonHook>
+
+## Algoritmul scăderii cu împrumut
+
+Scazi `a - b` (cu `a ≥ b`), reprezentate ca vectori de cifre inversați:
+
+1. Pornești de la unități cu `borrow = 0`.
+2. Pe fiecare poziție: `d = a[i] - b[i] - borrow`.
+3. Dacă `d < 0`: adaugi 10 (`d += 10`) și setezi `borrow = 1`; altfel `borrow = 0`.
+4. Scrii cifra `d` în rezultat.
+5. La final, elimini zerourile nesemnificative din față.
+
+<ObservationBox>
+Condiția `a ≥ b` e esențială: algoritmul cu împrumut produce un rezultat corect doar atunci. Dacă `a < b`, calculezi `b - a` și afișezi semnul minus separat.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`1000 − 367`. Inversate: `a = [0,0,0,1]`, `b = [7,6,3]`.
+
+```
+i=0: 0 - 7 - 0 = -7  -> +10 = 3, borrow 1   cifra 3
+i=1: 0 - 6 - 1 = -7  -> +10 = 3, borrow 1   cifra 3
+i=2: 0 - 3 - 1 = -4  -> +10 = 6, borrow 1   cifra 6
+i=3: 1 - 0 - 1 =  0  -> borrow 0            cifra 0
+rezultat invers: [3,3,6,0] -> 0633 -> normalizat 633
+```
+
+Verificare: `1000 - 367 = 633`. ✓
+
+Rezultatul brut (înainte de normalizare), ca vector invers:
+
+<ArrayDiagram
+  values="3 3 6 0"
+  index="0 1 2 3"
+  highlight="3"
+  caption="Zeroul nesemnificativ de pe poziția 3 (cea mai mare) se elimină la normalizare; rămâne 633." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// presupune a >= b
+vector<int> scade(const vector<int> &a, const vector<int> &b) {
+    vector<int> rez;
+    int borrow = 0;
+    for (int i = 0; i < (int)a.size(); i++) {
+        int d = a[i] - borrow;
+        if (i < (int)b.size()) d -= b[i];
+        if (d < 0) {
+            d += 10;       // imprumut de la pozitia urmatoare
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+        rez.push_back(d);
+    }
+    // normalizare: scot zerourile nesemnificative din fata
+    while (rez.size() > 1 && rez.back() == 0) rez.pop_back();
+    return rez;
+}
+
+int main() {
+    vector<int> a = {0,0,0,1};   // 1000
+    vector<int> b = {7,6,3};     // 367
+    vector<int> r = scade(a, b);
+    for (int i = r.size() - 1; i >= 0; i--) cout << r[i];  // 633
+    cout << "\n";
+    return 0;
+}
+```
+
+## Compararea a două numere mari
+
+Ca să știi care e mai mare (pentru a ști în ce ordine scazi), compari întâi lungimile, apoi cifrele de la cea mai semnificativă:
+
+```cpp
+// intoarce true daca a >= b
+bool maiMareSauEgal(const vector<int> &a, const vector<int> &b) {
+    if (a.size() != b.size()) return a.size() > b.size();
+    for (int i = a.size() - 1; i >= 0; i--) {
+        if (a[i] != b[i]) return a[i] > b[i];
+    }
+    return true;   // egale
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| scădere | O(n) | O(n) |
+| comparare | O(n) | O(1) |
+
+<MistakeBox>
+Capcane la scăderea numerelor mari:
+
+- **Nu verifici `a ≥ b`**: dacă scazi greșit ordinea, obții cifre aiurea. Compară întâi; pentru `a < b` calculează `b - a` cu semn minus.
+- **Uiți normalizarea**: rezultate ca `0633` rămân cu zerouri în față dacă nu elimini coada de zerouri.
+- **Elimini toate zerourile**: la `a - a = 0`, păstrează o cifră. Condiția `rez.size() > 1` o asigură.
+- **Confuzi împrumutul cu transportul**: la scădere `borrow` se *scade* la poziția următoare; la adunare `carry` se *adună*. Nu le amesteca.
+</MistakeBox>
+
+## Recapitulare
+
+- Scazi cifră cu cifră de la unități cu un împrumut: dacă `d < 0`, adaugi 10 și împrumuți 1 de la poziția următoare.
+- Algoritmul cere `a ≥ b`; pentru `a < b` calculezi `b - a` și pui semnul minus separat.
+- Normalizează la final zerourile nesemnificative din față, păstrând o cifră pentru rezultatul 0.

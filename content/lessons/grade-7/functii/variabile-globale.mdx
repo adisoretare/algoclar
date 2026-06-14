@@ -1,0 +1,138 @@
+---
+title: "Variabile globale — memoria comună a programului"
+slug: variabile-globale
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "variabile-globale", "domeniu"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Unde este vizibilă o variabilă globală?"
+    options:
+      - "Doar în funcția unde a fost declarată"
+      - "În toate funcțiile din fișier, după linia declarării"
+      - "Doar în `main`"
+      - "Doar în funcțiile `void`"
+    correctIndex: 1
+    explanation: "O variabilă globală e declarată în afara oricărei funcții și e vizibilă din toate funcțiile scrise după ea."
+  - question: "Cu ce valoare pornește o variabilă globală de tip `int` neinițializată explicit?"
+    options:
+      - "Cu o valoare aleatoare de gunoi"
+      - "Cu 0"
+      - "Cu 1"
+      - "Programul nu compilează"
+    correctIndex: 1
+    explanation: "Spre deosebire de variabilele locale, globalele se inițializează automat cu 0 (sau valoarea „zero” a tipului). Totuși, e bine să te bazezi pe asta conștient, nu din întâmplare."
+  - question: "Care e un risc real al variabilelor globale?"
+    options:
+      - "Fac programul să nu compileze"
+      - "Orice funcție le poate modifica, deci e greu de urmărit cine le-a schimbat"
+      - "Ocupă mereu mai multă memorie decât localele"
+      - "Nu pot fi citite, doar scrise"
+    correctIndex: 1
+    explanation: "Fiindcă orice funcție poate scrie într-o globală, un bug devine greu de localizat: nu știi imediat care funcție a stricat valoarea. De aceea le folosim cu măsură."
+---
+
+<LessonHook>
+Tabla din clasă e vizibilă tuturor: oricine se ridică poate scrie sau șterge pe ea, și toți văd ce e scris. E comodă pentru ce e comun tuturor — dar dacă cineva șterge ceva ce-ți trebuia, e greu de aflat cine a fost. Variabila globală e tabla programului tău.
+</LessonHook>
+
+## Ce este o variabilă globală?
+
+O variabilă **globală** este declarată **în afara oricărei funcții**, de obicei sus, după `#include`-uri. E vizibilă din toate funcțiile care vin după declararea ei.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n;          // globala: vizibila peste tot
+int v[1000];    // si vectorul e global
+
+int main() {
+    // n si v sunt accesibile aici
+}
+```
+
+<ObservationBox>
+Globalele se inițializează automat cu zero: un `int` global pornește de la `0`, un vector global e plin cu `0`. Localele, în schimb, pornesc cu valori de gunoi dacă nu le inițializezi.
+</ObservationBox>
+
+## Când sunt utile
+
+În problemele de concurs, vectorii mari și valorile partajate de mai multe funcții se declară deseori global, din două motive practice:
+
+- **Acces ușor**: nu trebuie să le pasezi prin parametri la fiecare funcție.
+- **Memorie**: vectorii globali stau într-o zonă de memorie mare; un `int v[1000000]` local în `main` poate depăși stiva și produce crash, dar global e în siguranță.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n;
+int v[100005];   // vector mare, declarat global
+
+int suma() {
+    int s = 0;          // s e local
+    for (int i = 0; i < n; i++) s += v[i];   // n si v sunt globale
+    return s;
+}
+
+int main() {
+    cin >> n;
+    for (int i = 0; i < n; i++) cin >> v[i];
+    cout << suma() << "\n";
+    return 0;
+}
+```
+
+Funcția `suma` folosește `n` și `v` direct, fără să le primească prin parametri — pentru că sunt globale.
+
+## Locală vs. globală — cine câștigă la nume identic?
+
+Dacă o funcție are o variabilă locală cu același nume ca o globală, **localul are prioritate** în acea funcție:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int x = 100;   // global
+
+void f() {
+    int x = 5;        // local, "umbreste" globalul
+    cout << x << "\n"; // 5 (cel local)
+}
+
+int main() {
+    f();
+    cout << x << "\n"; // 100 (globalul, neatins)
+    return 0;
+}
+```
+
+În `f`, numele `x` se referă la cel local. Globalul `x` rămâne `100`.
+
+## De ce le folosim cu măsură
+
+Comoditatea globalelor are un preț: orice funcție le poate modifica. Într-un program mare, dacă o globală are o valoare greșită, trebuie să verifici *toate* funcțiile ca să afli cine a stricat-o. Variabilele locale + parametrii fac fluxul de date explicit și mai ușor de depanat.
+
+Regula practică pentru concurs: **vectori mari și `n`-ul de intrare** — global e ok. **Variabile de lucru temporare** (`i`, `s`, `temp`) — păstrează-le locale.
+
+<MistakeBox>
+Capcane cu variabile globale:
+
+- **Te bazezi că o globală e „proaspătă" la fiecare apel**: nu e — păstrează ce a lăsat apelul anterior. Resetează-o explicit dacă ai nevoie.
+- **Uiți că un local umbrește globalul**: declari din greșeală `int n` local și te miri că modificările nu se văd în afară.
+- **Vector mare declarat local în `main`**: `int v[1000000]` în `main` poate da stack overflow. Declară-l global.
+- **Mai multe funcții scriu în aceeași globală fără să-ți dai seama**: bug greu de găsit. Limitează scrierile.
+</MistakeBox>
+
+## Recapitulare
+
+- O variabilă globală e declarată în afara funcțiilor și e vizibilă din toate funcțiile de după ea.
+- Globalele pornesc automat de la zero; sunt utile pentru vectori mari și valori partajate.
+- Un nume local umbrește globalul cu același nume; folosește globalele cu măsură, fiindcă orice funcție le poate schimba.

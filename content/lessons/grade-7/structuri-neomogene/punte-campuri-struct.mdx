@@ -1,0 +1,119 @@
+---
+title: "Lecție-punte: alegerea câmpurilor importante"
+slug: punte-campuri-struct
+grade: 7
+chapter: structuri-neomogene
+difficulty: mediu
+estimatedTime: 11
+free: true
+status: draft
+isBridge: true
+tags: ["struct", "modelare", "design"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum decizi ce câmpuri pui într-o structură?"
+    options:
+      - "Pui toate datele din enunț, ca să fii sigur"
+      - "Pui exact câmpurile de care au nevoie operațiile cerute (citire, sortare, răspuns)"
+      - "Pui doar un câmp, mereu"
+      - "Câmpurile nu contează, le adaugi pe parcurs oricum"
+    correctIndex: 1
+    explanation: "Pornești de la ce trebuie să faci cu datele. Câmpurile sunt cele de care depind operațiile: ce citești, după ce sortezi, ce afișezi. Restul e balast."
+  - question: "De ce e util să păstrezi un câmp `indiceInitial` chiar dacă enunțul nu-l cere direct?"
+    options:
+      - "Ca să ocupe mai multă memorie"
+      - "Pentru că după sortare ordinea inițială se pierde, iar uneori răspunsul cere poziția originală"
+      - "Pentru că e obligatoriu în orice struct"
+      - "Ca să faci codul mai lent"
+    correctIndex: 1
+    explanation: "Sortarea rearanjează elementele. Dacă răspunsul cere „al câtelea era inițial”, ai nevoie de un câmp care reține poziția de la citire, altfel o pierzi."
+  - question: "Ce câmp e candidat să fie precalculat și stocat în structură?"
+    options:
+      - "O valoare care se folosește des și e scumpă de recalculat (ex. o cheie de sortare compusă)"
+      - "Niciodată nimic, recalculezi mereu"
+      - "Doar numele elementului"
+      - "Indexul, mereu"
+    correctIndex: 0
+    explanation: "Dacă o valoare derivată (ex. raport, sumă, cheie de departajare) se folosește des în comparații, e mai eficient s-o calculezi o dată și s-o ții ca un câmp, decât s-o recalculezi la fiecare comparație."
+---
+
+<LessonHook>
+Când completezi un formular, nu scrii toată povestea vieții — doar rubricile de care are nevoie cererea: nume, dată, semnătură. O structură bună e la fel: conține exact câmpurile cerute de problemă, nici mai multe, nici mai puține.
+</LessonHook>
+
+## Pornește de la operații, nu de la date
+
+Întrebarea greșită e „ce date am?". Întrebarea bună e **„ce trebuie să fac cu ele?"**. Câmpurile structurii ies din operațiile cerute:
+
+- Ce **citești** din intrare? → câmpuri de bază.
+- După ce **sortezi** sau **cauți**? → cheia trebuie să fie un câmp.
+- Ce conține **răspunsul**? → câmpul (sau câmpurile) afișate la final.
+
+<ObservationBox>
+O structură nu trebuie să fie o copie a întregului enunț. Câmpurile inutile ocupă memorie și încarcă codul. Ține doar ce folosesc efectiv operațiile.
+</ObservationBox>
+
+## Câmpul „ascuns" care salvează soluția: indicele inițial
+
+Capcana clasică: sortezi un vector de structuri, apoi enunțul cere „pe ce poziție era inițial elementul X". După sortare, ordinea de citire s-a pierdut.
+
+Soluția: adaugi un câmp care reține poziția de la citire, **înainte** de sortare:
+
+```cpp
+struct Elem {
+    int valoare;
+    int indiceInitial;   // pozitia la citire, supravietuieste sortarii
+};
+
+// la citire:
+for (int i = 0; i < n; i++) {
+    cin >> v[i].valoare;
+    v[i].indiceInitial = i;   // memorez ordinea originala
+}
+```
+
+Acum, oricât ai sorta, `v[i].indiceInitial` îți spune de unde a venit fiecare element.
+
+## Câmpuri precalculate
+
+Dacă o valoare derivată se folosește des — de exemplu o cheie de departajare compusă, un raport, o sumă — calculeaz-o o dată și ține-o într-un câmp. Eviți să o recalculezi la fiecare comparație din `sort`.
+
+```cpp
+struct Produs {
+    int pret, cantitate;
+    long long total;   // pret * cantitate, precalculat
+};
+```
+
+Comparatorul folosește direct `a.total < b.total`, fără înmulțiri repetate.
+
+<ObservationBox>
+Echilibru: precalculează doar ce se folosește des și e scump de recalculat. Un câmp în plus pentru o valoare folosită o singură dată e balast — calculează-l pe loc.
+</ObservationBox>
+
+## Exemplu de gândire
+
+Problemă: „n elevi cu nume și 3 note; afișează-i ordonați descrescător după medie, iar la egalitate în ordinea citirii".
+
+Câmpurile care ies din cerință:
+- `nume` — apare în răspuns.
+- `media` — cheie de sortare; o precalculezi din cele 3 note (nu ții cele 3 note dacă nu-ți mai trebuie).
+- `indiceInitial` — pentru departajarea „în ordinea citirii".
+
+Nimic în plus. Structura urmează fix operațiile.
+
+<MistakeBox>
+Capcane la alegerea câmpurilor:
+
+- **Pierzi ordinea inițială**: sortezi fără un câmp `indiceInitial` și nu mai poți reconstrui pozițiile de la citire.
+- **Câmpuri inutile**: copiezi tot enunțul în structură; memorie și cod irosite.
+- **Recalculezi în comparator o valoare scumpă**: înmulțiri/medii repetate la fiecare comparație → sortare mai lentă. Precalculează-le într-un câmp.
+- **Tip greșit pentru câmp precalculat**: o sumă/produs ca `int` poate da overflow. Alege `long long` pentru câmpuri derivate mari.
+</MistakeBox>
+
+## Recapitulare
+
+- Câmpurile unei structuri ies din operațiile cerute (citire, sortare, răspuns), nu din tot enunțul.
+- Reține `indiceInitial` înainte de sortare dacă răspunsul depinde de ordinea originală.
+- Precalculează în câmpuri doar valorile derivate folosite des și scumpe de recalculat; atenție la tipul lor (overflow).

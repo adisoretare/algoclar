@@ -1,0 +1,138 @@
+---
+title: "Probleme Greedy cu sortare — ordonezi, apoi alegi"
+slug: greedy-cu-sortare
+grade: 7
+chapter: greedy
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["greedy", "sortare", "criteriu"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce multe probleme Greedy încep cu o sortare?"
+    options:
+      - "Ca să elimine duplicatele"
+      - "Pentru că, ordonate după criteriul de prioritate, alegerea lacomă devine o simplă parcurgere"
+      - "Pentru că sortarea e obligatorie în C++"
+      - "Ca să reducă memoria"
+    correctIndex: 1
+    explanation: "Dacă sortezi după criteriul de alegere locală, opțiunea cea mai bună la fiecare pas e mereu următoarea din vector. Greedy se reduce la o parcurgere O(n)."
+  - question: "La problema timpului total de așteptare, după ce criteriu sortezi clienții?"
+    options:
+      - "Descrescător după durată"
+      - "Crescător după durată"
+      - "Alfabetic"
+      - "După ordinea sosirii"
+    correctIndex: 1
+    explanation: "Servind întâi clienții cu durată mică, fiecare așteptare ulterioară e cât mai scurtă. Sortarea crescătoare după durată minimizează timpul total de așteptare."
+  - question: "Care e complexitatea tipică a unui Greedy cu sortare?"
+    options:
+      - "O(n²)"
+      - "O(n log n), dominată de sortare"
+      - "O(1)"
+      - "O(2ⁿ)"
+    correctIndex: 1
+    explanation: "Sortarea costă O(n log n), iar parcurgerea Greedy O(n). Termenul dominant e sortarea, deci O(n log n) în total."
+---
+
+<LessonHook>
+La casă, dacă lași clienții cu coșul plin înaintea celor cu un singur produs, toți cei din spate așteaptă inutil. Pune-i întâi pe cei rapizi și timpul total de așteptare scade. Multe probleme Greedy se rezolvă exact așa: ordonezi inteligent, apoi alegi pe rând.
+</LessonHook>
+
+## Tiparul Greedy cu sortare
+
+Multe probleme Greedy au aceeași formă:
+1. **Sortezi** datele după criteriul de alegere locală.
+2. **Parcurgi** vectorul sortat și iei pe rând, aplicând regula.
+
+După sortare, opțiunea cea mai bună la fiecare pas e mereu următorul element — deci nu mai cauți nimic, doar parcurgi.
+
+<ObservationBox>
+Sortarea nu e algoritmul, ci pregătirea lui. Ea transformă „caută cea mai bună opțiune" într-o simplă parcurgere în ordine. Tot ce contează e să sortezi după criteriul *corect*.
+</ObservationBox>
+
+## Problema: timpul total de așteptare
+
+`n` clienți, fiecare cu o durată de servire. Servești unul câte unul. Timpul de așteptare al unui client e suma duratelor celor serviți înaintea lui. Vrei **timpul total de așteptare minim**.
+
+**Criteriu:** servește întâi clienții cu durata cea mai mică (sortare crescătoare după durată). Astfel duratele mici sunt numărate de cele mai multe ori, iar cele mari de cele mai puține.
+
+## Exemplu numeric
+
+Durate: `{4, 1, 3}`. Le sortăm crescător.
+
+Înainte de sortare:
+
+<ArrayDiagram
+  values="4 1 3"
+  index="0 1 2"
+  caption="Duratele clienților, în ordinea sosirii." />
+
+După sortare crescătoare:
+
+<ArrayDiagram
+  values="1 3 4"
+  index="0 1 2"
+  caption="Sortate crescător după durată — ordinea de servire pentru așteptare minimă." />
+
+Timpul total de așteptare (suma timpilor la care fiecare e servit):
+
+```
+clientul 1 (durata 1): asteapta 0
+clientul 2 (durata 3): asteapta 1          (1)
+clientul 3 (durata 4): asteapta 1+3 = 4    (1, apoi 3)
+total asteptare = 0 + 1 + 4 = 5
+```
+
+Orice altă ordine dă un total ≥ 5. De exemplu `{4, 3, 1}` dă `0 + 4 + 7 = 11`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int v[3] = {4, 1, 3};
+    int n = 3;
+
+    sort(v, v + n);   // crescator dupa durata
+
+    long long prefix = 0;      // timpul scurs pana la clientul curent
+    long long totalAsteptare = 0;
+    for (int i = 0; i < n; i++) {
+        totalAsteptare += prefix;   // clientul i asteapta cat s-a servit inainte
+        prefix += v[i];             // adaug durata lui pentru urmatorii
+    }
+
+    cout << totalAsteptare << "\n";   // 5
+    return 0;
+}
+```
+
+## Complexitate
+
+| Etapă | Timp | Spațiu |
+|-------|------|--------|
+| sortare | O(n log n) | O(log n) |
+| parcurgere Greedy | O(n) | O(1) |
+| total | O(n log n) | O(log n) |
+
+<MistakeBox>
+Capcane la Greedy cu sortare:
+
+- **Sortare după criteriul greșit**: crescător vs. descrescător schimbă complet rezultatul. Verifică pe un exemplu mic.
+- **Overflow la acumulare**: sumele de timpi/produse depășesc `int`. Folosește `long long` pentru `prefix` și total.
+- **Uiți departajarea la egalități**: dacă două elemente sunt egale pe criteriul principal, definește o regulă secundară clară.
+- **Sortezi vectori paraleli separat**: dacă fiecare element are mai multe câmpuri, ține-le într-o structură și sortează o singură dată (altfel se desincronizează).
+</MistakeBox>
+
+## Recapitulare
+
+- Tiparul: sortezi după criteriul de alegere locală, apoi parcurgi și iei pe rând.
+- La timpul total de așteptare, sortarea crescătoare după durată dă optimul.
+- Complexitatea e O(n log n), dominată de sortare; atenție la overflow și la criteriul corect.

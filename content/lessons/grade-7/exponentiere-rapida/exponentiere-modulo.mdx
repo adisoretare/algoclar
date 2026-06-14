@@ -1,0 +1,126 @@
+---
+title: "Exponențiere rapidă modulo — puteri uriașe fără overflow"
+slug: exponentiere-modulo
+grade: 7
+chapter: exponentiere-rapida
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["exponentiere", "modulo", "overflow"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce se cere de obicei rezultatul modulo un număr prim la puteri mari?"
+    options:
+      - "Ca să fie mai greu de calculat"
+      - "Pentru că rezultatul real are mii de cifre și nu încape în niciun tip; modulo îl ține mic"
+      - "Pentru că modulo face calculul mai lent"
+      - "Pentru că puterile mici nu există"
+    correctIndex: 1
+    explanation: "a^n crește exploziv (a^1000 are sute de cifre). Lucrând modulo M, toate valorile rămân sub M, deci încap într-un tip standard și calculul e posibil."
+  - question: "Care proprietate permite să aplici modulo după fiecare înmulțire?"
+    options:
+      - "(a · b) mod M = ((a mod M) · (b mod M)) mod M"
+      - "(a + b) mod M = a · b"
+      - "a mod M = a / M"
+      - "(a · b) mod M = a mod M + b mod M"
+    correctIndex: 0
+    explanation: "Înmulțirea e compatibilă cu modulo: poți reduce factorii modulo M înainte și rezultatul după, fără a schimba restul final. Asta ține numerele mici tot timpul."
+  - question: "Ce tip folosești pentru produsul intermediar când M poate fi aproape de 10⁹?"
+    options:
+      - "int"
+      - "long long (pentru că a*b poate ajunge la ~10¹⁸)"
+      - "short"
+      - "char"
+    correctIndex: 1
+    explanation: "Dacă a și b sunt sub 10⁹, produsul a*b poate fi ~10¹⁸, care depășește int dar încape în long long. Fără long long, ai overflow chiar și cu modulo."
+---
+
+<LessonHook>
+Vrei ultima cifră a lui 7^100? Nu calculezi numărul întreg (are 85 de cifre) — lucrezi tot timpul „modulo 10", păstrând doar restul. Exponențierea modulo combină puterea rapidă cu acest truc: numere uriașe, dar ținute mereu mici.
+</LessonHook>
+
+## De ce modulo
+
+`a^n` crește exploziv: `2^1000` are peste 300 de cifre. Problemele cer de obicei rezultatul **modulo** un număr (frecvent `10^9 + 7`, prim), tocmai ca să rămână gestionabil. Combini exponentierea rapidă cu reducerea modulo la fiecare pas.
+
+<ObservationBox>
+Proprietatea care face totul posibil: `(a · b) mod M = ((a mod M) · (b mod M)) mod M`. Poți aplica modulo după **fiecare** înmulțire, fără a schimba restul final — așa numerele rămân mereu sub `M`.
+</ObservationBox>
+
+## Algoritmul
+
+E exact exponentierea rapidă, dar adaugi `% MOD` după fiecare înmulțire:
+
+```cpp
+const long long MOD = 1000000007;
+
+long long putereMod(long long a, long long n, long long mod) {
+    long long rez = 1;
+    a %= mod;                       // reduc baza de la inceput
+    while (n > 0) {
+        if (n & 1) rez = (rez * a) % mod;   // bit 1: contribuie, redus mod
+        a = (a * a) % mod;                  // patrat, redus mod
+        n >>= 1;
+    }
+    return rez;
+}
+
+int main() {
+    // 7^100 mod (10^9+7)
+    // cout << putereMod(7, 100, MOD);
+    return 0;
+}
+```
+
+## De ce `long long` e obligatoriu
+
+Dacă `mod ≈ 10^9`, atunci `a` și `rez` sunt sub `10^9`, dar produsul `a * a` poate ajunge la `~10^18`. Asta depășește `int` (max ~2·10⁹), dar încape în `long long` (max ~9·10¹⁸). Reduci imediat cu `% mod` ca să nu se acumuleze.
+
+<ObservationBox>
+Tiparul „înmulțesc, apoi `% mod` imediat" trebuie respectat la *fiecare* produs. O singură înmulțire nereдусă modulo poate face overflow și strică tot rezultatul.
+</ObservationBox>
+
+## Exemplu pas cu pas
+
+`3^13 mod 100` (ultimele două cifre). `13 = 1101`.
+
+```
+rez=1, a=3
+bit 1: rez = 1*3 % 100 = 3;     a = 9
+bit 0: rez = 3;                 a = 81
+bit 1: rez = 3*81 % 100 = 43;   a = 6561 % 100 = 61
+bit 1: rez = 43*61 % 100 = 23;  a = ...
+n=0: stop
+```
+
+Rezultat: `3^13 mod 100 = 23`. Verificare: `3^13 = 1594323`, iar `...23` sunt ultimele două cifre. ✓
+
+## Aplicații tipice
+
+- **Ultima cifră / ultimele k cifre** ale unei puteri: `mod 10`, `mod 100`, ...
+- **Numărări combinatoriale mari** (permutări, combinări) cerute `mod 10^9+7`.
+- **Invers modular** pentru `mod` prim, prin teorema lui Fermat: `a^(mod-2) mod mod` — exact o exponentiere modulo.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| exponentiere modulo | O(log n) | O(1) |
+
+<MistakeBox>
+Capcane la exponențierea modulo:
+
+- **`int` în loc de `long long`**: `a * a` cu `a ≈ 10^9` depășește `int`. Overflow garantat. Folosește `long long`.
+- **Uiți `% mod` după o înmulțire**: o singură reducere omisă lasă numărul să crească și să facă overflow.
+- **Nu reduci baza la început**: dacă `a` vine deja mai mare ca `mod`, fă `a %= mod` înainte de buclă.
+- **`mod` neprim la invers modular**: formula Fermat `a^(mod-2)` funcționează doar pentru `mod` prim și `a` nedivizibil cu `mod`.
+</MistakeBox>
+
+## Recapitulare
+
+- Exponențierea modulo = exponentiere rapidă + `% mod` după fiecare înmulțire, ca numerele să rămână mici.
+- Se bazează pe `(a·b) mod M = ((a mod M)·(b mod M)) mod M`; folosește `long long` pentru produs.
+- Aplicații: ultimele cifre, numărări mari `mod 10^9+7`, invers modular (Fermat, pentru `mod` prim).

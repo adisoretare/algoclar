@@ -1,0 +1,138 @@
+---
+title: "Ridicare la putere în timp logaritmic"
+slug: putere-logaritmica
+grade: 7
+chapter: exponentiere-rapida
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["exponentiere", "logaritmic", "putere"]
+visualizers: ["matrix-expo"]
+relatedProblems: []
+quiz:
+  - question: "Pe ce idee se bazează ridicarea rapidă la putere?"
+    options:
+      - "Pe înmulțirea de n ori a bazei"
+      - "Pe descompunerea exponentului folosind pătrate repetate: a^(2k) = (a^k)²"
+      - "Pe sortarea cifrelor exponentului"
+      - "Pe împărțirea bazei la 2"
+    correctIndex: 1
+    explanation: "Cheia e că a^(2k) = (a^k)². Calculând pătrate repetate, înjumătățești exponentul la fiecare pas, deci faci O(log n) înmulțiri în loc de n."
+  - question: "Câte înmulțiri face exponentierea rapidă pentru a^n?"
+    options:
+      - "n"
+      - "n/2"
+      - "aproximativ log₂(n)"
+      - "n²"
+    correctIndex: 2
+    explanation: "Fiecare pas înjumătățește exponentul, deci sunt aproximativ log₂(n) pași — de exemplu ~30 pentru n de ordinul unui miliard, în loc de un miliard."
+  - question: "În varianta iterativă, ce faci când bitul curent al exponentului este 1?"
+    options:
+      - "Înmulțești rezultatul cu baza curentă"
+      - "Împarți rezultatul la 2"
+      - "Ignori pasul"
+      - "Resetezi rezultatul la 1"
+    correctIndex: 0
+    explanation: "Când bitul e 1, acea putere a bazei contribuie la rezultat, deci înmulțești rezultatul cu baza curentă. Apoi, indiferent de bit, ridici baza la pătrat și treci la bitul următor."
+---
+
+<LessonHook>
+Ca să calculezi 2³², nu înmulțești 2 de 32 de ori. Ridici la pătrat: 2², apoi (2²)² = 2⁴, apoi 2⁸, 2¹⁶, 2³² — doar 5 pași. Fiecare pătrat dublează exponentul, așa că ajungi sus în pași logaritmici, nu liniari.
+</LessonHook>
+
+## Problema
+
+Vrei `a^n` pentru `n` mare (până la un miliard sau mai mult). Metoda naivă înmulțește baza de `n` ori — O(n), prea lent. Exponentierea rapidă o face în O(log n).
+
+## Ideea: pătrate repetate
+
+Observația cheie:
+
+```
+a^(2k)   = (a^k)²        (exponent par)
+a^(2k+1) = a · (a^k)²    (exponent impar)
+```
+
+La fiecare pas înjumătățești exponentul. Din `n` ajungi la `0` în ~log₂(n) pași.
+
+<ObservationBox>
+De ce e atât de eficient: înjumătățind exponentul de fiecare dată, faci ~30 de înmulțiri pentru `n ≈ 10⁹`, nu un miliard. Aceeași idee de „a ataca problema prin jumătăți" ca la căutarea binară.
+</ObservationBox>
+
+## Varianta recursivă
+
+```cpp
+long long putere(long long a, long long n) {
+    if (n == 0) return 1;          // caz de baza: a^0 = 1
+    long long jum = putere(a, n / 2);
+    long long p = jum * jum;        // (a^(n/2))^2
+    if (n % 2 == 1) p = p * a;      // exponent impar: inca un a
+    return p;
+}
+```
+
+Calculezi o singură dată `a^(n/2)`, apoi îl ridici la pătrat — aici e câștigul față de naiv.
+
+## Varianta iterativă (pe biți)
+
+Parcurgi exponentul bit cu bit. Ții o `baza` care se ridică la pătrat la fiecare pas; când bitul curent e 1, înmulțești rezultatul cu baza:
+
+```cpp
+long long putere(long long a, long long n) {
+    long long rez = 1;
+    while (n > 0) {
+        if (n & 1) rez = rez * a;   // bit 1 -> contribuie
+        a = a * a;                  // ridic baza la patrat
+        n >>= 1;                    // urmatorul bit
+    }
+    return rez;
+}
+```
+
+## Exemplu pas cu pas
+
+`3^13`. În binar, `13 = 1101`.
+
+```
+n=13 (1101): bit 1 -> rez=3;      a=9    (3^2)
+n=6  (110):  bit 0 -> rez=3;      a=81   (3^4)
+n=3  (11):   bit 1 -> rez=243;    a=6561 (3^8)
+n=1  (1):    bit 1 -> rez=1594323; a=...
+n=0: stop
+```
+
+Rezultat: `3^13 = 1594323`. ✓ Doar 4 pași în loc de 13 înmulțiri.
+
+## Complexitate
+
+| Metodă | Înmulțiri | Timp |
+|--------|-----------|------|
+| naivă | n | O(n) |
+| exponentiere rapidă | ~log₂(n) | O(log n) |
+
+## Vizualizare
+
+Aceeași schemă de pătrate repetate stă și la baza ridicării **matricelor** la putere (folosită la recurențe liniare). Urmărește cum se înjumătățește exponentul:
+
+<Visualizer name="matrix-expo" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa. Observă cum fiecare pas dublează exponentul acumulat — aceeași idee ca la puterea unui număr.
+</HintBox>
+
+<MistakeBox>
+Capcane la exponentierea rapidă:
+
+- **Overflow**: `a * a` crește exploziv. Pentru puteri mari fără modulo, rezultatul depășește `long long` repede. De obicei se cere rezultatul modulo un număr prim (vezi lecția următoare).
+- **Caz de bază lipsă**: fără `n == 0 -> 1`, recursivitatea nu se oprește.
+- **Confuzi `n / 2` cu `n % 2`**: înjumătățirea e `n / 2`; paritatea (bit impar) se verifică cu `n % 2` sau `n & 1`.
+- **Recalculezi `a^(n/2)` de două ori**: dacă scrii `putere(a,n/2) * putere(a,n/2)`, pierzi tot câștigul — devine din nou O(n). Salvează rezultatul într-o variabilă.
+</MistakeBox>
+
+## Recapitulare
+
+- Exponentierea rapidă folosește `a^(2k) = (a^k)²`, înjumătățind exponentul la fiecare pas → O(log n) înmulțiri.
+- Varianta iterativă parcurge exponentul pe biți: ridici baza la pătrat mereu, înmulțești rezultatul când bitul e 1.
+- Salvează `a^(n/2)` o singură dată (recursiv) și atenție la overflow — de regulă se lucrează modulo.

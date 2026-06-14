@@ -1,0 +1,139 @@
+---
+title: "Definirea funcțiilor — corpul și valoarea returnată"
+slug: definirea-functiilor
+grade: 7
+chapter: functii
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["functii", "definire", "return"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce face instrucțiunea `return` într-o funcție?"
+    options:
+      - "Afișează valoarea pe ecran"
+      - "Trimite o valoare înapoi la locul apelului și oprește funcția"
+      - "Reia funcția de la început"
+      - "Declară o variabilă nouă"
+    correctIndex: 1
+    explanation: "`return` întoarce o valoare către cel care a apelat funcția și termină imediat execuția funcției. Codul de după `return` nu se mai execută."
+  - question: "Ce tip returnat folosești pentru o funcție care nu întoarce nicio valoare?"
+    options:
+      - "int"
+      - "void"
+      - "bool"
+      - "Nu pui niciun tip"
+    correctIndex: 1
+    explanation: "`void` înseamnă „fără valoare returnată”. O astfel de funcție face ceva (de exemplu afișează), dar nu trimite niciun rezultat înapoi."
+  - question: "O funcție `int maxim(int a, int b)` ajunge la finalul corpului fără să întâlnească vreun `return`. Ce se întâmplă?"
+    options:
+      - "Întoarce automat 0"
+      - "Comportament nedefinit — valoarea returnată e impredictibilă"
+      - "Programul nu compilează niciodată"
+      - "Întoarce ultimul parametru"
+    correctIndex: 1
+    explanation: "O funcție non-`void` care se termină fără `return` produce comportament nedefinit. Asigură-te că orice drum prin funcție ajunge la un `return`."
+---
+
+<LessonHook>
+O rețetă de prăjitură are un nume („tort de ciocolată") și o listă de pași concreți: amestecă, coace, decorează. Declararea e numele de pe copertă; definirea e rețeta propriu-zisă, pas cu pas, care chiar produce tortul.
+</LessonHook>
+
+## Ce este definirea unei funcții?
+
+**Definirea** conține codul efectiv al funcției — corpul dintre acolade. Spre deosebire de declarare (care se termină cu `;`), definirea descrie *ce face* funcția.
+
+Forma generală:
+
+```
+tip_returnat nume_functie(parametri) {
+    // corpul: instructiunile functiei
+    return valoare;   // daca tipul nu e void
+}
+```
+
+<ObservationBox>
+Dacă definești funcția *înainte* de `main`, nu mai ai nevoie de un prototip separat — definirea servește și ca declarare. Prototipul e necesar doar când definirea vine după primul apel.
+</ObservationBox>
+
+## Instrucțiunea `return`
+
+`return` face două lucruri deodată: trimite o valoare înapoi la locul apelului și **oprește** funcția pe loc. Orice cod scris după un `return` executat nu mai rulează.
+
+```cpp
+int maxim(int a, int b) {
+    if (a > b) return a;   // daca a e mai mare, ies aici
+    return b;              // altfel ajung aici
+}
+```
+
+Tipul valorii din `return` trebuie să fie compatibil cu tipul returnat declarat. O funcție `int` întoarce un întreg, una `double` întoarce un real.
+
+## Funcții fără valoare returnată: `void`
+
+Unele funcții fac o acțiune, dar nu calculează un rezultat — de exemplu afișează ceva. Pentru ele folosim tipul `void`:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void salut(string nume) {
+    cout << "Salut, " << nume << "!\n";
+    // fara return cu valoare
+}
+
+int main() {
+    salut("Ana");    // Salut, Ana!
+    salut("Bogdan"); // Salut, Bogdan!
+    return 0;
+}
+```
+
+Într-o funcție `void` poți folosi `return;` simplu (fără valoare) ca să ieși mai devreme, dar nu e obligatoriu la final.
+
+## Exemplu complet
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int maxim(int a, int b) {
+    if (a > b) return a;
+    return b;
+}
+
+int main() {
+    int x = 7, y = 12;
+    cout << maxim(x, y) << endl;   // 12
+    cout << maxim(20, 5) << endl;  // 20
+    return 0;
+}
+```
+
+Funcția `maxim` e definită o singură dată, dar o putem apela de câte ori vrem, cu argumente diferite. Asta e câștigul: scrii logica o dată, o refolosești oriunde.
+
+## Complexitate
+
+Definirea în sine nu are cost — costul vine din *ce face* corpul. O funcție cu o singură comparație, ca `maxim`:
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| oricare | O(1) | O(1) |
+
+<MistakeBox>
+Capcane la definire:
+
+- **Funcție `int` fără `return` pe toate ramurile**: dacă un `if` întoarce o valoare dar ramura `else` nu, comportamentul e nedefinit. Asigură un `return` pe orice drum.
+- **Confuzi `return` cu `cout`**: `return` trimite valoarea înapoi în program; `cout` o afișează pe ecran. Sunt lucruri diferite.
+- **Cod după `return`**: instrucțiunile de după un `return` executat sunt cod mort — nu rulează niciodată.
+- **Definești aceeași funcție de două ori**: două definiri cu același antet dau eroare de „redefinire". Declararea poate apărea de mai multe ori, definirea o singură dată.
+</MistakeBox>
+
+## Recapitulare
+
+- Definirea conține corpul funcției între acolade și descrie ce face efectiv.
+- `return` trimite o valoare înapoi și oprește imediat funcția.
+- `void` marchează o funcție care face o acțiune fără să întoarcă o valoare.

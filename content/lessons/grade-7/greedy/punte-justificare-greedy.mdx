@@ -1,0 +1,108 @@
+---
+title: "Lecție-punte: cum justifici corectitudinea unei soluții Greedy"
+slug: punte-justificare-greedy
+grade: 7
+chapter: greedy
+difficulty: greu
+estimatedTime: 13
+free: true
+status: draft
+isBridge: true
+tags: ["greedy", "demonstratie", "corectitudine"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce arată argumentul „exchange” (de schimb) pentru un Greedy?"
+    options:
+      - "Că Greedy e mai rapid decât brute force"
+      - "Că o soluție optimă poate fi transformată în cea Greedy fără a-i înrăutăți valoarea"
+      - "Că datele trebuie sortate"
+      - "Că nu există soluție optimă"
+    correctIndex: 1
+    explanation: "Argumentul de schimb ia o soluție optimă și înlocuiește o alegere a ei cu alegerea Greedy, arătând că rezultatul nu se înrăutățește. Repetat, transformă optimul în soluția Greedy — deci Greedy e și el optim."
+  - question: "Ce este proprietatea de alegere lacomă (greedy choice property)?"
+    options:
+      - "Faptul că Greedy e lacom de memorie"
+      - "Existența unei soluții optime care conține prima alegere făcută de Greedy"
+      - "Faptul că Greedy alege la întâmplare"
+      - "Că orice alegere duce la optim"
+    correctIndex: 1
+    explanation: "Înseamnă că prima alegere lacomă nu strică optimul: există măcar o soluție optimă care o include. Combinată cu subproblema rămasă, dă corectitudinea prin inducție."
+  - question: "Care e cel mai practic prim pas pentru a câștiga încredere într-un Greedy la concurs?"
+    options:
+      - "Să presupui că e corect și să mergi mai departe"
+      - "Să cauți contraexemple mici și, dacă rezistă, să schițezi un argument de schimb"
+      - "Să crești dimensiunea datelor"
+      - "Să schimbi limbajul de programare"
+    correctIndex: 1
+    explanation: "Întâi încerci să-l dobori cu contraexemple mici. Dacă rezistă, schițezi de ce alegerea lacomă nu strică optimul (argument de schimb). Asta separă un Greedy corect de unul doar plauzibil."
+---
+
+<LessonHook>
+Oricine poate spune „cred că merge". Un matematician însă arată de ce nu se poate altfel. Pentru un Greedy, diferența dintre puncte maxime și „aproape" e fix asta: nu doar să intuiești că alegerea lacomă e bună, ci să poți argumenta că nicio altă alegere nu duce mai departe.
+</LessonHook>
+
+## De ce nu e de ajuns „pare că merge"
+
+Un Greedy poate da răspunsuri corecte pe toate exemplele tale și totuși să fie greșit. La concurs, un criteriu plauzibil dar nedemonstrat e o capcană: pică exact pe testul pe care nu l-ai imaginat. Justificarea îți spune *înainte* dacă soluția e corectă.
+
+<ObservationBox>
+Două unelte fac aproape toată treaba: **proprietatea de alegere lacomă** (prima alegere nu strică optimul) și **argumentul de schimb** (orice optim poate fi „împins" spre soluția Greedy fără pierdere).
+</ObservationBox>
+
+## Unealta 1: proprietatea de alegere lacomă
+
+Arată că **există o soluție optimă care conține prima alegere a Greedy-ului**. Dacă da, poți face acea alegere fără regret, apoi repeți raționamentul pe ce rămâne (subproblema). Prin inducție, întreaga construcție Greedy e optimă.
+
+La selecția activităților: prima aleasă e cea care se termină cel mai devreme. Susții că există un optim care o conține — fiindcă, dacă un optim folosește altă primă activitate, aceea se termină mai târziu și o poți înlocui cu cea Greedy fără să pierzi nimic.
+
+## Unealta 2: argumentul de schimb
+
+Iei o soluție **optimă** oarecare și o compari cu cea Greedy. Găsești prima diferență și **schimbi** alegerea optimului cu cea a Greedy-ului, arătând că soluția rămâne cel puțin la fel de bună. Repetând, transformi optimul în soluția Greedy — deci Greedy e și el optim.
+
+```
+optim:   ... X ...      (X = alegerea optimului la pasul k)
+greedy:  ... G ...      (G = alegerea Greedy la pasul k)
+
+inlocuiesti X cu G in optim
+-> arati ca valoarea NU scade
+-> deci si varianta cu G e optima
+```
+
+<ObservationBox>
+Cheia argumentului de schimb: înlocuirea trebuie să fie mereu posibilă și să nu înrăutățească rezultatul. Dacă găsești fie și un caz unde schimbul strică soluția, Greedy-ul (cu acel criteriu) e greșit.
+</ObservationBox>
+
+## Unealta 0 (practică): contraexemple mici
+
+Înainte de orice demonstrație formală, **încearcă să dobori** criteriul:
+
+1. Generează cazuri mici (3–5 elemente) cu valori variate.
+2. Compară Greedy cu răspunsul corect (brute force pe cazul mic).
+3. Dacă diferă, ai un contraexemplu — criteriul e greșit.
+
+Dacă rezistă la multe încercări, criteriul devine credibil și merită demonstrat.
+
+## Tiparul de lucru la concurs
+
+| Pas | Ce faci |
+|-----|---------|
+| 1 | Formulezi criteriul de alegere locală |
+| 2 | Cauți contraexemple mici (brute force vs. Greedy) |
+| 3 | Dacă rezistă, schițezi argumentul de schimb / alegerea lacomă |
+| 4 | Implementezi (de obicei sortare + parcurgere) |
+
+<MistakeBox>
+Capcane la justificarea unui Greedy:
+
+- **Confunzi „a trecut testele mele" cu „e corect"**: exemplele nu demonstrează nimic; un contraexemplu, în schimb, infirmă.
+- **Sari peste argumentul de schimb**: implementezi un criteriu plauzibil fără să verifici că schimbul nu strică optimul.
+- **Argument de schimb incomplet**: arăți schimbul doar pentru un caz, nu pentru oricare diferență posibilă.
+- **Renunți la Greedy la primul contraexemplu**: uneori problema e Greedy, dar cu alt criteriu — caută și alte criterii înainte de a abandona metoda.
+</MistakeBox>
+
+## Recapitulare
+
+- Un Greedy corect se justifică, nu se presupune: exemplele nu sunt dovadă, dar un contraexemplu infirmă.
+- Proprietatea de alegere lacomă (prima alegere nu strică optimul) plus argumentul de schimb dau demonstrația.
+- În practică: formulezi criteriul, cauți contraexemple mici, apoi schițezi argumentul de schimb înainte de a implementa.
