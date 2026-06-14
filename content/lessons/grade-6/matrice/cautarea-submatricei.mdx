@@ -1,0 +1,130 @@
+---
+title: "Căutarea unei submatrice — potrivești un tipar dreptunghiular"
+slug: cautarea-submatricei
+grade: 6
+chapter: matrice
+difficulty: greu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "submatrice", "potrivire"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă că tiparul P (dimensiune p×q) apare în matricea A (n×m) cu colțul în (i, j)?"
+    options:
+      - "P[x][y] = A[x][y] pentru toate x, y"
+      - "P[x][y] = A[i+x][j+y] pentru toate celulele lui P"
+      - "P apare doar pe diagonală"
+      - "P are aceeași sumă ca A"
+    correctIndex: 1
+    explanation: "Tiparul așezat cu colțul stânga-sus în (i, j) se potrivește dacă fiecare celulă P[x][y] coincide cu A[i+x][j+y]. Verifici tot dreptunghiul."
+  - question: "Câte poziții de colț (i, j) posibile are P (p×q) în A (n×m)?"
+    options:
+      - "n × m"
+      - "(n - p + 1) × (m - q + 1)"
+      - "p × q"
+      - "n - p"
+    correctIndex: 1
+    explanation: "Colțul poate fi pe liniile 0..n-p și coloanele 0..m-q, altfel tiparul ar ieși din A. Deci (n-p+1)×(m-q+1) poziții."
+  - question: "Ce complexitate are căutarea naivă a unei submatrice?"
+    options:
+      - "O(n·m)"
+      - "O(n·m·p·q) în cazul cel mai rău"
+      - "O(log(n·m))"
+      - "O(p·q)"
+    correctIndex: 1
+    explanation: "Pentru fiecare dintre ~n·m poziții de colț, compari până la p·q celule ale tiparului. În cel mai rău caz O(n·m·p·q)."
+---
+
+<LessonHook>
+Cauți un mic logo pe o pagină scanată: îl pui într-un colț, verifici dacă se potrivește pixel cu pixel, iar dacă nu, îl muți cu o poziție și încerci din nou. Căutarea unei submatrice e exact asta — potrivești un dreptunghi mic peste unul mare.
+</LessonHook>
+
+## Problema
+
+Ai o matrice mare `A` (`n × m`) și un **tipar** `P` (`p × q`). Vrei să afli dacă `P` apare în `A` ca **bloc dreptunghiular** și unde anume.
+
+`P` așezat cu colțul stânga-sus în `(i, j)` se potrivește dacă, pentru toate celulele lui:
+
+`P[x][y] == A[i+x][j+y]`
+
+<ObservationBox>
+Colțul tiparului nu poate fi oriunde: ultima linie de start e `n - p`, ultima coloană `m - q`. Altfel `P` ar depăși marginile lui `A`. Deci sunt `(n-p+1)·(m-q+1)` poziții de încercat.
+</ObservationBox>
+
+## Algoritmul naiv
+
+Pentru fiecare colț `(i, j)` valid:
+
+1. Compari toate cele `p × q` celule ale tiparului cu zona corespunzătoare din `A`.
+2. La prima nepotrivire, abandonezi acel colț și treci la următorul.
+3. Dacă toate se potrivesc → tiparul apare la `(i, j)`.
+
+## Pas cu pas pe numere
+
+`A` (3×3), tiparul `P` (2×2) `= [[1,2],[3,1]]`:
+
+<ArrayDiagram values="5 1 2" valueLabel="L0" index="0 1 2" />
+
+<ArrayDiagram values="9 3 1" valueLabel="L1" index="0 1 2" />
+
+<ArrayDiagram values="4 0 7" valueLabel="L2" index="0 1 2" caption="P se potrivește cu colțul în (0, 1): {1,2 / 3,1}" />
+
+Colțul `(0,0)` dă `{5,1 / 9,3}` — nu se potrivește. Colțul `(0,1)` dă `{1,2 / 3,1}` — potrivire! Tiparul apare la `(0, 1)`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int A[100][100], P[100][100];
+
+int main() {
+    int n, m, p, q;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> A[i][j];
+    cin >> p >> q;
+    for (int x = 0; x < p; x++)
+        for (int y = 0; y < q; y++) cin >> P[x][y];
+
+    for (int i = 0; i <= n - p; i++)
+        for (int j = 0; j <= m - q; j++) {
+            bool ok = true;
+            for (int x = 0; x < p && ok; x++)
+                for (int y = 0; y < q; y++)
+                    if (A[i + x][j + y] != P[x][y]) { ok = false; break; }
+            if (ok) cout << "Submatrice gasita la (" << i << ", " << j << ")\n";
+        }
+    return 0;
+}
+```
+
+Cele patru bucle: două pentru colț `(i, j)`, două pentru verificarea celulelor `(x, y)` ale tiparului.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|---|---|---|
+| Cel mai rău | O(n·m·p·q) | O(1) |
+| Tipic (nepotriviri rapide) | mult mai bun | O(1) |
+
+Pentru gimnaziu, când matricele sunt mici, costul e acceptabil. Algoritmi mai rapizi există, dar îi vei studia mai târziu.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Colțul iese din matrice.** Buclele de start merg până la `n - p` și `m - q` (inclusiv). Dacă le duci până la `n`/`m`, accesezi `A[i+x][j+y]` în afara matricei.
+- **Indexare relativă greșită.** Celula tiparului `P[x][y]` se compară cu `A[i+x][j+y]`, nu cu `A[x][y]`. Confuzia compară mereu același colț.
+- **Nu abandonezi la prima nepotrivire.** Fără ieșire rapidă verifici tot tiparul degeaba — corect ca rezultat, dar inutil de lent.
+- **`p > n` sau `q > m`.** Dacă tiparul e mai mare decât matricea, nu poate apărea. Buclele nici nu trebuie să pornească (`n - p < 0`).
+</MistakeBox>
+
+## Recapitulare
+
+- Cauți tiparul `P` (p×q) ca **bloc dreptunghiular** în `A`; sunt `(n-p+1)·(m-q+1)` colțuri posibile.
+- Pentru fiecare colț, compari `P[x][y]` cu `A[i+x][j+y]` și abandonezi la **prima nepotrivire**.
+- Naiv e **O(n·m·p·q)** — bun la gimnaziu; atenție la marginile `n-p`, `m-q` și la indexarea relativă.

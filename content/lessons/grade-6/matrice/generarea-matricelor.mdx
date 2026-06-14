@@ -1,0 +1,131 @@
+---
+title: "Generarea matricelor — completezi după o regulă"
+slug: generarea-matricelor
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "generare", "reguli"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pentru tabla înmulțirii, ce valoare pui în a[i][j]?"
+    options:
+      - "i + j"
+      - "(i+1) × (j+1) dacă numerotezi de la 0"
+      - "i - j"
+      - "max(i, j)"
+    correctIndex: 1
+    explanation: "Tabla înmulțirii cere produsul liniei cu coloana. Cu numerotare de la 0, linia i reprezintă numărul i+1, deci a[i][j] = (i+1)×(j+1)."
+  - question: "Cum generezi o matrice cu 1 pe diagonala principală și 0 în rest (matricea identitate)?"
+    options:
+      - "a[i][j] = 1 mereu"
+      - "a[i][j] = (i == j) ? 1 : 0"
+      - "a[i][j] = i + j"
+      - "a[i][j] = (i + j == n-1) ? 1 : 0"
+    correctIndex: 1
+    explanation: "Identitatea are 1 unde i == j (diagonala principală) și 0 în rest. Condiția i == j decide valoarea."
+  - question: "Ce e esențial când generezi o matrice după o regulă?"
+    options:
+      - "Să citești matricea de la tastatură întâi"
+      - "Să exprimi valoarea fiecărui element ca funcție de i și j"
+      - "Să sortezi rezultatul"
+      - "Să folosești recursivitate"
+    correctIndex: 1
+    explanation: "Generarea înseamnă să calculezi a[i][j] dintr-o formulă care depinde de poziție (i, j), fără să citești valori."
+---
+
+<LessonHook>
+Nu primești matricea gata făcută — primești o regulă: „pune în fiecare căsuță produsul rândului cu coloana”. Trebuie s-o completezi tu, căsuță cu căsuță. Asta e generarea unei matrice: o construiești dintr-o formulă, nu o citești.
+</LessonHook>
+
+## Ce înseamnă generarea
+
+A **genera** o matrice înseamnă să completezi fiecare element `a[i][j]` după o **regulă care depinde de poziție** — de indicii `i` și `j` — fără să citești valori de la intrare.
+
+Tiparul e mereu același: două bucle imbricate și o formulă în interior.
+
+<ObservationBox>
+Întrebarea cheie la orice generare: „ce funcție de `i` și `j` dă valoarea din căsuță?”. Odată ce ai formula, codul e o simplă dublă buclă.
+</ObservationBox>
+
+## Exemple uzuale
+
+**Tabla înmulțirii** (`a[i][j] = (i+1)·(j+1)`), pentru `n = m = 4`:
+
+<ArrayDiagram values="1 2 3 4" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="2 4 6 8" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="3 6 9 12" valueLabel="L2" index="off" />
+
+<ArrayDiagram values="4 8 12 16" valueLabel="L3" index="off" caption="a[i][j] = (i+1)·(j+1)" />
+
+**Matricea identitate** (`1` pe diagonala principală, `0` în rest):
+
+<ArrayDiagram values="1 0 0 0" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="0 1 0 0" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="0 0 1 0" valueLabel="L2" index="off" />
+
+<ArrayDiagram values="0 0 0 1" valueLabel="L3" index="off" caption="a[i][j] = 1 dacă i == j, altfel 0" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n = 4, m = 4;
+
+    // tabla inmultirii
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            a[i][j] = (i + 1) * (j + 1); // numerotam de la 0, valorile de la 1
+
+    // matricea identitate (in alta matrice)
+    int id[100][100];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            id[i][j] = (i == j) ? 1 : 0; // 1 pe diagonala principala
+
+    // afisare tabla inmultirii
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) cout << a[i][j] << " ";
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+## Altă regulă des întâlnită: „șah”
+
+`a[i][j] = (i + j) % 2` dă tipar de tablă de șah (alternanță 0/1), pentru că `i + j` schimbă paritatea la fiecare pas vecin. Multe generări se reduc la o astfel de expresie pe `i` și `j`.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Generare | O(n·m) | O(n·m) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Numerotare amestecată.** La tabla înmulțirii, dacă numerotezi de la 0 trebuie `(i+1)·(j+1)`. Dacă uiți `+1`, prima linie și coloană ies pline de zerouri.
+- **Formulă pe valoare, nu pe poziție.** Generarea folosește `i` și `j`, nu valori citite. Dacă încerci să citești matricea înainte, ai înțeles greșit cerința.
+- **Confunzi diagonalele.** `i == j` e principala; `i + j == n-1` e secundara. Pentru identitate folosești `i == j`.
+- **Suprascrii dimensiunile.** Generează doar în zona `n × m` folosită; restul matricei globale rămâne 0 și nu trebuie afișat.
+</MistakeBox>
+
+## Recapitulare
+
+- A **genera** o matrice = a completa `a[i][j]` dintr-o **formulă pe poziție** (`i`, `j`), fără citire.
+- Tiparul e mereu **două bucle + o expresie**; întrebarea e „ce funcție de `i` și `j`?”.
+- Exemple: tabla înmulțirii `(i+1)(j+1)`, identitatea `i==j`, șah `(i+j)%2`.

@@ -1,0 +1,133 @@
+---
+title: "Parcurgeri pe diagonale — i+j și i−j sunt constante"
+slug: parcurgeri-diagonale
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "diagonale", "indici"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Pe diagonala principală a unei matrice pătratice, ce relație leagă indicii i și j?"
+    options:
+      - "i + j = n - 1"
+      - "i = j"
+      - "i = j + 1"
+      - "i × j = n"
+    correctIndex: 1
+    explanation: "Diagonala principală merge din colțul stânga-sus în dreapta-jos: a[0][0], a[1][1], ... — adică toate elementele cu i = j."
+  - question: "Pe diagonala secundară (colț dreapta-sus → stânga-jos), ce relație au indicii?"
+    options:
+      - "i = j"
+      - "i + j = n - 1"
+      - "i - j = 0"
+      - "i = n"
+    correctIndex: 1
+    explanation: "Pe diagonala secundară, suma indicilor e constantă: a[0][n-1], a[1][n-2], ... toate au i + j = n - 1."
+  - question: "Elementele de pe o diagonală paralelă cu cea principală au în comun..."
+    options:
+      - "aceeași sumă i + j"
+      - "aceeași diferență i - j"
+      - "aceeași valoare"
+      - "aceeași linie"
+    correctIndex: 1
+    explanation: "Toate diagonalele paralele cu cea principală au i - j constant. Diagonalele paralele cu cea secundară au i + j constant."
+---
+
+<LessonHook>
+La jocul X și 0 verifici dacă cineva a câștigat pe diagonală: colț cu colț, oblic. Nu te uiți pe rânduri sau coloane, ci pe linia înclinată. Ca să prinzi acea linie într-o matrice, ai nevoie de o regulă simplă între linie și coloană.
+</LessonHook>
+
+## Cele două diagonale principale
+
+Într-o matrice **pătratică** (`n × n`) există două diagonale speciale:
+
+- **Diagonala principală** (stânga-sus → dreapta-jos): elementele cu **`i == j`**.
+- **Diagonala secundară** (dreapta-sus → stânga-jos): elementele cu **`i + j == n - 1`**.
+
+<ObservationBox>
+Truc de aur: pe o diagonală „\" (ca principala), **`i − j` e constant**. Pe o diagonală „/" (ca secundara), **`i + j` e constant**. Aceste două sume/diferențe identifică orice diagonală.
+</ObservationBox>
+
+## Exemplu pe numere
+
+Matricea `a` (4×4):
+
+<ArrayDiagram values="1 2 3 4" valueLabel="L0" index="0 1 2 3" caption="a[0][0]=1 (principală), a[0][3]=4 (secundară)" />
+
+<ArrayDiagram values="5 6 7 8" valueLabel="L1" index="0 1 2 3" />
+
+<ArrayDiagram values="9 1 2 3" valueLabel="L2" index="0 1 2 3" />
+
+<ArrayDiagram values="4 5 6 7" valueLabel="L3" index="0 1 2 3" caption="a[3][3]=7 (principală), a[3][0]=4 (secundară)" />
+
+- Diagonala principală (`i == j`): `1, 6, 2, 7`.
+- Diagonala secundară (`i + j == 3`): `4, 7, 1, 4`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n;
+    cin >> n; // matrice patratica
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    int sumaP = 0, sumaS = 0;
+    for (int i = 0; i < n; i++) {
+        sumaP += a[i][i];         // principala: i == j
+        sumaS += a[i][n - 1 - i]; // secundara: j = n-1-i
+    }
+    cout << "Diagonala principala: " << sumaP << "\n";
+    cout << "Diagonala secundara: " << sumaS << "\n";
+    return 0;
+}
+```
+
+O singură buclă ajunge: pentru fiecare `i`, elementul principal e `a[i][i]`, iar cel secundar `a[i][n-1-i]`.
+
+## Diagonale paralele
+
+Toate diagonalele „\" se grupează după **`i − j`**. Pentru o matrice `n × n`, `i − j` ia valori de la `-(n-1)` la `n-1`. Poți aduna pe fiecare diagonală folosind `d = i - j` ca etichetă (cu un decalaj ca să fie pozitiv):
+
+```cpp
+// suma fiecarei diagonale paralele cu cea principala
+int sumaDiag[200] = {0}; // indexat dupa (i - j + n)
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+        sumaDiag[i - j + n] += a[i][j]; // decalaj +n ca sa fie index pozitiv
+```
+
+Analog, pentru diagonalele „/" folosești `i + j` (valori `0..2n-2`).
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| O diagonală | O(n) | O(1) |
+| Toate diagonalele | O(n²) | O(n) etichete |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Formula secundarei greșită.** Elementul secundar pe linia `i` e `a[i][n-1-i]`, nu `a[i][n-i]` (care iese din matrice cu un pas).
+- **Index negativ la diagonale paralele.** `i - j` poate fi negativ. Adaugă un decalaj (`+ n`) ca să-l folosești ca index de vector.
+- **Aplici pe matrice nepătratică.** „Diagonala principală” clasică e definită pe matrice pătratică. Pe `n ≠ m`, regula `i == j` merge doar până la `min(n, m)`.
+- **Numeri de două ori centrul.** La `n` impar, elementul din mijloc e pe ambele diagonale. Dacă aduni „principală + secundară”, el se numără de două ori — scade-l o dată dacă problema cere altfel.
+</MistakeBox>
+
+## Recapitulare
+
+- Diagonala **principală**: `i == j`; **secundară**: `i + j == n - 1`.
+- Diagonale paralele „\" au **`i − j` constant**; cele „/" au **`i + j` constant**.
+- Centrul (la `n` impar) e pe ambele diagonale — atenție la dubla numărare.

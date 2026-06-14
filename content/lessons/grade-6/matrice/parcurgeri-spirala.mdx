@@ -1,0 +1,139 @@
+---
+title: "Parcurgeri în spirală — strângi matricea din afară spre centru"
+slug: parcurgeri-spirala
+grade: 6
+chapter: matrice
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "spirala", "margini"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce patru margini ții minte într-o parcurgere în spirală?"
+    options:
+      - "Doar sus și jos"
+      - "sus, jos, stânga, dreapta — și le strângi spre interior"
+      - "Doar diagonala principală"
+      - "Centrul și un colț"
+    correctIndex: 1
+    explanation: "Spirala merge: linia de sus →, coloana din dreapta ↓, linia de jos ←, coloana din stânga ↑. După fiecare latură, marginea respectivă se strânge spre centru."
+  - question: "După ce parcurgi linia de sus (stânga → dreapta), ce faci cu marginea `sus`?"
+    options:
+      - "O lași neschimbată"
+      - "O cobori cu 1 (sus++)"
+      - "O urci cu 1 (sus--)"
+      - "O resetezi la 0"
+    correctIndex: 1
+    explanation: "Linia de sus e gata, deci o eliminăm: sus++. Astfel spirala nu o mai revizitează când urcă pe coloana din stânga."
+  - question: "De ce sunt necesare verificările `sus <= jos` și `stanga <= dreapta` între laturi?"
+    options:
+      - "Ca să sortăm spirala"
+      - "Ca să nu revizităm elemente când marginile s-au întâlnit (mai ales la matrice nepătratice)"
+      - "Ca să evităm overflow"
+      - "Nu sunt necesare"
+    correctIndex: 1
+    explanation: "Când marginile s-au strâns, o latură poate să nu mai existe. Fără verificări, ai reparcurge sau ai ieși din matrice."
+---
+
+<LessonHook>
+Cojești un măr într-o singură fâșie continuă: tai pe margine de jur împrejur, apoi spirala se strânge tot mai spre interior până nu mai rămâne nimic. Parcurgerea în spirală a unei matrice face exact asta cu elementele.
+</LessonHook>
+
+## Ideea
+
+Parcurgerea în **spirală** vizitează elementele pe marginea exterioară, apoi pe marginea următoare din interior, și tot așa spre centru. Sensul tipic: **dreapta → jos → stânga → sus**, repetat.
+
+Cheia e să ții patru **margini** și să le strângi după fiecare latură:
+
+- `sus` — prima linie nevizitată
+- `jos` — ultima linie nevizitată
+- `stanga` — prima coloană nevizitată
+- `dreapta` — ultima coloană nevizitată
+
+<ObservationBox>
+După ce „consumi” o latură, strângi marginea ei: ai terminat linia de sus → `sus++`; ai terminat coloana din dreapta → `dreapta--`. Așa zona nevizitată se micșorează până dispare.
+</ObservationBox>
+
+## Pas cu pas pe numere
+
+Matricea 3×3:
+
+<ArrayDiagram values="1 2 3" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="8 9 4" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="7 6 5" valueLabel="L2" index="off" caption="Spirala: 1 2 3 4 5 6 7 8 9" />
+
+Ordinea de vizitare:
+
+```
+sus    (stanga->dreapta): 1 2 3   apoi sus++
+dreapta(sus->jos):        4 5     apoi dreapta--
+jos    (dreapta->stanga): 6 7     apoi jos--
+stanga (jos->sus):        8       apoi stanga++
+ramane centrul:           9
+rezultat: 1 2 3 4 5 6 7 8 9
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    int sus = 0, jos = n - 1, stanga = 0, dreapta = m - 1;
+    while (sus <= jos && stanga <= dreapta) {
+        for (int j = stanga; j <= dreapta; j++) cout << a[sus][j] << " ";
+        sus++;
+        for (int i = sus; i <= jos; i++) cout << a[i][dreapta] << " ";
+        dreapta--;
+        if (sus <= jos) { // mai exista linie de jos?
+            for (int j = dreapta; j >= stanga; j--) cout << a[jos][j] << " ";
+            jos--;
+        }
+        if (stanga <= dreapta) { // mai exista coloana din stanga?
+            for (int i = jos; i >= sus; i--) cout << a[i][stanga] << " ";
+            stanga++;
+        }
+    }
+    cout << "\n";
+    return 0;
+}
+```
+
+Cele două `if`-uri previn revizitarea când matricea nu e pătratică și o latură a dispărut deja.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Parcurgere în spirală | O(n·m) | O(1) |
+
+Fiecare element e afișat exact o dată.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Uiți verificările `if` pentru jos/stânga.** La matrice cu o singură linie sau coloană rămasă, fără `if (sus <= jos)` reparcurgi elemente sau ieși din matrice.
+- **Strângi marginea în momentul greșit.** `sus++` se face **după** ce ai parcurs linia de sus, nu înainte. Ordinea „parcurge, apoi strânge” trebuie respectată.
+- **Sensuri inversate la laturile de întoarcere.** Linia de jos se parcurge de la `dreapta` spre `stanga` (descrescător), coloana din stânga de la `jos` spre `sus`. Indici crescători aici dau ordine greșită.
+- **Condiția buclei mare greșită.** Bucla rulează cât timp `sus <= jos && stanga <= dreapta`. Cu `<` în loc de `<=` ratezi ultima linie/coloană.
+</MistakeBox>
+
+## Recapitulare
+
+- Spirala ține **patru margini** (sus, jos, stânga, dreapta) și le **strânge** după fiecare latură.
+- Sens tipic: sus→dreapta, dreapta→jos, jos→stânga, stânga→sus, repetat spre centru.
+- Verificările `if` între laturi sunt **obligatorii** la matrice nepătratice, ca să nu revizitezi.

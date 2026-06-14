@@ -1,0 +1,135 @@
+---
+title: "Transpunerea unei matrice — liniile devin coloane"
+slug: transpunere-matrice
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "transpunere", "indici"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce face transpunerea unei matrice?"
+    options:
+      - "Sortează fiecare linie"
+      - "Schimbă liniile cu coloanele: t[j][i] = a[i][j]"
+      - "Inversează ordinea liniilor"
+      - "Adună diagonalele"
+    correctIndex: 1
+    explanation: "Transpusa schimbă rolul indicilor: elementul de pe linia i, coloana j ajunge pe linia j, coloana i. Deci t[j][i] = a[i][j]."
+  - question: "O matrice cu n linii și m coloane, transpusă, are ce dimensiuni?"
+    options:
+      - "n linii și m coloane (la fel)"
+      - "m linii și n coloane"
+      - "n linii și n coloane"
+      - "1 linie și n×m coloane"
+    correctIndex: 1
+    explanation: "Liniile devin coloane și invers, deci transpusa unei matrice n×m este o matrice m×n."
+  - question: "De ce transpunerea „pe loc” (fără matrice nouă) merge doar pentru matrice pătratice?"
+    options:
+      - "Pentru că altfel valorile sunt prea mari"
+      - "Pentru că la n≠m forma se schimbă (m×n) și nu mai încape în aceeași matrice"
+      - "Pentru că diagonala dispare"
+      - "Nu e adevărat, merge mereu"
+    correctIndex: 1
+    explanation: "La nepătratice, transpusa are altă formă (m×n), deci ai nevoie de o matrice nouă. La pătratice poți interschimba a[i][j] cu a[j][i] direct."
+---
+
+<LessonHook>
+Ai un tabel cu elevii pe rânduri și notele la materii pe coloane. Cineva vrea același tabel, dar cu materiile pe rânduri și elevii pe coloane. Nu schimbi datele — doar rotești tabelul. Asta e transpunerea unei matrice.
+</LessonHook>
+
+## Ce este transpusa
+
+**Transpusa** unei matrice schimbă **liniile cu coloanele**: elementul de pe linia `i`, coloana `j` ajunge pe linia `j`, coloana `i`.
+
+`t[j][i] = a[i][j]`
+
+O matrice `n × m` are transpusa de formă `m × n`.
+
+<ObservationBox>
+Pe diagonala principală (`i == j`), elementele rămân pe loc — sunt „axa” în jurul căreia se oglindește matricea. Tot ce e deasupra diagonalei se schimbă cu ce e dedesubt.
+</ObservationBox>
+
+## Exemplu pe numere
+
+Matricea `a` (2×3):
+
+<ArrayDiagram values="1 2 3" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="4 5 6" valueLabel="L1" index="off" caption="a are 2 linii, 3 coloane" />
+
+Transpusa `t` (3×2):
+
+<ArrayDiagram values="1 4" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="2 5" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="3 6" valueLabel="L2" index="off" caption="t are 3 linii, 2 coloane — t[j][i] = a[i][j]" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100], t[100][100];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    // transpusa intr-o matrice noua: merge si pentru n != m
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            t[j][i] = a[i][j]; // linia i, col j -> linia j, col i
+
+    for (int i = 0; i < m; i++) {       // t are m linii
+        for (int j = 0; j < n; j++)     // si n coloane
+            cout << t[i][j] << " ";
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+## Transpunere „pe loc” (doar pătratice)
+
+Dacă matricea e **pătratică** (`n == m`), poți transpune fără matrice nouă, interschimbând perechile de deasupra diagonalei cu cele de dedesubt:
+
+```cpp
+// doar pentru n == m
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++) // j incepe de la i+1: doar deasupra diagonalei
+        swap(a[i][j], a[j][i]);
+```
+
+`j` pornește de la `i + 1` ca să atingi fiecare pereche **o singură dată** — altfel le-ai schimba înapoi.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Transpunere în matrice nouă | O(n·m) | O(n·m) |
+| Transpunere pe loc (pătratică) | O(n²) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Transpunere pe loc cu `j` de la 0.** Dacă `j` pornește de la `0`, schimbi fiecare pereche de două ori și matricea revine la forma inițială. Pornește `j` de la `i + 1`.
+- **Confunzi dimensiunile la afișare.** Transpusa unei `n × m` are `m` linii și `n` coloane. Afișarea cu limitele vechi (`n × m`) e greșită.
+- **Pe loc la matrice nepătratică.** La `n ≠ m` nu poți transpune în aceeași matrice — forma se schimbă. Folosește o matrice nouă.
+- **Inversezi indicii la copiere.** Formula e `t[j][i] = a[i][j]`. Scrierea `t[i][j] = a[j][i]` transpune greșit dacă nu ești atent la limite.
+</MistakeBox>
+
+## Recapitulare
+
+- **Transpusa** schimbă liniile cu coloanele: `t[j][i] = a[i][j]`; o `n × m` devine `m × n`.
+- Diagonala principală rămâne pe loc; restul se oglindește față de ea.
+- Pe **loc** doar la matrice **pătratice**, cu `swap(a[i][j], a[j][i])` și `j` de la `i + 1`.

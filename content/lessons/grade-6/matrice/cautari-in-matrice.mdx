@@ -1,0 +1,126 @@
+---
+title: "Căutări în matrice — găsești o valoare și poziția ei"
+slug: cautari-in-matrice
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "cautare", "pozitie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum cauți o valoare într-o matrice oarecare (nesortată)?"
+    options:
+      - "Cu căutare binară pe linii"
+      - "Parcurgi toate elementele cu două bucle și compari"
+      - "Sortezi întâi matricea"
+      - "Te uiți doar pe diagonală"
+    correctIndex: 1
+    explanation: "Pe o matrice fără nicio ordine, singura metodă sigură e parcurgerea completă: verifici fiecare a[i][j]. E O(n·m)."
+  - question: "Când găsești valoarea căutată, ce reții ca să cunoști POZIȚIA ei?"
+    options:
+      - "Doar valoarea"
+      - "Perechea (i, j) — linia și coloana"
+      - "Suma liniei"
+      - "Doar linia"
+    correctIndex: 1
+    explanation: "Poziția unui element în matrice e perechea (linie, coloană) = (i, j). Reții ambii indici."
+  - question: "Cum oprești căutarea imediat ce ai găsit prima apariție?"
+    options:
+      - "Nu se poate opri"
+      - "Folosești un indicator (flag) sau ieși din ambele bucle când ai găsit"
+      - "Continui până la final mereu"
+      - "Sortezi rezultatul"
+    correctIndex: 1
+    explanation: "Setezi un flag „găsit” și reții (i, j); cu un break ieși din bucla interioară, iar flag-ul oprește și bucla exterioară. Eviți munca inutilă."
+---
+
+<LessonHook>
+Cauți un anumit elev într-un catalog cu rânduri și coloane. Mergi rând cu rând, te uiți la fiecare nume, iar când îl găsești reții exact unde e: rândul și coloana. Asta e căutarea într-o matrice.
+</LessonHook>
+
+## Căutare într-o matrice oarecare
+
+Dacă matricea **nu are nicio ordine**, ca să afli dacă o valoare există trebuie să verifici **fiecare element**. Parcurgi cu două bucle și compari. Când găsești, reții **poziția**: perechea `(i, j)`.
+
+<ObservationBox>
+Pe o matrice nesortată nu există scurtătură: în cel mai rău caz valoarea e ultima, deci trebuie să poți ajunge la toate cele `n·m` elemente. Costul e O(n·m).
+</ObservationBox>
+
+## Exemplu pe numere
+
+Căutăm valoarea `7` în matricea 3×4:
+
+<ArrayDiagram values="2 9 4 1" valueLabel="L0" index="0 1 2 3" />
+
+<ArrayDiagram values="5 7 3 8" valueLabel="L1" index="0 1 2 3" caption="7 e la (1, 1)" />
+
+<ArrayDiagram values="6 0 2 9" valueLabel="L2" index="0 1 2 3" />
+
+Parcurgând pe linii, găsim `7` la linia `1`, coloana `1` → poziția `(1, 1)`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n, m, x;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+    cin >> x; // valoarea cautata
+
+    int li = -1, co = -1; // pozitia gasita; -1 = inca negasit
+    bool gasit = false;
+    for (int i = 0; i < n && !gasit; i++)
+        for (int j = 0; j < m; j++)
+            if (a[i][j] == x) {
+                li = i; co = j;
+                gasit = true; // oprim cautarea
+                break;        // iesim din bucla pe coloane
+            }
+
+    if (gasit) cout << "Gasit la (" << li << ", " << co << ")\n";
+    else cout << "Nu exista\n";
+    return 0;
+}
+// pentru x = 7: Gasit la (1, 1)
+```
+
+Condiția `!gasit` din bucla exterioară plus `break`-ul din cea interioară opresc căutarea la **prima apariție**.
+
+## Variante des cerute
+
+- **Toate aparițiile**: nu te oprești, ci afișezi fiecare `(i, j)` cu `a[i][j] == x`.
+- **Maximul și poziția lui**: reții valoarea maximă și `(i, j)` unde a apărut.
+- **Căutare pe linii sortate**: dacă fiecare linie e sortată, poți face căutare binară pe linie → O(n·log m).
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|---|---|---|
+| Matrice nesortată | O(n·m) | O(1) |
+| Linii sortate (binar pe linie) | O(n·log m) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Uiți să reții ambii indici.** Poziția e `(i, j)`. Dacă reții doar linia, nu mai știi pe ce coloană e elementul.
+- **`break` iese doar dintr-o buclă.** Un singur `break` părăsește bucla interioară, nu și pe cea exterioară. Folosește un flag (`gasit`) pentru a opri complet.
+- **Inițializezi poziția cu 0.** Dacă pornești `li = co = 0`, nu distingi „găsit la (0,0)” de „negăsit”. Inițializează cu `-1`.
+- **Cauți binar pe matrice nesortată.** Căutarea binară cere ordine. Pe o matrice oarecare dă rezultate greșite — folosește parcurgerea completă.
+</MistakeBox>
+
+## Recapitulare
+
+- Pe o matrice **nesortată**, cauți parcurgând tot: O(n·m), și reții poziția ca pereche **`(i, j)`**.
+- Pentru **prima apariție**, oprește căutarea cu un **flag** + `break` (un singur `break` nu ajunge).
+- Dacă liniile sunt **sortate**, poți coborî la O(n·log m) cu căutare binară pe fiecare linie.

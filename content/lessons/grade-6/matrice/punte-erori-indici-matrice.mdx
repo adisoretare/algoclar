@@ -1,0 +1,101 @@
+---
+title: "Lecție-punte: cum eviți erorile de indici în matrice"
+slug: punte-erori-indici-matrice
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["matrice", "indici", "depanare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e ordinea corectă a indicilor pentru linia i, coloana j?"
+    options:
+      - "a[j][i]"
+      - "a[i][j]"
+      - "depinde de matrice"
+      - "a[i+j]"
+    correctIndex: 1
+    explanation: "Convenția standard e linie-întâi: a[i][j] = linia i, coloana j. Inversarea e una dintre cele mai frecvente erori."
+  - question: "Pentru o matrice cu n linii, ce indice de linie e valid?"
+    options:
+      - "0 ≤ i ≤ n"
+      - "0 ≤ i ≤ n-1"
+      - "1 ≤ i ≤ n+1"
+      - "orice i"
+    correctIndex: 1
+    explanation: "Cu numerotare de la 0, liniile sunt 0..n-1. Accesul la a[n][...] iese din matrice — eroarea clasică „off-by-one”."
+  - question: "Care e cel mai sigur mod de a prinde o eroare de indici?"
+    options:
+      - "Rulezi o singură dată și speri"
+      - "Urmărești manual codul pe un exemplu mic (ex. 2×3) și verifici fiecare acces"
+      - "Mărești dimensiunile matricei"
+      - "Eviți complet matricele"
+    correctIndex: 1
+    explanation: "Urmărirea manuală pe o matrice mică, cu n ≠ m, scoate la iveală inversări de indici și depășiri de limite înainte să te încurci pe teste mari."
+---
+
+<LessonHook>
+Te muți într-un bloc nou și încurci etajul cu apartamentul: ajungi la ușa greșită. La matrice se întâmplă la fel — dacă inversezi linia cu coloana sau treci de ultima cu un pas, „bați la ușa” greșită. Vestea bună: aproape toate erorile de indici vin din câteva tipare pe care le poți recunoaște.
+</LessonHook>
+
+## De ce sunt erorile de indici atât de frecvente
+
+La matrice jonglezi cu **doi indici** simultan, fiecare cu propria limită. Două surse de bug domină:
+
+- **Inversarea** liniei cu coloana (`a[j][i]` în loc de `a[i][j]`).
+- **Off-by-one**: treci de `n-1` sau pornești de la `1` când trebuia de la `0` (sau invers).
+
+<ObservationBox>
+Regulă de aur pentru depistare: testează pe o matrice **nepătratică** mică (ex. `2×3`). Dacă inversezi indicii, la `n ≠ m` codul fie iese din matrice, fie dă rezultate clar greșite — eroarea se vede imediat. Pe matrice pătratice se ascunde.
+</ObservationBox>
+
+## Cele trei verificări rapide
+
+Înainte de a rula pe teste, verifică:
+
+1. **Ordinea indicilor.** Peste tot `a[linie][coloană]` = `a[i][j]`. Linia mereu prima.
+2. **Limitele buclelor.** Liniile `0..n-1`, coloanele `0..m-1`. La parcurgere pe coloane, bucla interioară merge până la `n` (linii), nu `m`.
+3. **Dimensiunile la afișare.** Dacă ai transpus sau ai schimbat forma, afișezi cu noile limite, nu cu cele vechi.
+
+## Exemplul care prinde bug-ul
+
+Pe matricea `2×3`:
+
+<ArrayDiagram values="1 2 3" valueLabel="L0" index="0 1 2" />
+
+<ArrayDiagram values="4 5 6" valueLabel="L1" index="0 1 2" caption="a[1][2] = 6. Dar a[2][1] NU există — linia 2 e în afara matricei!" />
+
+Dacă din greșeală scrii `a[j][i]` cu `j = 2`, accesezi linia `2` într-o matrice cu doar 2 linii (`0` și `1`) → memorie în afara matricei, rezultat imprevizibil. Pe o matrice `3×3` aceeași greșeală ar fi „mers” și ai fi pierdut bug-ul.
+
+## Tipare de cod corecte
+
+```cpp
+// parcurgere pe linii: i exterior, j interior
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+        folosesc(a[i][j]); // linie-intai, mereu
+
+// vecin cu verificare de margine
+int ni = i + dx[k], nj = j + dy[k];
+if (ni >= 0 && ni < n && nj >= 0 && nj < m) // OBLIGATORIU
+    folosesc(a[ni][nj]);
+```
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **`a[j][i]` în loc de `a[i][j]`.** Cea mai des întâlnită. Testează pe `n ≠ m` ca s-o prinzi; pe pătratice se ascunde.
+- **`<= n` în loc de `< n`.** Bucla `for (i = 0; i <= n; i++)` accesează `a[n][...]`, care nu există. Limita corectă e `< n`.
+- **Limita greșită în bucla interioară.** La parcurgere pe coloane, interiorul merge pe linii (`i < n`). Folosirea lui `m` aici e clasică la `n ≠ m`.
+- **Vecin fără verificare de margine.** La bordură, `i-1` sau `j+1` ies din matrice. Verifică limitele înainte de orice acces la vecin.
+</MistakeBox>
+
+## Recapitulare
+
+- Cele două surse de bug: **inversarea** linie/coloană și **off-by-one** la limite.
+- Testează pe o matrice **mică, nepătratică** (`2×3`) — acolo erorile de indici ies imediat la suprafață.
+- Verifică mereu: **linie-întâi** (`a[i][j]`), limite `< n`/`< m`, și **margini** înainte de a accesa vecini.

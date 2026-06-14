@@ -1,0 +1,129 @@
+---
+title: "Bordarea unei matrice — chenarul de pe margine"
+slug: bordare-matrice
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "bordura", "margini"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Un element a[i][j] e pe bordura (chenarul) matricei n×m dacă..."
+    options:
+      - "i == j"
+      - "i == 0 sau i == n-1 sau j == 0 sau j == m-1"
+      - "i + j == n-1"
+      - "i și j sunt pare"
+    correctIndex: 1
+    explanation: "Bordura e prima/ultima linie sau prima/ultima coloană. Un element e pe margine dacă e pe vreuna dintre ele."
+  - question: "Care e un motiv practic des întâlnit pentru a borda o matrice cu un chenar suplimentar de zerouri?"
+    options:
+      - "Ca să ocupe mai puțină memorie"
+      - "Ca să accesezi vecinii fără să verifici de fiecare dată dacă ieși din matrice"
+      - "Ca să sortezi liniile"
+      - "Ca să transpui mai ușor"
+    correctIndex: 1
+    explanation: "Un chenar de „gardă” (de obicei 0) în jurul matricei lasă orice element interior să-și citească vecinii fără verificări de margine — codul devine mai simplu și mai sigur."
+  - question: "Câte elemente are bordura unei matrice n×m (cu n, m ≥ 2)?"
+    options:
+      - "n + m"
+      - "2n + 2m - 4"
+      - "n × m"
+      - "2(n + m)"
+    correctIndex: 1
+    explanation: "Două linii întregi (2m) plus două coloane (2n), minus cele 4 colțuri numărate de două ori: 2n + 2m - 4."
+---
+
+<LessonHook>
+Pui o ramă în jurul unei fotografii. Rama atinge doar marginea, nu mijlocul. La matrice, „bordura” e exact acest chenar: prima și ultima linie, prima și ultima coloană. Iar uneori adaugi tu o ramă suplimentară ca să-ți fie mai ușor de lucrat.
+</LessonHook>
+
+## Ce este bordura
+
+**Bordura** (chenarul) unei matrice sunt elementele de pe **margine**: prima linie, ultima linie, prima coloană, ultima coloană.
+
+Un element `a[i][j]` e pe bordură dacă:
+
+`i == 0` **sau** `i == n-1` **sau** `j == 0` **sau** `j == m-1`.
+
+<ObservationBox>
+Elementele care **nu** sunt pe bordură formează „interiorul”: `1 ≤ i ≤ n-2` și `1 ≤ j ≤ m-2`. Distincția margine/interior apare des în probleme cu matrice.
+</ObservationBox>
+
+## Exemplu: marchează bordura
+
+Matricea 4×4, bordura marcată cu `1`, interiorul cu `0`:
+
+<ArrayDiagram values="1 1 1 1" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="1 0 0 1" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="1 0 0 1" valueLabel="L2" index="off" />
+
+<ArrayDiagram values="1 1 1 1" valueLabel="L3" index="off" caption="Bordura = chenarul exterior; interiorul rămâne 0" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    int sumaBordura = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) {
+            cin >> a[i][j];
+            if (i == 0 || i == n - 1 || j == 0 || j == m - 1)
+                sumaBordura += a[i][j]; // element pe margine
+        }
+
+    cout << "Suma bordurii = " << sumaBordura << "\n";
+    return 0;
+}
+```
+
+O singură condiție cu patru cazuri, legate prin `sau`, recunoaște orice element de pe margine.
+
+## A doua idee: bordare cu un chenar de gardă
+
+Uneori **adaugi** tu o ramă de zerouri în jurul matricei. De ce? Ca să poți citi vecinii oricărui element interior **fără verificări de margine**. Lucrezi cu matricea reală pe pozițiile `1..n` și `1..m`, iar linia/coloana `0` și `n+1`/`m+1` rămân `0` ca „gardă”.
+
+```cpp
+// matricea reala stocata de la (1,1); marginea 0 ramane garda
+for (int i = 1; i <= n; i++)
+    for (int j = 1; j <= m; j++)
+        cin >> a[i][j];
+// acum a[i-1][j], a[i+1][j], a[i][j-1], a[i][j+1] exista mereu (sunt 0 la margine)
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Parcurgerea bordurii | O(n·m) la citire, O(n+m) doar marginea | O(1) |
+
+Numărul de elemente de pe bordură e `2n + 2m - 4` (cele 4 colțuri nu se numără de două ori).
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Numeri colțurile de două ori.** Un colț e și pe linie, și pe coloană de margine. Condiția cu `sau` îl tratează o singură dată — dar dacă aduni separat „liniile” și „coloanele”, le dublezi.
+- **Confunzi `n-1` cu `n`.** Ultima linie e `n-1`, ultima coloană `m-1` (numerotare de la 0). `i == n` iese din matrice.
+- **Garda dimensionată greșit.** Dacă bordezi cu un chenar de zerouri, matricea trebuie declarată cu cel puțin `n+2` × `m+2` și datele citite de la `(1,1)`.
+- **Interior gol.** La `n < 3` sau `m < 3` nu există interior — toată matricea e bordură. Tratează cazul dacă problema cere strict interiorul.
+</MistakeBox>
+
+## Recapitulare
+
+- **Bordura** = elementele cu `i ∈ {0, n-1}` sau `j ∈ {0, m-1}`; interiorul e restul.
+- Recunoști un element de margine cu o singură condiție `sau`; colțurile nu se dublează.
+- Un **chenar de gardă** (zerouri în jur) lasă vecinii să fie accesați **fără verificări de margine**.

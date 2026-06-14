@@ -1,0 +1,138 @@
+---
+title: "Vectori de direcție — vecinii unei celule, fără cod repetat"
+slug: vectori-de-directie
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "directii", "vecini"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce sunt vectorii de direcție dx[] și dy[]?"
+    options:
+      - "Sumele liniilor și coloanelor"
+      - "Liste cu deplasările spre celulele vecine (ex. dx={-1,1,0,0}, dy={0,0,-1,1})"
+      - "Diagonalele matricei"
+      - "Pozițiile elementelor maxime"
+    correctIndex: 1
+    explanation: "dx și dy codifică cum se schimbă linia și coloana pentru fiecare direcție. Vecinul k al celulei (i,j) este (i+dx[k], j+dy[k])."
+  - question: "De ce sunt utili vectorii de direcție în loc să scrii cei 4 vecini pe rând?"
+    options:
+      - "Ocupă mai multă memorie"
+      - "Tratezi toate direcțiile cu o singură buclă, fără cod copiat de 4 ori"
+      - "Sunt mai rapizi ca timp de execuție"
+      - "Permit căutare binară"
+    correctIndex: 1
+    explanation: "Cu o buclă pe k parcurgi toate direcțiile uniform. Eviți să scrii (i-1,j),(i+1,j),(i,j-1),(i,j+1) separat și greșelile asociate."
+  - question: "Ce verificare e obligatorie înainte de a accesa un vecin (ni, nj)?"
+    options:
+      - "Că (ni, nj) e pe diagonală"
+      - "Că ni și nj sunt în interiorul matricei (0..n-1, 0..m-1)"
+      - "Că valoarea e pară"
+      - "Nicio verificare"
+    correctIndex: 1
+    explanation: "Un vecin poate cădea în afara matricei (la margini). Înainte de a-l folosi, verifici 0 ≤ ni < n și 0 ≤ nj < m."
+---
+
+<LessonHook>
+Stai pe o căsuță de pe o tablă și vrei să te uiți la vecini: sus, jos, stânga, dreapta. În loc să scrii de fiecare dată patru cazuri aproape identice, ții o listă scurtă de „pași”: ce adaugi la rând și la coloană pentru fiecare direcție. Asta sunt vectorii de direcție.
+</LessonHook>
+
+## Problema cu cod repetat
+
+Multe probleme cer să te uiți la **vecinii** unei celule. Scris naiv, ai patru linii aproape identice:
+
+```cpp
+// varianta repetitiva, usor de gresit
+verifica(i - 1, j); // sus
+verifica(i + 1, j); // jos
+verifica(i, j - 1); // stanga
+verifica(i, j + 1); // dreapta
+```
+
+Patru copii înseamnă patru locuri unde poți greși un semn. Vectorii de direcție elimină repetiția.
+
+## Ideea: două liste de deplasări
+
+Ții doi vectori mici: `dx[]` (cât se schimbă linia) și `dy[]` (cât se schimbă coloana). Pentru cele 4 direcții:
+
+```cpp
+int dx[] = {-1, 1, 0, 0}; // sus, jos, -, -
+int dy[] = {0, 0, -1, 1}; // -, -, stanga, dreapta
+```
+
+Vecinul `k` al celulei `(i, j)` este `(i + dx[k], j + dy[k])`. O buclă pe `k` acoperă toate direcțiile.
+
+<ObservationBox>
+`dx[k]` și `dy[k]` „mergi împreună”: perechea `(dx[k], dy[k])` e un pas într-o direcție. Pentru 8 direcții (cu diagonale) extinzi listele la 8 perechi.
+</ObservationBox>
+
+## Exemplu pe numere
+
+Celula `(1, 1)` din matricea 3×3 are 4 vecini direcți:
+
+<ArrayDiagram values="0 2 0" valueLabel="L0" index="off" caption="sus = (0,1) = 2" />
+
+<ArrayDiagram values="5 9 7" valueLabel="L1" index="off" caption="stânga=(1,0)=5, centru=(1,1)=9, dreapta=(1,2)=7" />
+
+<ArrayDiagram values="0 4 0" valueLabel="L2" index="off" caption="jos = (2,1) = 4" />
+
+Vecinii lui `9`: `2` (sus), `4` (jos), `5` (stânga), `7` (dreapta). Suma lor: `18`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+int dx[] = {-1, 1, 0, 0}; // cele 4 directii
+int dy[] = {0, 0, -1, 1};
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    int li = 1, co = 1; // celula pentru care vrem suma vecinilor
+    int suma = 0;
+    for (int k = 0; k < 4; k++) {
+        int ni = li + dx[k]; // linia vecinului
+        int nj = co + dy[k]; // coloana vecinului
+        if (ni >= 0 && ni < n && nj >= 0 && nj < m) // vecinul e in matrice?
+            suma += a[ni][nj];
+    }
+    cout << "Suma vecinilor = " << suma << "\n"; // 18 pentru exemplul de sus
+    return 0;
+}
+```
+
+Verificarea `ni >= 0 && ni < n && nj >= 0 && nj < m` e esențială: la margini, unii vecini cad în afara matricei.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Vecinii unei celule | O(1) (4 sau 8 direcții) | O(1) |
+| Vecinii tuturor celulelor | O(n·m) | O(1) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Uiți verificarea de margine.** La celulele de pe bordură, un vecin poate avea `ni = -1` sau `nj = m` → acces în afara matricei. Verifică **întotdeauna** înainte de `a[ni][nj]`.
+- **`dx` și `dy` nepotrivite.** Perechea `(dx[k], dy[k])` trebuie să descrie aceeași direcție. Dacă le încurci, „sus” devine altceva.
+- **Numeri celula curentă ca vecin.** Cu `(0,0)` în liste ai include `(i, j)` însăși. Vecinii au deplasare nenulă.
+- **8 direcții cu liste de 4.** Pentru diagonale ai nevoie de 8 perechi. Folosirea listelor de 4 ratează vecinii oblici.
+</MistakeBox>
+
+## Recapitulare
+
+- **Vectorii de direcție** `dx[]`, `dy[]` codifică deplasările spre vecini; vecinul `k` e `(i+dx[k], j+dy[k])`.
+- O **singură buclă** pe direcții înlocuiește 4 (sau 8) cazuri copiate — mai puține greșeli.
+- **Verifică marginile** (`0 ≤ ni < n`, `0 ≤ nj < m`) înainte de a accesa orice vecin.

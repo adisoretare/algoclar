@@ -1,0 +1,122 @@
+---
+title: "Parcurgeri pe coloane — o coloană întreagă, de sus în jos"
+slug: parcurgeri-coloane
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "parcurgere", "coloane"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La parcurgerea pe coloane, ce fixează bucla EXTERIOARĂ?"
+    options:
+      - "Linia"
+      - "Coloana"
+      - "Diagonala"
+      - "Valoarea minimă"
+    correctIndex: 1
+    explanation: "Bucla exterioară fixează coloana j, iar cea interioară parcurge toate liniile i ale acelei coloane — de sus în jos."
+  - question: "Cum obții parcurgerea pe coloane pornind de la cea pe linii?"
+    options:
+      - "Schimbi ordinea celor două bucle (j exterior, i interior)"
+      - "Sortezi matricea"
+      - "Transpui matricea obligatoriu"
+      - "Nu se poate, e altă structură"
+    correctIndex: 0
+    explanation: "Doar inversezi rolurile buclelor: j devine exterior, i interior. Accesul rămâne a[i][j], dar ordinea de vizitare se schimbă."
+  - question: "Ce ordine de vizitare dă parcurgerea pe coloane pentru o matrice 2×2?"
+    options:
+      - "a[0][0], a[0][1], a[1][0], a[1][1]"
+      - "a[0][0], a[1][0], a[0][1], a[1][1]"
+      - "a[1][1], a[0][1], a[1][0], a[0][0]"
+      - "a[0][1], a[0][0], a[1][1], a[1][0]"
+    correctIndex: 1
+    explanation: "Pe coloane: termini coloana 0 (liniile 0,1), apoi coloana 1 (liniile 0,1). Deci a[0][0], a[1][0], a[0][1], a[1][1]."
+---
+
+<LessonHook>
+Citești un clasament pe coloane: parcurgi toată coloana „nume”, apoi toată coloana „punctaj”. Mergi de sus în jos pe fiecare coloană, nu de la stânga la dreapta pe rânduri. Asta e parcurgerea pe coloane a unei matrice.
+</LessonHook>
+
+## Ce înseamnă parcurgerea pe coloane
+
+A parcurge **pe coloane** înseamnă: iei coloana 0 în întregime (toate liniile, de sus în jos), apoi coloana 1, și așa mai departe.
+
+Diferența față de parcurgerea pe linii e **doar ordinea buclelor**: aici bucla exterioară e pe coloane (`j`), cea interioară pe linii (`i`). Accesul la element rămâne tot `a[i][j]`.
+
+<ObservationBox>
+Aceeași matrice, alt traseu. Pe linii „se mișcă repede” coloana; pe coloane „se mișcă repede” linia. Doar inversezi care buclă e exterioară.
+</ObservationBox>
+
+## Exemplu: suma fiecărei coloane
+
+Fie matricea `a` (3 linii, 3 coloane):
+
+<ArrayDiagram values="2 5 1" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="4 0 6" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="3 3 3" valueLabel="L2" index="off" caption="Sumele pe coloane: 9, 8, 10" />
+
+Pentru fiecare coloană resetezi suma și aduni de sus în jos:
+
+```
+coloana 0: 2+4+3 = 9
+coloana 1: 5+0+3 = 8
+coloana 2: 1+6+3 = 10
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < m; j++) {       // bucla exterioara: coloana
+        int suma = 0;                   // reset pentru fiecare coloana
+        for (int i = 0; i < n; i++)     // bucla interioara: liniile
+            suma += a[i][j];
+        cout << "Suma coloanei " << j << " = " << suma << "\n";
+    }
+    return 0;
+}
+// pentru matricea de mai sus: 9, 8, 10
+```
+
+Singura schimbare față de parcurgerea pe linii: `j` e acum exterior, `i` interior. Indexarea `a[i][j]` nu se schimbă.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Parcurgere pe coloane | O(n·m) | O(1) suplimentar |
+
+Același cost ca pe linii — atingi tot atâtea elemente, doar în altă ordine.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Greșești limita buclei interioare.** Pe coloane, bucla interioară merge pe **linii** (`i < n`). Folosirea lui `m` aici e o eroare clasică (mai ales când `n ≠ m`).
+- **Crezi că trebuie să transpui matricea.** Nu — parcurgerea pe coloane e doar inversarea buclelor. Transpunerea e altă operație (creezi o matrice nouă).
+- **Reset în locul greșit.** `suma = 0` se pune la începutul fiecărei coloane (în bucla pe `j`), nu o singură dată.
+- **Confunzi `a[i][j]` cu `a[j][i]`.** Indexarea rămâne linie-întâi: `a[i][j]`. Doar ordinea buclelor se schimbă, nu accesul.
+</MistakeBox>
+
+## Recapitulare
+
+- Parcurgerea **pe coloane** = bucla exterioară pe `j` (coloană), interioară pe `i` (linie), de sus în jos.
+- Diferă de cea pe linii **doar prin ordinea buclelor**; accesul rămâne `a[i][j]`.
+- Cost **O(n·m)**; atenție ca bucla interioară să meargă până la `n` (linii), nu `m`.

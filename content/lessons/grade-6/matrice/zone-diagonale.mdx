@@ -1,0 +1,126 @@
+---
+title: "Zone determinate de diagonale — sus, jos, stânga, dreapta"
+slug: zone-diagonale
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "diagonale", "zone"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cele două diagonale ale unei matrice pătratice împart interiorul în câte zone (triunghiuri)?"
+    options:
+      - "2"
+      - "4 (sus, jos, stânga, dreapta)"
+      - "8"
+      - "Niciuna"
+    correctIndex: 1
+    explanation: "Diagonala principală și cea secundară se intersectează în centru și taie matricea în 4 triunghiuri: nord, sud, vest, est."
+  - question: "Un element a[i][j] e în zona de SUS (nord) dacă..."
+    options:
+      - "i < j și i + j < n-1"
+      - "i > j și i > n/2"
+      - "i == j"
+      - "i + j > n-1"
+    correctIndex: 0
+    explanation: "Zona de sus e deasupra ambelor diagonale: mai sus decât principala (i < j) și mai sus decât secundara (i + j < n-1)."
+  - question: "Ce două mărimi compari ca să plasezi un element față de cele două diagonale?"
+    options:
+      - "valoarea și poziția"
+      - "i față de j (principala) și i+j față de n-1 (secundara)"
+      - "linia față de coloană doar"
+      - "suma liniei față de suma coloanei"
+    correctIndex: 1
+    explanation: "Față de diagonala principală compari i cu j; față de cea secundară compari i+j cu n-1. Combinația celor două te plasează într-unul dintre cele 4 triunghiuri."
+---
+
+<LessonHook>
+Tragi cele două diagonale ale unui pătrat și obții patru triunghiuri: unul în sus, unul în jos, unul la stânga, unul la dreapta — ca un plic. Multe probleme cer să prelucrezi doar una dintre aceste zone. Trebuie să știi, pentru fiecare căsuță, în ce triunghi cade.
+</LessonHook>
+
+## Cele patru zone
+
+Cele două diagonale ale unei matrice **pătratice** o împart în **patru triunghiuri**: nord (sus), sud (jos), vest (stânga), est (dreapta).
+
+Plasarea unui element `a[i][j]` se face comparând cu cele două diagonale:
+
+- față de **principala**: `i < j` (deasupra) sau `i > j` (dedesubt)
+- față de **secundara**: `i + j < n-1` (deasupra) sau `i + j > n-1` (dedesubt)
+
+<ObservationBox>
+Combini cele două comparații ca niște coordonate:
+
+- **Sus**: `i < j` **și** `i + j < n-1`
+- **Jos**: `i > j` **și** `i + j > n-1`
+- **Stânga**: `i > j` **și** `i + j < n-1`
+- **Dreapta**: `i < j` **și** `i + j > n-1`
+</ObservationBox>
+
+## Exemplu pe numere
+
+Matricea 5×5, fiecare zonă marcată: `1`=sus, `2`=jos, `3`=stânga, `4`=dreapta, `0`=pe diagonale:
+
+<ArrayDiagram values="0 1 1 1 0" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="3 0 1 0 4" valueLabel="L1" index="off" />
+
+<ArrayDiagram values="3 3 0 4 4" valueLabel="L2" index="off" />
+
+<ArrayDiagram values="3 0 2 0 4" valueLabel="L3" index="off" />
+
+<ArrayDiagram values="0 2 2 2 0" valueLabel="L4" index="off" caption="Cele 4 triunghiuri delimitate de diagonale (0 = pe diagonală)" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n;
+    cin >> n; // matrice patratica
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    int sumaSus = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            if (i < j && i + j < n - 1) // zona de sus: deasupra ambelor diagonale
+                sumaSus += a[i][j];
+
+    cout << "Suma zonei de sus = " << sumaSus << "\n";
+    return 0;
+}
+```
+
+Pentru altă zonă schimbi doar condiția (`i > j && i + j > n - 1` pentru jos, etc.).
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Parcurgerea unei zone | O(n²) | O(1) |
+
+Parcurgi toată matricea și verifici apartenența fiecărui element la zonă.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Incluzi diagonalele din greșeală.** Elementele de pe diagonale (`i == j` sau `i + j == n-1`) **nu** sunt în niciun triunghi. Folosește `<` și `>` stricte, nu `<=`.
+- **Confunzi zonele.** Sus = `i < j && i + j < n-1`. Ușor de încurcat cu stânga (`i > j && i + j < n-1`). Verifică pe un exemplu mic.
+- **Aplici pe matrice nepătratică.** Cele două diagonale și cele 4 zone simetrice sunt definite pe matrice **pătratică**. La `n ≠ m` definiția zonelor nu mai e simetrică.
+- **Centrul la `n` impar.** La `n` impar, centrul e pe ambele diagonale — nu aparține niciunei zone. Tratează-l separat dacă problema o cere.
+</MistakeBox>
+
+## Recapitulare
+
+- Cele două diagonale taie matricea pătratică în **4 triunghiuri**: sus, jos, stânga, dreapta.
+- Plasezi un element comparând `i` cu `j` (principala) și `i+j` cu `n-1` (secundara).
+- Folosește **inegalități stricte** ca să excluzi diagonalele; definiția cere matrice **pătratică**.

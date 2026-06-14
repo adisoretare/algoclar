@@ -1,0 +1,120 @@
+---
+title: "Parcurgeri pe linii — o linie întreagă, apoi următoarea"
+slug: parcurgeri-linii
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "parcurgere", "linii"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La parcurgerea pe linii, ce fixează bucla EXTERIOARĂ?"
+    options:
+      - "Coloana"
+      - "Linia"
+      - "Valoarea maximă"
+      - "Diagonala"
+    correctIndex: 1
+    explanation: "Bucla exterioară fixează linia i, iar cea interioară parcurge toate coloanele j ale acelei linii. Astfel tratezi o linie întreagă înainte de a trece la următoarea."
+  - question: "Cum calculezi suma fiecărei linii separat?"
+    options:
+      - "Resetezi suma la 0 înainte de bucla pe coloane, pentru fiecare linie"
+      - "Folosești o singură variabilă sumă pentru toată matricea"
+      - "Aduni doar primul element din fiecare linie"
+      - "Nu se poate calcula pe linii"
+    correctIndex: 0
+    explanation: "Pentru fiecare linie i, pui sumă = 0, apoi aduni toate coloanele. Resetarea la începutul fiecărei linii e esențială."
+  - question: "Ce ordine de vizitare dă parcurgerea pe linii pentru o matrice 2×2?"
+    options:
+      - "a[0][0], a[1][0], a[0][1], a[1][1]"
+      - "a[0][0], a[0][1], a[1][0], a[1][1]"
+      - "a[1][1], a[1][0], a[0][1], a[0][0]"
+      - "a[0][0], a[1][1], a[0][1], a[1][0]"
+    correctIndex: 1
+    explanation: "Pe linii: termini linia 0 (coloanele 0,1), apoi linia 1 (coloanele 0,1). Deci a[0][0], a[0][1], a[1][0], a[1][1]."
+---
+
+<LessonHook>
+Citești o pagină dintr-o carte: parcurgi primul rând de la stânga la dreapta, treci la rândul următor, și tot așa până jos. Nu sari de pe un rând pe altul la întâmplare. Parcurgerea pe linii a unei matrice e exact acest mod natural de citire.
+</LessonHook>
+
+## Ce înseamnă parcurgerea pe linii
+
+A parcurge **pe linii** înseamnă: iei linia 0 în întregime (toate coloanele), apoi linia 1, și așa mai departe. E ordinea în care citești text.
+
+Tiparul de cod: bucla **exterioară** pe linii (`i`), bucla **interioară** pe coloane (`j`).
+
+<ObservationBox>
+Regula: indicele din bucla exterioară „se mișcă încet”, cel din bucla interioară „se mișcă repede”. La parcurgerea pe linii, coloana `j` baleiază complet pentru fiecare linie `i` fixată.
+</ObservationBox>
+
+## Exemplu: suma fiecărei linii
+
+Fie matricea `a` (3 linii, 3 coloane):
+
+<ArrayDiagram values="2 5 1" valueLabel="L0" index="off" caption="Linia 0 → suma 8" />
+
+<ArrayDiagram values="4 0 6" valueLabel="L1" index="off" caption="Linia 1 → suma 10" />
+
+<ArrayDiagram values="3 3 3" valueLabel="L2" index="off" caption="Linia 2 → suma 9" />
+
+Pentru fiecare linie resetezi suma și aduni coloanele:
+
+```
+linia 0: 2+5+1 = 8
+linia 1: 4+0+6 = 10
+linia 2: 3+3+3 = 9
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100];
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    for (int i = 0; i < n; i++) {       // bucla exterioara: linia
+        int suma = 0;                   // reset pentru fiecare linie
+        for (int j = 0; j < m; j++)     // bucla interioara: coloanele
+            suma += a[i][j];
+        cout << "Suma liniei " << i << " = " << suma << "\n";
+    }
+    return 0;
+}
+// pentru matricea de mai sus: 8, 10, 9
+```
+
+Resetarea `suma = 0` **înainte** de bucla interioară e esențială — altfel ai aduna totul într-o singură valoare.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Parcurgere pe linii | O(n·m) | O(1) suplimentar |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Resetezi suma în locul greșit.** `suma = 0` trebuie pus la **începutul fiecărei linii** (în bucla pe `i`), nu o singură dată înainte de tot. Altfel obții o sumă cumulată pe toată matricea.
+- **Inversezi buclele.** Dacă pui `j` exterior și `i` interior, parcurgi de fapt **pe coloane**, nu pe linii — altă ordine de vizitare.
+- **Limite confundate.** Linia merge `0..n-1`, coloana `0..m-1`. Folosirea lui `n` la coloane când `n ≠ m` iese din matrice.
+- **Afișezi suma în interiorul buclei pe `j`.** Afișarea trebuie după ce s-a terminat linia, nu la fiecare coloană.
+</MistakeBox>
+
+## Recapitulare
+
+- Parcurgerea **pe linii** = bucla exterioară pe `i` (linie), interioară pe `j` (coloană) — ordinea de citire a unui text.
+- Pentru calcule per linie (sumă, maxim), **resetezi acumulatorul la începutul fiecărei linii**.
+- Costul e **O(n·m)**; inversarea buclelor schimbă parcurgerea în „pe coloane”.

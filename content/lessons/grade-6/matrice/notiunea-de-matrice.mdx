@@ -1,0 +1,128 @@
+---
+title: "Noțiunea de matrice — un tabel cu linii și coloane"
+slug: notiunea-de-matrice
+grade: 6
+chapter: matrice
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["matrice", "tablou-bidimensional", "indici"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum identifici un element într-o matrice?"
+    options:
+      - "Printr-un singur index"
+      - "Prin doi indici: linia și coloana"
+      - "Prin valoarea lui"
+      - "Prin suma liniei"
+    correctIndex: 1
+    explanation: "Un element de matrice are nevoie de două coordonate: a[i][j] = elementul de pe linia i, coloana j. Un singur index nu ajunge într-un tabel."
+  - question: "O matrice cu n linii și m coloane are câte elemente?"
+    options:
+      - "n + m"
+      - "n × m"
+      - "max(n, m)"
+      - "n² "
+    correctIndex: 1
+    explanation: "Fiecare dintre cele n linii are m elemente, deci n × m în total."
+  - question: "Dacă liniile se numerotează de la 0, ce interval acoperă indicele de linie al unei matrice cu n linii?"
+    options:
+      - "de la 1 la n"
+      - "de la 0 la n-1"
+      - "de la 0 la n"
+      - "de la 1 la n-1"
+    correctIndex: 1
+    explanation: "Cu numerotare de la 0, liniile sunt 0, 1, ..., n-1. Accesul la a[n] ar ieși din matrice."
+---
+
+<LessonHook>
+Te uiți la tabla de șah, la o agendă cu ore pe zile, sau la harta unui oraș cu străzi și bulevarde. Toate au același tipar: ca să arăți un loc, spui rândul și coloana. „Linia 3, coloana 5”. O matrice e exact acest tabel de numere.
+</LessonHook>
+
+## Ce este o matrice
+
+O **matrice** e un tablou **bidimensional**: un tabel de valori organizate pe **linii** și **coloane**. Spre deosebire de vector (care are un singur index), un element de matrice are nevoie de **doi indici**:
+
+`a[i][j]` = elementul de pe **linia `i`**, **coloana `j`**.
+
+O matrice cu `n` linii și `m` coloane are `n × m` elemente.
+
+<ObservationBox>
+Reține ordinea: **primul index e linia, al doilea e coloana**. `a[2][5]` înseamnă linia 2, coloana 5 — nu invers. Confuzia aici e sursa multor erori.
+</ObservationBox>
+
+## Cum arată
+
+Matricea `a` cu 3 linii și 4 coloane (`n = 3`, `m = 4`):
+
+<ArrayDiagram values="7 2 9 4" valueLabel="L0" index="0 1 2 3" caption="Linia 0" />
+
+<ArrayDiagram values="1 5 3 8" valueLabel="L1" index="0 1 2 3" caption="Linia 1" />
+
+<ArrayDiagram values="6 0 2 7" valueLabel="L2" index="0 1 2 3" caption="Linia 2 — coloanele sunt 0..3" />
+
+Aici `a[1][2] = 3` (linia 1, coloana 2), iar `a[2][0] = 6`.
+
+## Citire și afișare
+
+Citești o matrice cu **două bucle imbricate**: una pentru linii, una pentru coloane.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int a[100][100]; // matrice globala, initializata cu 0
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    // citire: pentru fiecare linie, fiecare coloana
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    // afisare ca tabel
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++)
+            cout << a[i][j] << " ";
+        cout << "\n"; // trecem la linia urmatoare
+    }
+    return 0;
+}
+```
+
+Bucla exterioară fixează linia, cea interioară parcurge coloanele acelei linii. `cout << "\n"` după bucla interioară mută afișarea pe rândul următor.
+
+## Declararea matricei
+
+```cpp
+int a[100][100]; // pana la 100 de linii si 100 de coloane
+```
+
+Dimensiunile din declarație sunt **maximele posibile**, nu cele efective. Folosești doar primele `n × m` celule. Declarată global, matricea e inițializată automat cu `0`.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|---|---|---|
+| Citire / afișare / parcurgere | O(n·m) | O(n·m) |
+
+Orice parcurgere completă atinge toate cele `n × m` elemente — de aceea costul de bază al lucrului cu matrice e `O(n·m)`.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Inversezi linia cu coloana.** `a[i][j]` = linia `i`, coloana `j`. Dacă scrii `a[j][i]` din greșeală, citești cu totul alt element (sau ieși din matrice dacă `n ≠ m`).
+- **Bucle cu limite greșite.** Liniile merg `0..n-1`, coloanele `0..m-1`. Folosirea lui `n` pentru coloane când `n ≠ m` accesează în afara matricei.
+- **Matrice prea mare pe stivă.** `int a[1000][1000]` declarată **local** în `main` poate depăși stiva. Declar-o **global** ca să stea în memoria statică.
+- **Uiți `"\n"` la afișare.** Fără trecerea la rând nou după fiecare linie, toată matricea apare pe un singur rând.
+</MistakeBox>
+
+## Recapitulare
+
+- O **matrice** e un tabel cu **linii și coloane**; un element are **doi indici**: `a[i][j]` = linia `i`, coloana `j`.
+- O matrice `n × m` are `n·m` elemente; o parcurgi cu **două bucle imbricate** (linii × coloane).
+- Declar-o **global** (memorie + inițializare cu 0) și nu inversa niciodată linia cu coloana.
