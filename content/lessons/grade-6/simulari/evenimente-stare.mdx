@@ -1,0 +1,126 @@
+---
+title: "Evenimente care modifică starea — regulile de tranziție"
+slug: evenimente-stare
+grade: 6
+chapter: simulari
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["simulare", "evenimente", "tranzitii"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este un „eveniment” într-o simulare?"
+    options:
+      - "Starea inițială"
+      - "O acțiune/regulă care transformă starea curentă în starea următoare"
+      - "Rezultatul final"
+      - "O eroare de cod"
+    correctIndex: 1
+    explanation: "Un eveniment e o tranziție: primește starea curentă și o modifică după o regulă (ex. „intră o mașină” → un loc devine ocupat)."
+  - question: "Cum procesezi o listă de evenimente date în ordine?"
+    options:
+      - "Le sortezi întâi"
+      - "Le aplici pe rând, fiecare modificând starea lăsată de cel dinainte"
+      - "Aplici doar ultimul"
+      - "Le aplici în ordine inversă"
+    correctIndex: 1
+    explanation: "Simularea respectă ordinea: fiecare eveniment pornește din starea rezultată după evenimentul precedent. Ordinea contează."
+  - question: "Înainte de a aplica un eveniment, ce verifici des?"
+    options:
+      - "Dacă evenimentul e valid în starea curentă (ex. nu scoți o mașină dintr-un parcaj gol)"
+      - "Dacă vectorul e sortat"
+      - "Dacă numărul e prim"
+      - "Nimic, aplici mereu"
+    correctIndex: 0
+    explanation: "Multe evenimente au precondiții. Un „iese o mașină” n-are sens dacă parcajul e gol. Verifici validitatea înainte, altfel starea devine incoerentă."
+---
+
+<LessonHook>
+La un joc pe calculator apeși tasta dreapta și personajul se mută; apeși spațiu și sare. Fiecare apăsare e un *eveniment* care schimbă ce e pe ecran. Simularea unui sistem e exact asta: o listă de evenimente, fiecare modificând starea după o regulă.
+</LessonHook>
+
+## Ce este un eveniment
+
+Un **eveniment** e o regulă care **transformă starea curentă în starea următoare**. Primește sistemul așa cum e acum și îl modifică: „intră o mașină”, „becul `k` se aprinde”, „robotul face un pas”.
+
+În cod, un eveniment e de obicei o **modificare a reprezentării** (un element de vector, un contor) plus, eventual, o **verificare** dinainte.
+
+<ObservationBox>
+Schema oricărei simulări: **stare inițială → aplici evenimentele în ordine → stare finală**. Fiecare eveniment pornește din starea lăsată de cel dinainte. Ordinea contează.
+</ObservationBox>
+
+## Pas cu pas pe numere
+
+Parcaj cu 5 locuri (0 = liber, 1 = ocupat), stare inițială toate libere. Evenimente: `intra 2`, `intra 0`, `iese 2`, `intra 4`.
+
+<ArrayDiagram values="0 0 0 0 0" valueLabel="loc" index="0 1 2 3 4" caption="Stare inițială: tot liber" />
+
+```
+eveniment "intra 2": locul 2 era liber -> devine 1   -> 0 0 1 0 0
+eveniment "intra 0": locul 0 era liber -> devine 1   -> 1 0 1 0 0
+eveniment "iese 2" : locul 2 era ocupat -> devine 0  -> 1 0 0 0 0
+eveniment "intra 4": locul 4 era liber -> devine 1   -> 1 0 0 0 1
+stare finala: 1 0 0 0 1  (2 locuri ocupate)
+```
+
+<ArrayDiagram values="1 0 0 0 1" valueLabel="loc" index="0 1 2 3 4" highlight="0 4" caption="Stare finală după cele 4 evenimente" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int loc[100]; // 0 = liber, 1 = ocupat
+
+int main() {
+    int n, q;
+    cin >> n >> q; // n locuri, q evenimente
+    // stare initiala: toate libere (vector global = 0)
+
+    for (int e = 0; e < q; e++) {
+        string tip;
+        int p;
+        cin >> tip >> p; // ex: "intra 2" sau "iese 2"
+
+        if (tip == "intra") {
+            if (loc[p] == 0) loc[p] = 1; // verificam: locul era liber
+        } else { // "iese"
+            if (loc[p] == 1) loc[p] = 0; // verificam: locul era ocupat
+        }
+    }
+
+    int ocupate = 0;
+    for (int i = 0; i < n; i++) ocupate += loc[i];
+    cout << "Locuri ocupate: " << ocupate << "\n";
+    return 0;
+}
+```
+
+Verificările `loc[p] == 0` / `== 1` sunt **precondiții**: un eveniment imposibil (intri pe un loc deja ocupat) nu trebuie să strice starea.
+
+## Complexitate
+
+| Aspect | Cost |
+|---|---|
+| Un eveniment (modificare simplă) | O(1) |
+| Q evenimente | O(Q) plus eventual O(n) la final |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Ignori precondiția.** „Iese o mașină” dintr-un loc gol, sau „intră” pe unul ocupat — dacă nu verifici, starea devine incoerentă (contoare negative, dubluri).
+- **Schimbi ordinea evenimentelor.** Simularea respectă ordinea dată. A le sorta sau a le aplica invers schimbă rezultatul.
+- **Actualizezi parțial starea.** Dacă un eveniment afectează mai multe componente (vector **și** contor), actualizează-le pe **toate**, altfel se desincronizează.
+- **Recalculezi totul la fiecare eveniment.** Dacă poți actualiza starea în O(1) (un singur loc), n-o reparcurge complet de fiecare dată — devine lent la Q mare.
+</MistakeBox>
+
+## Recapitulare
+
+- Un **eveniment** transformă starea curentă în următoarea, după o regulă (cu eventuală **precondiție**).
+- Simularea = stare inițială → **aplici evenimentele în ordine** → stare finală.
+- Verifică validitatea înainte de a aplica și actualizează **toate** componentele stării afectate.

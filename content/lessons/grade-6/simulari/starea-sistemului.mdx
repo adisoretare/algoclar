@@ -1,0 +1,117 @@
+---
+title: "Starea sistemului — fotografia de la un moment dat"
+slug: starea-sistemului
+grade: 6
+chapter: simulari
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["simulare", "stare", "modelare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce este „starea” unui sistem la un moment dat?"
+    options:
+      - "Lista tuturor evenimentelor viitoare"
+      - "Toată informația care descrie complet sistemul în acel moment"
+      - "Doar primul element"
+      - "Numărul de pași făcuți"
+    correctIndex: 1
+    explanation: "Starea e fotografia completă: tot ce trebuie să știi acum ca să poți calcula ce urmează, fără să te uiți în trecut."
+  - question: "De ce e utilă proprietatea că starea conține TOT ce trebuie pentru pasul următor?"
+    options:
+      - "Ca să nu fie nevoie să reții tot istoricul, doar starea curentă"
+      - "Ca să ocupe mai multă memorie"
+      - "Ca să poți sorta sistemul"
+      - "Nu e utilă"
+    correctIndex: 0
+    explanation: "Dacă starea curentă e suficientă pentru a calcula starea următoare, poți „uita” istoricul. Ții minte doar o fotografie, nu tot filmul."
+  - question: "La un robot pe o tablă, ce face parte din stare?"
+    options:
+      - "Doar tabla"
+      - "Poziția robotului (și direcția, dacă mișcările depind de ea)"
+      - "Doar numărul de pași rămași"
+      - "Culoarea tablei"
+    correctIndex: 1
+    explanation: "Starea trebuie să conțină tot ce influențează pasul următor: poziția robotului, iar dacă întoarcerile contează, și direcția în care e orientat."
+---
+
+<LessonHook>
+Pui un film pe pauză. Cadrul înghețat de pe ecran îți arată tot ce se întâmplă chiar acum: unde e fiecare personaj, ce ține în mână. Din acel cadru poți ghici ce urmează, fără să derulezi tot filmul de la început. Acel cadru e „starea” sistemului.
+</LessonHook>
+
+## Ce este starea
+
+**Starea** unui sistem e toată informația care îl descrie **complet la un moment dat** — fotografia lui. Dacă ai starea curentă, poți calcula ce se întâmplă în pasul următor **fără să te uiți în trecut**.
+
+<ObservationBox>
+Proprietatea cheie: o stare bună e **suficientă pentru viitor**. Dacă din starea curentă poți deduce starea următoare, nu mai ai nevoie de istoric — ții minte o singură fotografie, nu tot filmul.
+</ObservationBox>
+
+## Starea = reprezentarea, la un moment dat
+
+Reprezentarea (lecția trecută) e *cum* stochezi sistemul. Starea e *valoarea concretă* a acelei reprezentări **acum**. Pe măsură ce simularea avansează, starea se schimbă, dar structura rămâne aceeași.
+
+Exemplu: un robot pe o linie de 6 căsuțe. Starea = poziția lui.
+
+<ArrayDiagram values=". . R . . ." valueLabel="linie" index="0 1 2 3 4 5" pointers="2:R:primary" caption="Stare la momentul t: robotul e pe căsuța 2" />
+
+<ArrayDiagram values=". . . R . ." valueLabel="linie" index="0 1 2 3 4 5" pointers="3:R:primary" caption="Stare la momentul t+1: după un pas la dreapta, robotul e pe 3" />
+
+Aici starea e doar un număr: poziția. Dar dacă mișcările ar depinde de **direcția** robotului, starea ar trebui să includă și direcția.
+
+## Ce intră în stare?
+
+Întrebarea decisivă: **„de ce informație am nevoie ca să calculez pasul următor?”**. Tot ce influențează viitorul intră în stare; restul nu.
+
+| Sistem | Starea minimă |
+|---|---|
+| Robot pe linie (doar stânga/dreapta) | poziția |
+| Robot care se rotește | poziția **și** direcția |
+| Parcaj | care locuri sunt ocupate |
+| Șir de becuri | vectorul de 0/1 |
+
+## Implementare C++ — o stare care evoluează
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 6;
+    int pozRobot = 2; // STAREA: pozitia robotului pe linie
+
+    // un pas la dreapta = trecem la starea urmatoare
+    if (pozRobot + 1 < n)
+        pozRobot = pozRobot + 1; // noua stare depinde doar de starea veche
+
+    cout << "Pozitia robotului: " << pozRobot << "\n"; // 3
+    return 0;
+}
+```
+
+Noua stare (`pozRobot` după pas) se calculează **doar** din starea veche — exact proprietatea care face simularea simplă.
+
+## Complexitate
+
+| Aspect | Cost |
+|---|---|
+| Memorie pentru o stare | O(mărimea reprezentării) |
+| Trecerea la starea următoare | depinde de eveniment (vezi lecția următoare) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Stare incompletă.** Dacă lași pe dinafară ceva ce influențează viitorul (ex. direcția robotului), nu mai poți calcula corect pasul următor.
+- **Stare umflată cu istoric.** Nu păstra toți pașii anteriori dacă pasul următor depinde doar de cel curent. Reții o fotografie, nu tot filmul.
+- **Confunzi starea cu rezultatul final.** Starea se schimbă la fiecare pas; răspunsul problemei e adesea o valoare derivată din starea finală (sau acumulată pe drum).
+- **Modifici starea fără s-o actualizezi peste tot.** Dacă starea are mai multe componente (poziție + direcție), un pas trebuie să le actualizeze pe toate cele afectate.
+</MistakeBox>
+
+## Recapitulare
+
+- **Starea** = fotografia completă a sistemului acum; din ea poți calcula viitorul, fără istoric.
+- Pune în stare **exact** ce influențează pasul următor (poziție, direcție, ocupări) — nimic în plus.
+- Simularea = o **succesiune de stări**, fiecare calculată din cea precedentă.

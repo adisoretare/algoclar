@@ -1,0 +1,119 @@
+---
+title: "Simulări pe vectori — sistemul trăiește într-un șir"
+slug: simulari-pe-vectori
+grade: 6
+chapter: simulari
+difficulty: mediu
+estimatedTime: 17
+free: true
+status: draft
+isBridge: false
+tags: ["simulare", "vectori", "evenimente"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Când reprezinți sistemul printr-un vector în simulare?"
+    options:
+      - "Când obiectele sunt așezate pe o linie / au o singură coordonată (poziție)"
+      - "Doar când sunt sortate"
+      - "Niciodată"
+      - "Doar pentru numere prime"
+    correctIndex: 0
+    explanation: "Vectorul e potrivit când fiecare obiect are o poziție unică pe o linie: becuri, locuri, căsuțe. Un singur index (poziția) ajunge."
+  - question: "La „transmiterea” unei valori între vecini pe un vector (ex. un val care se propagă), ce greșeală apare des?"
+    options:
+      - "Suprascrii o celulă înainte s-o folosești pentru vecinul ei"
+      - "Folosești prea puțină memorie"
+      - "Sortezi vectorul"
+      - "Nu există greșeli"
+    correctIndex: 0
+    explanation: "Dacă actualizezi pe loc, poți strica valoarea veche de care are nevoie celula vecină. Soluția des folosită: calculezi noua stare într-un al doilea vector."
+  - question: "De ce se folosește uneori un al doilea vector („next”) în simulare?"
+    options:
+      - "Ca să dublezi memoria fără motiv"
+      - "Ca toate celulele să se actualizeze pe baza ACELEIAȘI stări vechi, simultan"
+      - "Ca să sortezi mai repede"
+      - "Ca să eviți cititul"
+    correctIndex: 1
+    explanation: "Când noua valoare a fiecărei celule depinde de vecinii din starea veche, scrii în „next” citind din „curent”, apoi le interschimbi. Astfel actualizarea e simultană, nu în cascadă."
+---
+
+<LessonHook>
+Un șir de oameni la coadă, fiecare pasează o minge celui din dreapta. Dacă toți o pasează „în același timp”, mingea se mută o poziție. Dar dacă fiecare o pasează imediat ce o primește, ajunge instantaneu la capăt. Diferența — actualizare simultană sau în cascadă — e inima simulărilor pe vectori.
+</LessonHook>
+
+## Când folosești un vector
+
+Reprezinți sistemul printr-un **vector** când obiectele stau pe o **linie**: au o singură coordonată (poziția). Becuri, locuri de parcare, căsuțe pe un drum, oameni la coadă. Indexul vectorului = poziția.
+
+Simularea modifică elementele vectorului pe măsură ce aplici evenimentele.
+
+<ObservationBox>
+Capcana centrală: când noua valoare a unei celule depinde de **vecinii** ei, actualizarea „pe loc” poate strica valoarea veche de care are nevoie celula următoare. Soluția: un al doilea vector pentru noua stare.
+</ObservationBox>
+
+## Exemplu: propagarea unui val
+
+Pe un șir, o celulă „activă” (1) le activează pe vecinele ei la pasul următor. Stare inițială: doar poziția 3 e activă. Vrem starea după **un** pas.
+
+<ArrayDiagram values="0 0 0 1 0 0 0" valueLabel="cur" index="0 1 2 3 4 5 6" highlight="3" caption="Starea curentă: activă doar poziția 3" />
+
+Regula: `next[i] = 1` dacă `i` sau un vecin al lui erau activi.
+
+<ArrayDiagram values="0 0 1 1 1 0 0" valueLabel="next" index="0 1 2 3 4 5 6" highlight="2 4" caption="Noua stare: 3 a rămas activă și i-a activat pe 2 și 4" />
+
+Dacă am fi scris direct în același vector de la stânga la dreapta, activarea lui 2 ar fi influențat greșit calculul pentru 3 — de-aceea folosim `next`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cur[100], next_[100]; // doua stari: curenta si urmatoarea
+
+int main() {
+    int n, pasi;
+    cin >> n >> pasi;
+    for (int i = 0; i < n; i++) cin >> cur[i];
+
+    for (int t = 0; t < pasi; t++) {
+        for (int i = 0; i < n; i++) {
+            int activ = cur[i];
+            if (i > 0 && cur[i - 1] == 1) activ = 1;     // vecin stang
+            if (i < n - 1 && cur[i + 1] == 1) activ = 1; // vecin drept
+            next_[i] = activ; // scriem in next, citim din cur
+        }
+        for (int i = 0; i < n; i++) cur[i] = next_[i]; // trecem la noua stare
+    }
+
+    for (int i = 0; i < n; i++) cout << cur[i] << " ";
+    cout << "\n";
+    return 0;
+}
+```
+
+Citim mereu din `cur`, scriem în `next_`, apoi copiem. Toate celulele „văd” aceeași stare veche → actualizare simultană.
+
+## Complexitate
+
+| Aspect | Cost |
+|---|---|
+| Un pas de simulare | O(n) |
+| `pasi` pași | O(pasi · n) |
+| Memorie | O(n) (două vectoare) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Actualizare în cascadă neintenționată.** Scrierea pe loc când valoarea depinde de vecini propagă efectul în același pas. Folosește `next` când e nevoie de simultaneitate.
+- **Acces în afara vectorului.** La capete, `cur[i-1]` sau `cur[i+1]` ies din vector. Verifică `i > 0` și `i < n-1` înainte.
+- **Uiți să copiezi `next` în `cur`.** Fără pasul de „trecere la noua stare”, simularea rămâne blocată în starea inițială.
+- **Confunzi pașii cu evenimentele.** Un „pas” aici e o actualizare a întregului vector; nu-l confunda cu un eveniment punctual pe o singură celulă.
+</MistakeBox>
+
+## Recapitulare
+
+- Folosești un **vector** când obiectele au o singură coordonată (poziția pe o linie).
+- Când noua valoare depinde de **vecini**, calculează în `next` citind din `cur`, apoi interschimbă — actualizare **simultană**.
+- Atenție la **margini** și la pasul de copiere `next → cur`; cost O(pasi · n).

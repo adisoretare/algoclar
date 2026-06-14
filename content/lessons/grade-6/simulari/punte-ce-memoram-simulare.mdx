@@ -1,0 +1,103 @@
+---
+title: "Lecție-punte: ce trebuie memorat într-o simulare"
+slug: punte-ce-memoram-simulare
+grade: 6
+chapter: simulari
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["simulare", "stare", "optimizare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Întrebarea-cheie când decizi ce memorezi într-o simulare este:"
+    options:
+      - "Cât de mult încape în memorie?"
+      - "De ce informație am nevoie ca să calculez pasul următor și răspunsul cerut?"
+      - "Cum sortez datele?"
+      - "Câte variabile pot declara?"
+    correctIndex: 1
+    explanation: "Memorezi exact ce influențează viitorul plus ce e nevoie pentru răspuns. Restul (istoricul complet) e adesea inutil."
+  - question: "Dacă problema cere doar „câte celule ard la final”, ce e suficient să memorezi?"
+    options:
+      - "Toate stările intermediare, pas cu pas"
+      - "Doar starea curentă (și eventual un contor), nu tot istoricul"
+      - "Pozițiile tuturor evenimentelor viitoare"
+      - "Nimic"
+    correctIndex: 1
+    explanation: "Dacă răspunsul depinde doar de starea finală, ții starea curentă și o suprascrii. Nu stoca toate generațiile dacă nu ți le cere nimeni."
+  - question: "Când chiar trebuie să memorezi mai mult decât starea curentă?"
+    options:
+      - "Niciodată"
+      - "Când răspunsul cere istoric (ex. „la ce pas a ars prima dată celula X”) sau când trebuie să compari stări"
+      - "Doar la vectori"
+      - "Doar când n e mic"
+    correctIndex: 1
+    explanation: "Dacă întrebarea privește momentul unui eveniment sau compararea unor stări, trebuie să reții informația suplimentară (ex. pasul la care s-a schimbat fiecare celulă)."
+---
+
+<LessonHook>
+Filmezi o cursă. Dacă vrei doar să afli cine câștigă, e destul fotografia de la final. Dacă vrei să afli în ce secundă a depășit un concurent pe altul, ai nevoie de tot filmul. Ce memorezi într-o simulare depinde fix de întrebarea pusă.
+</LessonHook>
+
+## Întrebarea care decide totul
+
+Înainte să scrii o simulare, răspunde la o singură întrebare:
+
+> **De ce informație am nevoie ca să (1) calculez pasul următor și (2) dau răspunsul cerut?**
+
+Tot ce intră în acest răspuns se memorează. Restul — în special **istoricul complet** — e adesea risipă de memorie și sursă de bug-uri.
+
+<ObservationBox>
+Două nevoi separate: una e pentru **a avansa** simularea (starea curentă), alta e pentru **a răspunde**. Uneori coincid (starea finală e răspunsul); alteori răspunsul cere ceva în plus (momentul unui eveniment).
+</ObservationBox>
+
+## Trei situații tipice
+
+| Întrebarea problemei | Ce memorezi |
+|---|---|
+| „Cum arată sistemul la final?” | doar **starea curentă** (o suprascrii la fiecare pas) |
+| „Câte celule sunt active la final?” | starea curentă + eventual un **contor** |
+| „La ce pas s-a activat celula X?” | o matrice/vector cu **momentul** activării fiecărei celule |
+
+Prima nu cere istoric. Ultima da — pentru că răspunsul privește *când* s-a întâmplat ceva, nu doar *dacă*.
+
+## Exemplu: aceeași simulare, două nevoi
+
+Propagarea focului pe o grilă. Dacă întrebarea e „câte ard la final”, ții o singură matrice și un contor. Dacă întrebarea e „în ce minut a ars fiecare celulă”, ții o matrice `timp[i][j]` în care notezi pasul la prima aprindere.
+
+```cpp
+// raspuns "cate ard la final": suficient un contor
+int ard = 0;
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+        if (cur[i][j] == 1) ard++;
+
+// raspuns "in ce pas a ars (i,j)": memoram momentul
+// timp[i][j] = pasul la care s-a aprins prima data (-1 daca nu arde)
+```
+
+Aceeași simulare, structuri de memorare diferite — pentru că **întrebarea** diferă.
+
+## Cum eviți să memorezi prea mult
+
+- Dacă pasul următor depinde **doar** de starea curentă, **nu** păstra toate stările anterioare.
+- Dacă ai nevoie de „starea veche” doar pentru calculul simultan, două matrice (`cur` + `next`) ajung — nu o stivă de generații.
+- Calculează agregatele (sume, contoare) **pe parcurs**, nu reconstruindu-le din istoric la final.
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Memorezi toate generațiile fără motiv.** Stocarea fiecărui pas (`stare[t][i][j]`) explodează memoria. Fă-o **doar** dacă răspunsul chiar cere istoricul.
+- **Memorezi prea puțin.** Dacă întrebarea cere „la ce pas”, dar tu ții doar starea finală, nu mai poți răspunde. Recitește cerința înainte de a alege.
+- **Reconstruiești agregate la final.** Dacă numeri ceva, ține un contor actualizat pe parcurs, nu reparcurge tot la sfârșit (mai lent, mai ușor de greșit).
+- **Confunzi „starea minimă pentru a avansa” cu „informația pentru răspuns”.** Sunt două nevoi distincte; memorezi reuniunea lor, nu doar una.
+</MistakeBox>
+
+## Recapitulare
+
+- Memorezi **exact** ce e nevoie ca (1) să avansezi simularea și (2) să dai răspunsul — nimic în plus.
+- Răspuns despre **starea finală** → ții doar starea curentă; răspuns despre **momentul** unui eveniment → ții și istoricul relevant.
+- Evită stocarea tuturor generațiilor; calculează agregatele **pe parcurs**.

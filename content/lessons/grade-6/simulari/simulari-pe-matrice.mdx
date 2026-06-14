@@ -1,0 +1,136 @@
+---
+title: "Simulări pe matrice — sistemul trăiește într-o grilă"
+slug: simulari-pe-matrice
+grade: 6
+chapter: simulari
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["simulare", "matrice", "vecini"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Când reprezinți sistemul printr-o matrice în simulare?"
+    options:
+      - "Când obiectele au două coordonate (linie și coloană) — o grilă"
+      - "Doar când sunt sortate"
+      - "Doar pentru numere prime"
+      - "Niciodată"
+    correctIndex: 0
+    explanation: "Matricea e potrivită pentru sisteme pe o grilă 2D: celule, hărți, table. Fiecare celulă are linie și coloană."
+  - question: "La o simulare pe grilă unde noua valoare a unei celule depinde de vecinii ei, ce folosești?"
+    options:
+      - "Aceeași matrice, actualizată pe loc"
+      - "O a doua matrice „next”, ca actualizarea să fie simultană"
+      - "Un singur număr"
+      - "Căutare binară"
+    correctIndex: 1
+    explanation: "Ca la vectori, dacă fiecare celulă depinde de vecinii din starea veche, scrii în „next” citind din „curent”, apoi interschimbi. Evită actualizarea în cascadă."
+  - question: "Cum accesezi uniform cei (până la) 4 vecini ai unei celule (i, j)?"
+    options:
+      - "Scrii cele 4 cazuri pe rând, fără verificări"
+      - "Cu vectorii de direcție dx[], dy[] și verificare de margine"
+      - "Cu o căutare binară"
+      - "Transpunând matricea"
+    correctIndex: 1
+    explanation: "Vectorii de direcție parcurg vecinii cu o buclă, iar verificarea 0≤ni<n, 0≤nj<m îi exclude pe cei din afara grilei."
+---
+
+<LessonHook>
+Un foc pornește într-un colț al unei păduri desenate ca o grilă. La fiecare minut, focul se întinde la căsuțele vecine. Vrei să simulezi cum arată pădurea după câteva minute. Sistemul trăiește într-o matrice, iar regula se aplică tuturor celulelor deodată.
+</LessonHook>
+
+## Când folosești o matrice
+
+Reprezinți sistemul printr-o **matrice** când obiectele stau pe o **grilă 2D**: fiecare celulă are **două** coordonate (linie și coloană). Hărți, table de joc, terenuri, ecrane de pixeli.
+
+Ideile de la simulările pe vectori se transferă direct, doar că lucrezi cu doi indici și (de obicei) patru vecini.
+
+<ObservationBox>
+Aceeași capcană ca la vectori, amplificată: dacă noua valoare a unei celule depinde de vecini, actualizarea pe loc propagă efectul în același pas. Folosește o a doua matrice `next`.
+</ObservationBox>
+
+## Exemplu: propagarea focului
+
+`1` = arde, `0` = pădure. La fiecare pas, orice celulă vecină (sus/jos/stânga/dreapta) cu una care arde se aprinde. Stare inițială: arde doar `(1,1)`.
+
+<ArrayDiagram values="0 0 0" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="0 1 0" valueLabel="L1" index="off" caption="Curent: arde doar (1,1)" />
+
+<ArrayDiagram values="0 0 0" valueLabel="L2" index="off" />
+
+După un pas, focul cuprinde și vecinii direcți:
+
+<ArrayDiagram values="0 1 0" valueLabel="L0" index="off" />
+
+<ArrayDiagram values="1 1 1" valueLabel="L1" index="off" caption="Next: (1,1) a aprins vecinii (0,1),(2,1),(1,0),(1,2)" />
+
+<ArrayDiagram values="0 1 0" valueLabel="L2" index="off" />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int cur[100][100], nxt[100][100];
+int dx[] = {-1, 1, 0, 0}; // cei 4 vecini
+int dy[] = {0, 0, -1, 1};
+
+int main() {
+    int n, m, pasi;
+    cin >> n >> m >> pasi;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> cur[i][j];
+
+    for (int t = 0; t < pasi; t++) {
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++) {
+                nxt[i][j] = cur[i][j]; // ce arde ramane aprins
+                for (int k = 0; k < 4; k++) {
+                    int ni = i + dx[k], nj = j + dy[k];
+                    if (ni >= 0 && ni < n && nj >= 0 && nj < m) // in grila?
+                        if (cur[ni][nj] == 1) nxt[i][j] = 1; // vecin care arde
+                }
+            }
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                cur[i][j] = nxt[i][j]; // trecem la noua stare
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) cout << cur[i][j] << " ";
+        cout << "\n";
+    }
+    return 0;
+}
+```
+
+Citim din `cur`, scriem în `nxt`, apoi copiem — toate celulele văd aceeași stare veche.
+
+## Complexitate
+
+| Aspect | Cost |
+|---|---|
+| Un pas de simulare | O(n·m) |
+| `pasi` pași | O(pasi · n · m) |
+| Memorie | O(n·m) (două matrice) |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Actualizare pe loc în cascadă.** Fără matricea `next`, focul aprins acum poate aprinde alți vecini în **același** pas — propagare prea rapidă. Folosește `nxt`.
+- **Vecin în afara grilei.** La margini, `(ni, nj)` poate ieși din matrice. Verifică `0 ≤ ni < n` și `0 ≤ nj < m` **înainte** de acces.
+- **Uiți să copiezi `nxt` în `cur`.** Fără pasul de trecere, simularea rămâne în starea inițială la fiecare iterație.
+- **Confunzi 4 vecini cu 8.** Dacă regula include diagonalele, ai nevoie de liste `dx`/`dy` cu 8 perechi, nu 4.
+</MistakeBox>
+
+## Recapitulare
+
+- Folosești o **matrice** când sistemul e o **grilă 2D** (linie + coloană pentru fiecare celulă).
+- Pentru reguli bazate pe vecini, calculează în `nxt` din `cur`, apoi interschimbă — actualizare **simultană**.
+- Parcurge vecinii cu **vectori de direcție** + verificare de margine; cost O(pasi · n · m).

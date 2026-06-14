@@ -1,0 +1,121 @@
+---
+title: "Reprezentarea sistemului simulat — alegi cum stochezi realitatea"
+slug: reprezentarea-sistemului
+grade: 6
+chapter: simulari
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["simulare", "modelare", "reprezentare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă „a reprezenta” un sistem într-o simulare?"
+    options:
+      - "A-l afișa frumos pe ecran"
+      - "A alege ce structuri de date stochează informația relevantă din sistem"
+      - "A-l sorta"
+      - "A-l rezolva matematic, fără cod"
+    correctIndex: 1
+    explanation: "Reprezentarea e alegerea structurilor (vector, matrice, contoare) care țin minte exact informația de care ai nevoie ca să simulezi evoluția sistemului."
+  - question: "Care e criteriul principal când alegi reprezentarea?"
+    options:
+      - "Să folosești cât mai multă memorie"
+      - "Să stochezi exact informația necesară pașilor simulării, nici mai mult, nici mai puțin"
+      - "Să fie cât mai complicată"
+      - "Să folosești mereu matrice"
+    correctIndex: 1
+    explanation: "O reprezentare bună conține fix datele de care depind evenimentele. Prea puțin → nu poți simula; prea mult → cod inutil de greoi."
+  - question: "Un șir de N becuri, fiecare aprins sau stins, se reprezintă natural prin..."
+    options:
+      - "Un singur număr întreg"
+      - "Un vector de 0 și 1 (sau bool) de lungime N"
+      - "O matrice N×N"
+      - "Un text"
+    correctIndex: 1
+    explanation: "Fiecare bec are două stări (aprins/stins) și o poziție, deci un vector de N valori 0/1 (ori bool) le ține pe toate, indexate după poziție."
+---
+
+<LessonHook>
+Vrei să simulezi pe calculator un parcaj: când intră o mașină, când iese, câte locuri libere rămân. Înainte de orice, trebuie să decizi *cum* ții minte parcajul în memorie — un număr? un vector cu fiecare loc? Alegerea asta e reprezentarea sistemului.
+</LessonHook>
+
+## Ce este o simulare
+
+A **simula** înseamnă a imita pe calculator evoluția unui sistem din realitate, pas cu pas: un parcaj, un șir de becuri, mișcarea unui robot. Calculatorul „rejoacă” ce s-ar întâmpla.
+
+Primul pas, înainte de orice algoritm, e **reprezentarea**: ce structuri de date țin minte sistemul.
+
+<ObservationBox>
+Regula de aur a reprezentării: stochează **exact** informația de care depind pașii simulării. Prea puțin și nu poți calcula ce urmează; prea mult și te încurci în date inutile.
+</ObservationBox>
+
+## Cum alegi reprezentarea
+
+Pune-ți trei întrebări:
+
+1. **Ce „obiecte” are sistemul?** (becuri, mașini, celule)
+2. **Ce trebuie să știu despre fiecare?** (aprins/stins, ocupat/liber)
+3. **Cum le indexez?** (după poziție → vector; după două coordonate → matrice)
+
+## Exemple de reprezentare
+
+**Șir de 8 becuri** (1 = aprins, 0 = stins):
+
+<ArrayDiagram values="1 0 0 1 1 0 1 0" valueLabel="bec" index="0 1 2 3 4 5 6 7" caption="Vector de 0/1, indexat după poziția becului" />
+
+**Parcaj cu 6 locuri** (1 = ocupat, 0 = liber):
+
+<ArrayDiagram values="0 1 1 0 0 1" valueLabel="loc" index="0 1 2 3 4 5" caption="Vector de 0/1 + un contor pentru locurile libere = 3" />
+
+Uneori un singur **contor** ajunge (câte locuri libere), alteori ai nevoie de tot **vectorul** (care loc anume e ocupat). Depinde ce întreabă problema.
+
+## Implementare C++ — schelet de reprezentare
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int bec[100]; // starea fiecarui bec: 0 = stins, 1 = aprins
+
+int main() {
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++)
+        cin >> bec[i]; // citim starea initiala a sistemului
+
+    // exemplu de informatie derivata: cate becuri sunt aprinse
+    int aprinse = 0;
+    for (int i = 0; i < n; i++)
+        if (bec[i] == 1) aprinse++;
+
+    cout << "Becuri aprinse initial: " << aprinse << "\n";
+    return 0;
+}
+```
+
+Vectorul `bec[]` e reprezentarea; restul simulării (lecțiile următoare) va modifica acest vector.
+
+## Complexitate
+
+| Aspect | Cost |
+|---|---|
+| Memorie reprezentare | O(număr de obiecte) |
+| Citirea stării inițiale | O(n) sau O(n·m) la matrice |
+
+<MistakeBox>
+Greșeli frecvente de concurs:
+
+- **Reprezentare prea săracă.** Dacă ții doar „câte becuri aprinse” dar problema întreabă „care bec”, nu mai poți răspunde. Verifică ce informație cer evenimentele.
+- **Reprezentare prea bogată.** Nu stoca date pe care nu le folosești niciodată — complică codul și crește șansa de bug.
+- **Indexare neclară.** Decide din start dacă obiectele sunt indexate de la 0 sau de la 1 și ține-te de convenție în toată simularea.
+- **Confunzi starea cu informația derivată.** „Locuri libere” se poate **calcula** din vector; nu trebuie neapărat stocat separat — dar dacă îl ții, actualizează-l la fiecare schimbare.
+</MistakeBox>
+
+## Recapitulare
+
+- **Reprezentarea** = structurile de date care țin minte sistemul; o alegi **înainte** de algoritm.
+- Stochează **exact** informația de care depind pașii: vector după poziție, matrice după două coordonate, contor pentru agregate.
+- Întreabă-te ce obiecte are sistemul, ce știi despre fiecare și cum le indexezi.
