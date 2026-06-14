@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["exponentiere", "logaritmic", "putere"]
-visualizers: ["matrix-expo"]
+visualizers: ["fast-power"]
 relatedProblems: []
 quiz:
   - question: "Pe ce idee se bazează ridicarea rapidă la putere?"
@@ -114,9 +114,9 @@ Rezultat: `3^13 = 1594323`. ✓ Doar 4 pași în loc de 13 înmulțiri.
 
 ## Vizualizare
 
-Aceeași schemă de pătrate repetate stă și la baza ridicării **matricelor** la putere (folosită la recurențe liniare). Urmărește cum se înjumătățește exponentul:
+Urmărește cum exponentul `n` se înjumătățește pas cu pas și cum baza se ridică la pătrat — `a^(2k) = (a^k)²` — adunând în rezultat doar puterile pentru care bitul curent e 1:
 
-<Visualizer name="matrix-expo" />
+<Visualizer name="fast-power" />
 
 <HintBox>
 Folosește **←** și **→** pentru a avansa. Observă cum fiecare pas dublează exponentul acumulat — aceeași idee ca la puterea unui număr.

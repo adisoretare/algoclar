@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["ciur", "numere-prime", "eratostene", "precalculare"]
-visualizers: []
+visualizers: ["ciur-eratostene"]
 relatedProblems: []
 quiz:
   - question: "De ce putem începe marcarea multiplilor lui i chiar de la i·i, nu de la 2·i?"
@@ -96,6 +96,12 @@ Vectorul global `compus` e inițializat automat cu `false` (toate „posibil pri
 | Spațiu | O(n) — un bit/bool pentru fiecare număr |
 
 Comparat cu verificarea fiecărui număr separat (`O(n√n)`), ciurul e dramatic mai rapid pentru a găsi **toate** primele dintr-un interval.
+
+## Vizualizare
+
+Urmărește cum fiecare prim își taie multiplii pornind de la `i·i`, iar numerele care rămân neatinse după cernere sunt exact numerele prime:
+
+<Visualizer name="ciur-eratostene" />
 
 <MistakeBox>
 **Greșeala 1 — pornești de la `2·i`:** funcționează, dar faci muncă inutilă marcând multipli deja tăiați. Pornește de la `i·i`.

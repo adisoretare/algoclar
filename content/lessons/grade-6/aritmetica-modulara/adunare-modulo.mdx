@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["modulo", "adunare", "overflow", "mod"]
-visualizers: []
+visualizers: ["adunare-modulo"]
 relatedProblems: []
 quiz:
   - question: "Pe un ceas de 12 ore, ora 10 + 5 ore înseamnă ce oră?"
@@ -88,6 +88,12 @@ Aici `suma + v[i]` ajunge cel mult la `2·(MOD−1) ≈ 2×10⁹`, ceea ce înc�
 ## Complexitate
 
 Fiecare adunare modulo costă **O(1)**. Adunarea modulo a `n` termeni rulează în **O(n)** — o singură parcurgere, cu numerele menținute mici tot timpul.
+
+## Vizualizare
+
+Urmărește cum valoarea se rotește înainte pe cadran și se reia de la 0 după fiecare tură de m pași — adunarea modulo e chiar mersul acelor pe ceas:
+
+<Visualizer name="adunare-modulo" />
 
 <MistakeBox>
 **Greșeala 1 — aduni tot și aplici `% m` abia la final:** suma intermediară poate depăși tipul și să dea overflow înainte de a ajunge la `%`. Redu **după fiecare** adunare.

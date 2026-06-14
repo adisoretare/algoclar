@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["stiva", "monotona", "next-greater"]
-visualizers: []
+visualizers: ["stack"]
 relatedProblems: []
 quiz:
   - question: "Ce este o stivă monotonă?"
@@ -134,6 +134,12 @@ Pentru **următorul element mai mic**, inversezi comparația: scoți din vârf c
 | stivă monotonă | O(n) | O(n) |
 
 Deși există o buclă `while` interioară, fiecare element intră și iese din stivă cel mult o dată — analiză amortizată O(n).
+
+## Vizualizare
+
+Urmărește stiva monotonă în acțiune: indicii nerezolvați se adaugă cu push, iar fiecare element nou „mătură" din vârf valorile mai mici decât el, devenind răspunsul lor:
+
+<Visualizer name="stack" />
 
 <MistakeBox>
 Capcane la stiva monotonă:

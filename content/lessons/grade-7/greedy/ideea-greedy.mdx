@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["greedy", "metoda", "optim"]
-visualizers: []
+visualizers: ["greedy-intervale"]
 relatedProblems: []
 quiz:
   - question: "Ce face un algoritm Greedy la fiecare pas?"
@@ -92,6 +92,12 @@ Aceeași strategie, două rezultate. De aceea Greedy nu e o rețetă universală
 - Problema cere un **optim** (minim/maxim, cât mai multe/puține).
 - Pare că o **regulă simplă de prioritate** ar putea funcționa (cel mai mare, cel mai scurt, cel mai devreme).
 - Poți **argumenta** că alegerea locală nu strică soluția globală.
+
+## Vizualizare
+
+Pe o problemă clasică Greedy — selecția activităților din intervale — urmărește cum alegerea local optimă (luată pas cu pas, fără a da înapoi) construiește soluția:
+
+<Visualizer name="greedy-intervale" />
 
 <MistakeBox>
 Capcane la metoda Greedy:

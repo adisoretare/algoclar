@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["numarare", "doi-indici", "secvente"]
-visualizers: []
+visualizers: ["sliding-window"]
 relatedProblems: []
 quiz:
   - question: "Câte secvențe contigue (subsecvențe) are un vector cu n elemente?"
@@ -115,6 +115,12 @@ int main() {
 |---|---|---|
 | Verifici toate secvențele | O(n²) sau O(n³) | O(1) |
 | Numărare cu doi indici | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește cum fereastra `[st, dr]` se lărgește la dreapta și se strânge la stânga când suma depășește S, iar la fiecare pas adaugi `dr − st + 1` secvențe valide la total:
+
+<Visualizer name="sliding-window" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

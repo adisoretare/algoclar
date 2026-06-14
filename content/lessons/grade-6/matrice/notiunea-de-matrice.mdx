@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "tablou-bidimensional", "indici"]
-visualizers: []
+visualizers: ["matrice-parcurgere"]
 relatedProblems: []
 quiz:
   - question: "Cum identifici un element într-o matrice?"
@@ -111,6 +111,12 @@ Dimensiunile din declarație sunt **maximele posibile**, nu cele efective. Folos
 | Citire / afișare / parcurgere | O(n·m) | O(n·m) |
 
 Orice parcurgere completă atinge toate cele `n × m` elemente — de aceea costul de bază al lucrului cu matrice e `O(n·m)`.
+
+## Vizualizare
+
+Explorează parcurgerile matricei (comută între linii, coloane, diagonale, spirală):
+
+<Visualizer name="matrice-parcurgere" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

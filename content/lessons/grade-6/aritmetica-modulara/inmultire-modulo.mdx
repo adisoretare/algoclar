@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["modulo", "inmultire", "overflow", "long-long"]
-visualizers: []
+visualizers: ["inmultire-modulo"]
 relatedProblems: []
 quiz:
   - question: "De ce este overflow-ul un pericol mult mai mare la înmulțirea modulo decât la adunare?"
@@ -101,6 +101,12 @@ Bucla de factorial arată ideea: `20!` are 19 cifre și nu încape nicăieri, da
 ## Complexitate
 
 O înmulțire modulo costă **O(1)**. Un produs de `n` factori (ca factorialul) rulează în **O(n)**, cu numerele menținute mici tot timpul prin reducerea modulo la fiecare pas.
+
+## Vizualizare
+
+Urmărește cum valoarea face mai multe ture pe cadran și se reia de la 0 după fiecare grup de m pași — înmulțirea e o adunare repetată, iar modulo o readuce mereu pe cerc:
+
+<Visualizer name="inmultire-modulo" />
 
 <MistakeBox>
 **Greșeala 1 — overflow la produs:** `(a * b) % m` cu `a`, `b` de tip `int` dă overflow înainte de modulo. Cast: `((long long)a * b) % m`.

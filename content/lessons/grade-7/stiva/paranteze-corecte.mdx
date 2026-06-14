@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["stiva", "paranteze", "verificare"]
-visualizers: []
+visualizers: ["stack"]
 relatedProblems: []
 quiz:
   - question: "Ce pui pe stivă la verificarea parantezelor?"
@@ -127,6 +127,12 @@ Pentru un singur tip, contorul e mai eficient (O(1) memorie). Stiva e indispensa
 |----------|------|--------|
 | verificare | O(n) | O(n) (stiva) |
 | un singur tip (contor) | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește cum fiecare paranteză deschisă intră pe stivă (push) și cum o paranteză închisă o potrivește cu vârful și îl scoate (pop) — la final stiva trebuie să fie goală:
+
+<Visualizer name="stack" />
 
 <MistakeBox>
 Capcane la verificarea parantezelor:

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["interclasare", "vectori-sortati", "doi-indici"]
-visualizers: []
+visualizers: ["interclasare"]
 relatedProblems: []
 quiz:
   - question: "De ce trebuie ca cei doi vectori să fie deja sortați pentru interclasare?"
@@ -124,6 +124,12 @@ Cele două bucle `while` de la final par redundante, dar exact una dintre ele ru
 | Interclasare | O(n + m) | O(n + m) rezultat |
 
 Liniar: fiecare element e mutat o singură dată. Comparativ, dacă ai lipi cei doi vectori și ai sorta, ai obține O((n+m)·log(n+m)) — mai lent.
+
+## Vizualizare
+
+Urmărește cum cei doi indici compară mereu doar capetele curente și mută cel mai mic element în rezultat, până când unul dintre vectori se golește:
+
+<Visualizer name="interclasare" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

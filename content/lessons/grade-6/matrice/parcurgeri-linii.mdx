@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "parcurgere", "linii"]
-visualizers: []
+visualizers: ["parcurgeri-linii"]
 relatedProblems: []
 quiz:
   - question: "La parcurgerea pe linii, ce fixează bucla EXTERIOARĂ?"
@@ -103,6 +103,12 @@ Resetarea `suma = 0` **înainte** de bucla interioară e esențială — altfel 
 | Operație | Timp | Spațiu |
 |---|---|---|
 | Parcurgere pe linii | O(n·m) | O(1) suplimentar |
+
+## Vizualizare
+
+Urmărește cum bucla exterioară fixează o linie, iar cea interioară baleiază coloanele ei, una după alta:
+
+<Visualizer name="parcurgeri-linii" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["vector", "inversare", "swap", "indici"]
-visualizers: []
+visualizers: ["two-pointers"]
 relatedProblems: []
 quiz:
   - question: "Câte swap-uri sunt necesare pentru a inversa un vector cu 6 elemente?"
@@ -118,6 +118,12 @@ Folosește O(n) spațiu suplimentar — corectă, dar varianta cu swap e prefera
 <ObservationBox>
 Swap-ul clasic necesită variabilă temporară `t`. C++ oferă `std::swap(a, b)` care face exact asta intern — poți folosi direct fără să-ți mai declari `t`.
 </ObservationBox>
+
+## Vizualizare
+
+Urmărește cum cei doi indici `st` și `dr` se apropie spre centru, interschimbând elementele la fiecare pas:
+
+<Visualizer name="two-pointers" />
 
 <MistakeBox>
 **Greșeala 1:** `v[st] = v[dr]; v[dr] = v[st];` fără variabilă temporară — prima valoare se pierde înainte de a fi salvată.

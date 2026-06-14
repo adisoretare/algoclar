@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["cmmdc", "euclid", "modulo", "recursiv"]
-visualizers: []
+visualizers: ["cmmdc"]
 relatedProblems: []
 quiz:
   - question: "CMMDC(12, 8) = ?"
@@ -107,6 +107,12 @@ Elegantă și compactă, dar consumă memorie de stivă proporțional cu număru
 |-----|------|--------|
 | Iterativ | O(log(min(a,b))) | O(1) |
 | Recursiv | O(log(min(a,b))) | O(log n) — stivă |
+
+## Vizualizare
+
+Urmărește cum resturile succesive scad până când `b` devine 0 — ultima valoare nenulă este CMMDC:
+
+<Visualizer name="cmmdc" />
 
 <MistakeBox>
 **Greșeala 1:** Confunzi ordinea la pasul de reducere. `CMMDC(a, b) = CMMDC(b, a % b)` — noul prim argument este `b`, nu `a % b`.

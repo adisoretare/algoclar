@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["vector", "cautare", "gasit", "pozitie"]
-visualizers: []
+visualizers: ["cautare-liniara"]
 relatedProblems: []
 quiz:
   - question: "Care e complexitatea căutării liniare în cel mai rău caz?"
@@ -116,6 +116,12 @@ if (!gasit) cout << "Nu exista\n";
 <ObservationBox>
 Dacă vectorul e **sortat**, poți folosi căutarea binară — O(log n). Pentru n = 1.000.000: liniară face 1.000.000 pași, binară face ~20. La concursuri, preferă căutarea binară când vectorul e deja sortat.
 </ObservationBox>
+
+## Vizualizare
+
+Urmărește cum cursorul verifică fiecare element pe rând, de la stânga la dreapta, până găsește valoarea căutată:
+
+<Visualizer name="cautare-liniara" />
 
 <MistakeBox>
 **Greșeala 1:** Returnezi `pozitie = 0` ca „negăsit" — dar 0 e o poziție validă! Folosește `-1` pentru „negăsit".

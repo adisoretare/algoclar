@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "bordura", "margini"]
-visualizers: []
+visualizers: ["bordare"]
 relatedProblems: []
 quiz:
   - question: "Un element a[i][j] e pe bordura (chenarul) matricei n×m dacă..."
@@ -112,6 +112,12 @@ for (int i = 1; i <= n; i++)
 | Parcurgerea bordurii | O(n·m) la citire, O(n+m) doar marginea | O(1) |
 
 Numărul de elemente de pe bordură e `2n + 2m - 4` (cele 4 colțuri nu se numără de două ori).
+
+## Vizualizare
+
+Urmărește cum chenarul de pe margine se distinge de interiorul matricei:
+
+<Visualizer name="bordare" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

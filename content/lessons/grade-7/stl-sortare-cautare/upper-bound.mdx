@@ -109,6 +109,12 @@ Analog, `lower_bound(x) - v` dă câte elemente sunt **strict < x**.
 | `upper_bound` | O(log n) | O(1) |
 | număr apariții (lower + upper) | O(log n) | O(1) |
 
+## Vizualizare
+
+Și `upper_bound` se bazează pe căutare binară. Urmărește cum intervalul se înjumătățește până la prima poziție unde elementul devine strict mai mare decât valoarea căutată:
+
+<Visualizer name="cautare-binara" />
+
 <MistakeBox>
 Capcane la `upper_bound`:
 

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "transpunere", "indici"]
-visualizers: []
+visualizers: ["transpunere"]
 relatedProblems: []
 quiz:
   - question: "Ce face transpunerea unei matrice?"
@@ -118,6 +118,12 @@ for (int i = 0; i < n; i++)
 |---|---|---|
 | Transpunere în matrice nouă | O(n·m) | O(n·m) |
 | Transpunere pe loc (pătratică) | O(n²) | O(1) |
+
+## Vizualizare
+
+Urmărește cum fiecare element `a[i][j]` se oglindește în `t[j][i]` față de diagonala principală:
+
+<Visualizer name="transpunere" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

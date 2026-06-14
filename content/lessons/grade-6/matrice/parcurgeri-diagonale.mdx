@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "diagonale", "indici"]
-visualizers: []
+visualizers: ["parcurgeri-diagonale"]
 relatedProblems: []
 quiz:
   - question: "Pe diagonala principală a unei matrice pătratice, ce relație leagă indicii i și j?"
@@ -116,6 +116,12 @@ Analog, pentru diagonalele „/" folosești `i + j` (valori `0..2n-2`).
 |---|---|---|
 | O diagonală | O(n) | O(1) |
 | Toate diagonalele | O(n²) | O(n) etichete |
+
+## Vizualizare
+
+Urmărește cum elementele de pe aceeași diagonală împart aceeași valoare `i − j` (sau `i + j`):
+
+<Visualizer name="parcurgeri-diagonale" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

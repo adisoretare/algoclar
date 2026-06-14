@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["numere-mari", "inmultire", "transport"]
-visualizers: []
+visualizers: ["big-numbers"]
 relatedProblems: []
 quiz:
   - question: "La înmulțirea unui număr mare cu un număr natural `k`, ce poate fi diferit față de adunare?"
@@ -142,6 +142,12 @@ for (int k = 2; k <= 100; k++) {
 |----------|------|--------|
 | înmulțire cu natural | O(n) | O(n) |
 | factorial n (n înmulțiri) | O(n · cifre) | O(cifre) |
+
+## Vizualizare
+
+Urmărește cum fiecare cifră se înmulțește cu `k`, se adună transportul, se scrie `p % 10` și se duce mai departe `p / 10` — iar la final transportul rămas se desface cifră cu cifră:
+
+<Visualizer name="big-numbers" />
 
 <MistakeBox>
 Capcane la înmulțirea cu un număr natural:

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["prefixe", "maxim", "precalculare"]
-visualizers: []
+visualizers: ["prefix-max"]
 relatedProblems: []
 quiz:
   - question: "Ce reprezintă `pmax[i]` (maximul pe prefix)?"
@@ -109,6 +109,12 @@ Asta e util, de pildă, când vrei pentru fiecare poziție produsul/maximul celo
 |---|---|---|
 | Construire `pmax`/`pmin` | O(n) | O(n) |
 | Fiecare interogare „prefix” | O(1) | — |
+
+## Vizualizare
+
+Urmărește cum, la fiecare poziție, recordul de până atunci se compară cu elementul curent și `pmax` urcă în trepte, fără să scadă vreodată:
+
+<Visualizer name="prefix-max" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

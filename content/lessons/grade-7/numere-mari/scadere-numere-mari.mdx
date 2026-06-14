@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["numere-mari", "scadere", "imprumut"]
-visualizers: []
+visualizers: ["big-numbers"]
 relatedProblems: []
 quiz:
   - question: "Ce este împrumutul (borrow) la scăderea numerelor mari?"
@@ -136,6 +136,12 @@ bool maiMareSauEgal(const vector<int> &a, const vector<int> &b) {
 |----------|------|--------|
 | scădere | O(n) | O(n) |
 | comparare | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește scăderea cifră cu cifră de la unități: când cifra de sus nu ajunge, se împrumută 10 de la poziția următoare (`borrow = 1`), iar la final se elimină zerourile nesemnificative:
+
+<Visualizer name="big-numbers" />
 
 <MistakeBox>
 Capcane la scăderea numerelor mari:

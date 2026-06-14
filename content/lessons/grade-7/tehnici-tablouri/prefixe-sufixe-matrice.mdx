@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["prefixe", "sufixe", "matrice"]
-visualizers: []
+visualizers: ["prefix-extrema"]
 relatedProblems: []
 quiz:
   - question: "Ce stochează un vector de prefixe `pre` pentru o linie?"
@@ -131,6 +131,12 @@ int main() {
 | construire prefix + sufix (o linie) | O(n) | O(n) |
 | toată matricea (linii și coloane) | O(n·m) | O(n·m) |
 | o interogare după precalcul | O(1) | O(1) |
+
+## Vizualizare
+
+Urmărește cum se construiește rezumatul pe prefix (de la stânga) și pe sufix (de la dreapta) — comută între maxim și minim pentru a vedea cum fiecare poziție își „amintește" ce e în spate și ce urmează:
+
+<Visualizer name="prefix-extrema" />
 
 <MistakeBox>
 Capcane la prefixe și sufixe:

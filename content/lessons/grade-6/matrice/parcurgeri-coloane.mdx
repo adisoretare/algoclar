@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "parcurgere", "coloane"]
-visualizers: []
+visualizers: ["parcurgeri-coloane"]
 relatedProblems: []
 quiz:
   - question: "La parcurgerea pe coloane, ce fixează bucla EXTERIOARĂ?"
@@ -105,6 +105,12 @@ Singura schimbare față de parcurgerea pe linii: `j` e acum exterior, `i` inter
 | Parcurgere pe coloane | O(n·m) | O(1) suplimentar |
 
 Același cost ca pe linii — atingi tot atâtea elemente, doar în altă ordine.
+
+## Vizualizare
+
+Urmărește cum se parcurge fiecare coloană de sus în jos, înainte de a trece la următoarea:
+
+<Visualizer name="parcurgeri-coloane" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

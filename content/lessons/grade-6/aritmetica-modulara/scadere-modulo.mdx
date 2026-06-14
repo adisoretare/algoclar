@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["modulo", "scadere", "rest-negativ", "mod"]
-visualizers: []
+visualizers: ["scadere-modulo"]
 relatedProblems: []
 quiz:
   - question: "Pe un ceas de 12 ore, ora 2 minus 5 ore înseamnă ce oră?"
@@ -98,6 +98,12 @@ Observă ultimul exemplu: `0 − 1` modulo `MOD` nu e `−1`, ci `MOD − 1 = 10
 ## Complexitate
 
 Scăderea modulo cu corecție costă tot **O(1)**: câteva operații aritmetice elementare. Nu adaugi complexitate față de o scădere obișnuită.
+
+## Vizualizare
+
+Urmărește cum valoarea se rotește înapoi pe cadran și, când trece de 0, se reia de la m − 1 — exact corecția `+ m` care transformă restul negativ în corespondentul lui pozitiv:
+
+<Visualizer name="scadere-modulo" />
 
 <MistakeBox>
 **Greșeala 1 — rezultat negativ neglijat:** `(a - b) % m` poate ieși negativ. Dacă apoi îl folosești ca index sau îl afișezi ca răspuns final, ai un bug. Adaugă mereu `+ m`.

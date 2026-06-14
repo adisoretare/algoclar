@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["factorial", "produs", "overflow", "for"]
-visualizers: []
+visualizers: ["recursion"]
 relatedProblems: []
 quiz:
   - question: "Cât este 5! ?"
@@ -104,6 +104,12 @@ Elegantă și ușor de citit, dar consumă O(n) memorie de stivă — evita-o pe
 |-----|------|--------|
 | Iterativ | O(n) | O(1) |
 | Recursiv | O(n) | O(n) — stiva de apeluri |
+
+## Vizualizare
+
+Urmărește cum apelurile recursive coboară până la cazul de bază, apoi se recompun înmulțind la întoarcere:
+
+<Visualizer name="recursion" />
 
 <MistakeBox>
 **Greșeala 1:** Folosești `int` în loc de `long long`. 13! depășește `int`. Declară și calculează cu `long long` mereu.

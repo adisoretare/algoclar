@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["modulo", "rest", "impartire", "paritate"]
-visualizers: []
+visualizers: ["restul-impartirii"]
 relatedProblems: []
 quiz:
   - question: "Ce valoare are 17 % 5?"
@@ -116,6 +116,12 @@ int rPozitiv = (r + 3) % 3;  // 2  (corect pe cerc)
 ## Complexitate
 
 Operația `%` costă **O(1)** — e o instrucțiune hardware directă, la fel ca `+` sau `*`.
+
+## Vizualizare
+
+Urmărește cum valoarea avansează pe cadran și se reia de la 0 după fiecare grup întreg de m pași — restul e exact poziția la care te oprești:
+
+<Visualizer name="restul-impartirii" />
 
 <MistakeBox>
 **Greșeala 1 — rest negativ neașteptat:** `-7 % 3` dă `-1` în C++, nu `2`. Când lucrezi pe un „cerc", corectează cu `(r % m + m) % m`.

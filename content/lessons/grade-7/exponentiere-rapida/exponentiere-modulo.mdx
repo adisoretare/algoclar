@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["exponentiere", "modulo", "overflow"]
-visualizers: []
+visualizers: ["fast-power"]
 relatedProblems: []
 quiz:
   - question: "De ce se cere de obicei rezultatul modulo un număr prim la puteri mari?"
@@ -109,6 +109,12 @@ Rezultat: `3^13 mod 100 = 23`. Verificare: `3^13 = 1594323`, iar `...23` sunt ul
 | Operație | Timp | Spațiu |
 |----------|------|--------|
 | exponentiere modulo | O(log n) | O(1) |
+
+## Vizualizare
+
+Urmărește cum, la fiecare pas, baza se ridică la pătrat și rezultatul se înmulțește când bitul e 1 — totul redus imediat `% mod`, ca valorile să rămână mici:
+
+<Visualizer name="fast-power" />
 
 <MistakeBox>
 Capcane la exponențierea modulo:

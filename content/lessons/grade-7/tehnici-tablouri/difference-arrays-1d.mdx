@@ -134,6 +134,12 @@ int main() {
 | o actualizare pe interval | O(lungime) | O(1) |
 | q actualizări + citire | O(q·n) | O(q + n) |
 
+## Vizualizare
+
+Urmărește cum fiecare actualizare pe interval marchează doar două poziții (`d[a] += x`, `d[b+1] -= x`) și cum reconstruirea prin sume parțiale „revarsă" valoarea pe tot intervalul:
+
+<Visualizer name="difference-array" />
+
 <MistakeBox>
 Capcane la difference arrays:
 

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "directii", "vecini"]
-visualizers: []
+visualizers: ["vectori-directie"]
 relatedProblems: []
 quiz:
   - question: "Ce sunt vectorii de direcție dx[] și dy[]?"
@@ -121,6 +121,12 @@ Verificarea `ni >= 0 && ni < n && nj >= 0 && nj < m` e esențială: la margini, 
 |---|---|---|
 | Vecinii unei celule | O(1) (4 sau 8 direcții) | O(1) |
 | Vecinii tuturor celulelor | O(n·m) | O(1) |
+
+## Vizualizare
+
+Urmărește cum perechile `(dx[k], dy[k])` indică, pe rând, fiecare celulă vecină:
+
+<Visualizer name="vectori-directie" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

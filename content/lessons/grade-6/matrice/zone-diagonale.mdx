@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "diagonale", "zone"]
-visualizers: []
+visualizers: ["zone-diagonale"]
 relatedProblems: []
 quiz:
   - question: "Cele două diagonale ale unei matrice pătratice împart interiorul în câte zone (triunghiuri)?"
@@ -109,6 +109,12 @@ Pentru altă zonă schimbi doar condiția (`i > j && i + j > n - 1` pentru jos, 
 | Parcurgerea unei zone | O(n²) | O(1) |
 
 Parcurgi toată matricea și verifici apartenența fiecărui element la zonă.
+
+## Vizualizare
+
+Urmărește cum cele două diagonale împart matricea în patru triunghiuri — sus, jos, stânga, dreapta:
+
+<Visualizer name="zone-diagonale" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["matrice", "submatrice", "potrivire"]
-visualizers: []
+visualizers: ["submatrice-cautare"]
 relatedProblems: []
 quiz:
   - question: "Ce înseamnă că tiparul P (dimensiune p×q) apare în matricea A (n×m) cu colțul în (i, j)?"
@@ -113,6 +113,12 @@ Cele patru bucle: două pentru colț `(i, j)`, două pentru verificarea celulelo
 | Tipic (nepotriviri rapide) | mult mai bun | O(1) |
 
 Pentru gimnaziu, când matricele sunt mici, costul e acceptabil. Algoritmi mai rapizi există, dar îi vei studia mai târziu.
+
+## Vizualizare
+
+Urmărește cum tiparul `P` alunecă peste matricea `A`, colț cu colț, comparând celulele:
+
+<Visualizer name="submatrice-cautare" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:

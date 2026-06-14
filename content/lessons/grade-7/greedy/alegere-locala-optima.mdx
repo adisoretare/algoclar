@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["greedy", "alegere-locala", "criteriu"]
-visualizers: []
+visualizers: ["greedy-intervale"]
 relatedProblems: []
 quiz:
   - question: "Ce este criteriul de alegere locală într-un Greedy?"
@@ -90,6 +90,12 @@ Rezultat: `A, D, F` — 3 activități. Criteriul „cel mai devreme sfârșit" 
 1. **Enumeră criterii candidate**: cel mai mic/mare, cel mai scurt/lung, cel mai devreme/târziu, cel mai bun raport.
 2. **Caută contraexemple mici** pentru fiecare. Cele care cad sunt eliminate.
 3. **Criteriul care supraviețuiește** devine candidatul serios — apoi îl justifici (lecția-punte).
+
+## Vizualizare
+
+Urmărește criteriul de alegere locală „sfârșitul cel mai devreme" aplicat la selecția activităților: la fiecare pas se ia opțiunea cea mai bună după regulă, iar cele incompatibile se sar:
+
+<Visualizer name="greedy-intervale" />
 
 <MistakeBox>
 Capcane la alegerea locală:

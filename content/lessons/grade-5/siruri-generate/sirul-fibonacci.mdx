@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["fibonacci", "siruri-recurente", "for", "doi-predecesori"]
-visualizers: []
+visualizers: ["recursion"]
 relatedProblems: []
 quiz:
   - question: "Care sunt primii 8 termeni ai șirului Fibonacci (începând cu 0, 1)?"
@@ -136,6 +136,12 @@ int main() {
 |-----|------|--------|
 | Generare n termeni (2 variabile) | O(n) | O(1) |
 | Generare n termeni (vector) | O(n) | O(n) |
+
+## Vizualizare
+
+Urmărește cum apelurile recursive se desfac până la F(0) și F(1), apoi se recompun adunând rezultatele:
+
+<Visualizer name="recursion" />
 
 <MistakeBox>
 **Greșeala 1:** Suprascrii `a` înainte să calculezi `c`. Ordinea corectă: `c = a + b`, apoi `a = b`, apoi `b = c`. Dacă faci `a = b; b = a + b`, al doilea `a` e deja suprascris.

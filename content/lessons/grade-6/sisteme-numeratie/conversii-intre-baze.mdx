@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["conversii", "baze", "impartiri-repetate", "binar"]
-visualizers: []
+visualizers: ["conversii-baze"]
 relatedProblems: []
 quiz:
   - question: "Pentru a converti 13 din baza 10 în baza 2 prin împărțiri repetate, în ce ordine citești resturile?"
@@ -124,6 +124,12 @@ int main() {
 ## Complexitate
 
 Ambele conversii costă **O(k)**, unde `k ≈ log_b n` este numărul de cifre al rezultatului. Fiecare împărțire scade numărul de `b` ori, deci ajungi la 0 după aproximativ `log_b n` pași.
+
+## Vizualizare
+
+Urmărește cum fiecare împărțire la bază scoate o cifră (restul) și micșorează numărul, până ajunge la 0 — iar cifrele citite invers formează rezultatul în noua bază:
+
+<Visualizer name="conversii-baze" />
 
 <MistakeBox>
 **Greșeala 1 — citești resturile în ordinea apariției:** dacă afișezi `1,0,1,1` cum au ieșit, obții `1011` (= 11), nu `1101` (= 13). Resturile se citesc **invers**.

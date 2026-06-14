@@ -9,7 +9,7 @@ free: true
 status: published
 isBridge: false
 tags: ["prime", "divizori", "verificare", "sqrt"]
-visualizers: []
+visualizers: ["ciur-eratostene"]
 relatedProblems: []
 quiz:
   - question: "Este 1 număr prim?"
@@ -109,6 +109,12 @@ int main() {
 <ObservationBox>
 Dacă trebuie să verifici primalitatea pentru toate numerele până la ~10⁶, folosește **Ciurul lui Eratostene** (studiat în clasa a 6-a) — precalculezi totul în O(n log log n). Funcția de mai sus este potrivită pentru numere individuale.
 </ObservationBox>
+
+## Vizualizare
+
+Urmărește cum ciurul taie pe rând multiplii fiecărui număr prim, lăsând în picioare doar numerele prime:
+
+<Visualizer name="ciur-eratostene" />
 
 <MistakeBox>
 **Greșeala 1:** Nu tratezi cazurile `n < 2`. Fără `if (n < 2) return false`, funcția returnează `true` pentru 0 și 1 — greșit prin definiție.

@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["greedy", "sortare", "criteriu"]
-visualizers: []
+visualizers: ["greedy-intervale"]
 relatedProblems: []
 quiz:
   - question: "De ce multe probleme Greedy încep cu o sortare?"
@@ -121,6 +121,12 @@ int main() {
 | sortare | O(n log n) | O(log n) |
 | parcurgere Greedy | O(n) | O(1) |
 | total | O(n log n) | O(log n) |
+
+## Vizualizare
+
+Tiparul „sortezi după criteriu, apoi parcurgi" se vede clar pe selecția activităților, unde sortarea după sfârșit transformă alegerea lacomă într-o simplă parcurgere:
+
+<Visualizer name="greedy-intervale" />
 
 <MistakeBox>
 Capcane la Greedy cu sortare:

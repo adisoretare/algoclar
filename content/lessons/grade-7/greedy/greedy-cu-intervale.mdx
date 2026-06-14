@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["greedy", "intervale", "activitati"]
-visualizers: []
+visualizers: ["greedy-intervale"]
 relatedProblems: []
 quiz:
   - question: "Pentru a alege cât mai multe activități care nu se suprapun, după ce criteriu sortezi?"
@@ -126,6 +126,12 @@ int main() {
 |-------|------|--------|
 | sortare după sfârșit | O(n log n) | O(log n) |
 | parcurgere Greedy | O(n) | O(1) |
+
+## Vizualizare
+
+Urmărește selecția activităților pas cu pas: sortate după sfârșit, se ia fiecare interval care începe la sau după sfârșitul ultimului ales, iar cele care se suprapun se sar:
+
+<Visualizer name="greedy-intervale" />
 
 <MistakeBox>
 Capcane la Greedy cu intervale:

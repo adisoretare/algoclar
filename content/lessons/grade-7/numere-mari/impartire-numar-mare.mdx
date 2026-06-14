@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["numere-mari", "impartire", "rest"]
-visualizers: []
+visualizers: ["big-numbers"]
 relatedProblems: []
 quiz:
   - question: "În ce direcție parcurgi cifrele la împărțirea unui număr mare la un natural?"
@@ -127,6 +127,12 @@ Un număr mare e divizibil cu `k` dacă restul împărțirii e `0`. Aceeași fun
 | împărțire la natural | O(n) | O(n) |
 
 unde `n` e numărul de cifre. Restul curent rămâne mereu mai mic decât `k`, deci `rest * 10 + cifra` încape în `long long` dacă `k` e rezonabil.
+
+## Vizualizare
+
+Urmărește împărțirea „lungă" de la cifra cea mai semnificativă: la fiecare pas `rest` devine `rest * 10 + cifra`, cifra câtului e `rest / k`, iar `rest % k` călătorește spre dreapta:
+
+<Visualizer name="big-numbers" />
 
 <MistakeBox>
 Capcane la împărțirea numerelor mari:

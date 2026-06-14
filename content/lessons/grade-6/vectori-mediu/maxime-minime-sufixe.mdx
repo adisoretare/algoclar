@@ -9,7 +9,7 @@ free: true
 status: draft
 isBridge: false
 tags: ["sufixe", "maxim", "precalculare"]
-visualizers: []
+visualizers: ["sufix-max"]
 relatedProblems: []
 quiz:
   - question: "Ce reprezintă `smax[i]` (maximul pe sufix)?"
@@ -117,6 +117,12 @@ maxFaraI = max(pmax[i-1], smax[i+1])
 |---|---|---|
 | Construire sufixe | O(n) | O(n) |
 | Interogare „în afară de i” | O(1) | — |
+
+## Vizualizare
+
+Urmărește cum parcurgerea pornește din dreapta și, la fiecare pas spre stânga, `smax` reține cel mai mare element văzut „de aici încolo”:
+
+<Visualizer name="sufix-max" />
 
 <MistakeBox>
 Greșeli frecvente de concurs:
