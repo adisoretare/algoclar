@@ -1,0 +1,141 @@
+---
+title: "Programare dinamică"
+slug: programare-dinamica-baraj
+grade: 8
+chapter: baraj
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["programare-dinamica", "memoizare", "subprobleme"]
+visualizers: ["dp-table-1d"]
+relatedProblems: []
+quiz:
+  - question: "Care e ideea de bază a programării dinamice?"
+    options: ["Încerci toate variantele", "Rezolvi fiecare subproblemă o singură dată și îi reții rezultatul, ca să nu îl recalculezi", "Sortezi datele", "Folosești recursivitate fără memorare"]
+    correctIndex: 1
+    explanation: "DP elimină recalcularea: o subproblemă apare de multe ori, dar o rezolvi o dată și citești rezultatul memorat de fiecare dată când reapare. Asta scade timpul de la exponențial la polinomial."
+  - question: "De ce calculul recursiv naiv al lui Fibonacci e exponențial, iar cu DP devine liniar?"
+    options: ["DP folosește mai multă memorie", "Recursivitatea naivă recalculează aceleași valori de miliarde de ori; DP le reține și le citește o singură dată", "Fibonacci nu se poate calcula recursiv", "Sunt la fel de rapide"]
+    correctIndex: 1
+    explanation: "fib(n) naiv recalculează fib(n−2) de mai multe ori, creând un arbore exponențial de apeluri. Memorând fiecare fib(k) o singură dată, rămân doar n valori de calculat → O(n)."
+  - question: "Ce trebuie să stabilești mai întâi când rezolvi o problemă de DP?"
+    options: ["Limbajul de programare", "Starea (ce înseamnă dp[i]) și tranziția (cum se obține din stările mai mici)", "Dimensiunea vectorului de citire", "Numărul de teste"]
+    correctIndex: 1
+    explanation: "Fără o definiție clară a stării și a relației de recurență dintre stări, codul nu are sens. Întâi definești ce reprezintă dp[i], apoi cum îl calculezi din valori deja cunoscute."
+---
+
+<LessonHook>
+Urci o scară și poți face pași de 1 sau 2 trepte. În câte feluri ajungi în vârf? În loc să
+desenezi toate traseele, observi ceva simplu: la treapta `n` ajungi fie de la `n−1`, fie de
+la `n−2`. Dacă știi deja răspunsul pentru acele două, l-ai aflat și pe al tău. Asta e
+programarea dinamică.
+</LessonHook>
+
+## Ce este programarea dinamică
+
+Programarea dinamică (DP) rezolvă o problemă spărgând-o în **subprobleme care se repetă**
+și **memorând** rezultatul fiecăreia, ca să nu îl recalculezi. Două ingrediente obligatorii:
+
+1. **Starea** — ce reprezintă `dp[i]` (răspunsul subproblemei `i`).
+2. **Tranziția (recurența)** — cum obții `dp[i]` din stări mai mici, deja calculate.
+
+<ObservationBox>
+Întrebarea de aur: „pe ce stări mai mici se sprijină starea curentă?”. Dacă găsești
+recurența și un punct de pornire (cazurile de bază), restul e doar completarea unui tabel
+de la mic la mare.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Numărul de moduri de a urca `n` trepte cu pași de 1 sau 2:
+
+- **Stare:** `dp[i]` = în câte feluri ajungi la treapta `i`.
+- **Tranziție:** `dp[i] = dp[i-1] + dp[i-2]` (vii fie de la i−1, fie de la i−2).
+- **Cazuri de bază:** `dp[0] = 1` (un singur fel: stai pe loc), `dp[1] = 1`.
+
+Completăm tabelul pentru `n = 6`:
+
+<ArrayDiagram
+  values="1 1 2 3 5 8 13"
+  valueLabel="dp"
+  index="0 1 2 3 4 5 6"
+  indexLabel="treaptă"
+  highlight="6"
+  caption="dp[i] = dp[i-1] + dp[i-2]. La treapta 6 sunt 13 moduri de urcare." />
+
+Fiecare celulă e suma celor două dinaintea ei: `2 = 1+1`, `3 = 2+1`, …, `13 = 8+5`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 1000;
+long long dp[N];
+
+int main() {
+    int n = 6;
+    dp[0] = 1;                       // caz de baza: stai pe loc
+    dp[1] = 1;                       // caz de baza
+    for (int i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];   // tranzitia
+    }
+    cout << dp[n] << "\n";           // 13
+    return 0;
+}
+```
+
+Dacă ai nevoie doar de ultimul rezultat, poți ține numai două variabile (optimizare de
+spațiu de la O(n) la O(1)):
+
+```cpp
+long long trepte(int n) {
+    long long a = 1, b = 1;          // dp[0], dp[1]
+    for (int i = 2; i <= n; i++) {
+        long long c = a + b;         // dp[i]
+        a = b; b = c;                // gliseaza fereastra
+    }
+    return b;
+}
+```
+
+## Complexitate
+
+| Abordare | Timp | Spațiu |
+|----------|------|--------|
+| Recursiv naiv (fără memorare) | O(2ⁿ) | O(n) |
+| DP cu tabel | O(n) | O(n) |
+| DP cu 2 variabile | O(n) | O(1) |
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Stare prost definită.** Dacă nu poți spune în cuvinte ce e `dp[i]`, recurența va fi
+  greșită. Definește starea înainte de a scrie cod.
+- **Cazuri de bază uitate sau greșite.** `dp[0]` și `dp[1]` trebuie setate manual; altfel
+  citești zerouri și tot tabelul iese 0.
+- **Overflow.** Valorile DP cresc exponențial (Fibonacci depășește `int` pe la al 47-lea
+  termen). Folosește `long long` sau lucrează modulo, cum cere enunțul.
+- **Ordine greșită de completare.** Calculezi `dp[i]` înainte ca `dp[i-1]` să fie gata →
+  citești o valoare încă neinițializată. Mergi de la mic la mare.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum tabelul `dp` se completează celulă cu celulă, fiecare valoare sprijinindu-se
+pe cele dinaintea ei:
+
+<Visualizer name="dp-table-1d" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+## Recapitulare
+
+- DP = spargi în subprobleme repetate și memorezi fiecare rezultat o singură dată.
+- Definește întâi starea (`dp[i]`), apoi tranziția și cazurile de bază; completezi de la mic la mare.
+- Atenție la inițializare, ordinea de completare și overflow (`long long` / modulo).

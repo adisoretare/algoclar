@@ -1,0 +1,151 @@
+---
+title: "Algoritmul lui Lee"
+slug: algoritmul-lee
+grade: 8
+chapter: baraj
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["lee", "bfs", "drum-minim"]
+visualizers: ["lee-fill"]
+relatedProblems: []
+quiz:
+  - question: "De ce algoritmul lui Lee folosește o coadă (BFS) și nu recursivitate (DFS)?"
+    options: ["E mai ușor de scris", "BFS explorează în straturi de distanță crescătoare, deci prima dată când atingi o celulă e pe drumul minim", "DFS nu funcționează pe matrice", "Coada e mai rapidă întotdeauna"]
+    correctIndex: 1
+    explanation: "BFS procesează toate celulele la distanța d înainte de cele la d+1. Prima oară când ajungi la o celulă, ai garantat drumul minim până la ea — proprietate pe care DFS nu o oferă."
+  - question: "Cu ce inițializezi distanțele celulelor nevizitate?"
+    options: ["0", "1", "-1 (sau infinit), ca semn de 'încă neatins'", "Distanța până la destinație"]
+    correctIndex: 2
+    explanation: "Folosești o valoare santinelă (-1 sau infinit) ca să distingi 'încă neatins' de 'distanță 0'. Sursa primește distanța 0; restul rămân -1 până le atingi."
+  - question: "Ce diferență esențială există între fill și algoritmul lui Lee?"
+    options: ["Niciuna", "Fill verifică doar apartenența la o zonă; Lee calculează distanța minimă în pași până la fiecare celulă", "Lee e mai lent", "Fill folosește coadă, Lee recursivitate"]
+    correctIndex: 1
+    explanation: "Fill răspunde 'ce e conectat?'; Lee răspunde 'la câți pași e?'. Lee e un BFS care păstrează distanța, propagând-o strat cu strat de la sursă."
+---
+
+<LessonHook>
+Arunci o piatră într-un lac liniștit: din punctul de impact pleacă valuri concentrice,
+fiecare inel atingând puncte tot mai îndepărtate, în ordine. Algoritmul lui Lee e exact
+acel val — pornește din sursă și se extinde în straturi, aflând distanța minimă până la
+fiecare celulă liberă.
+</LessonHook>
+
+## Ce este algoritmul lui Lee
+
+Algoritmul lui Lee găsește **drumul minim** (în număr de pași) între două celule ale unei
+matrice cu obstacole, deplasându-te pe 4 direcții. E un **BFS pe grilă**: explorezi
+celulele în ordinea distanței față de sursă, strat cu strat.
+
+Spre deosebire de fill (care doar marchează o zonă), Lee **reține distanța** la care a
+ajuns fiecare celulă. Primul moment când atingi o celulă îți dă garantat distanța minimă.
+
+<ObservationBox>
+Cheia corectitudinii: BFS scoate din coadă întâi toate celulele la distanța `d`, abia apoi
+pe cele la `d+1`. Deci când o celulă e atinsă prima oară, nu mai există un drum mai scurt
+spre ea. Aceasta e diferența față de o explorare recursivă (DFS).
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Matrice (`.` = liber, `#` = obstacol). Pornim din `S = (0,0)`, valorile sunt distanțele:
+
+```
+S . #          0 1 #
+. # .          1 # .
+. . .          2 3 4
+```
+
+Valul de distanțe:
+
+1. `(0,0)` primește distanța 0, intră în coadă.
+2. Vecinii liberi ai lui `(0,0)`: `(0,1)` și `(1,0)` → distanță 1.
+3. Din `(0,1)`: dreapta e `#`, jos e `#` → nimic nou. Din `(1,0)`: jos `(2,0)` → distanță 2.
+4. Valul continuă: `(2,1)` → 3, `(2,2)` → 4. Toate celulele libere au acum distanța minimă.
+
+## Implementare C++ (BFS cu coadă)
+
+```cpp
+#include <iostream>
+#include <queue>
+using namespace std;
+
+const int N = 1005;
+int dist[N][N];       // distanta minima; -1 = neatins
+int grid[N][N];       // 0 = liber, 1 = obstacol
+int n, m;
+
+int dl[] = {-1, 1, 0, 0};
+int dc[] = {0, 0, -1, 1};
+
+void lee(int sl, int sc) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) dist[i][j] = -1;   // init neatins
+
+    queue<pair<int,int>> q;
+    dist[sl][sc] = 0;             // sursa la distanta 0
+    q.push({sl, sc});
+
+    while (!q.empty()) {
+        auto [l, c] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nl = l + dl[d], nc = c + dc[d];
+            if (nl < 0 || nl >= n || nc < 0 || nc >= m) continue;
+            if (grid[nl][nc] == 1) continue;            // obstacol
+            if (dist[nl][nc] != -1) continue;           // deja atins (drum mai scurt)
+            dist[nl][nc] = dist[l][c] + 1;              // un pas mai departe
+            q.push({nl, nc});
+        }
+    }
+}
+
+int main() {
+    n = 3; m = 3;
+    int g[3][3] = {{0,0,1},{0,1,0},{0,0,0}};
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) grid[i][j] = g[i][j];
+
+    lee(0, 0);
+    cout << dist[2][2] << "\n";   // 4 pasi pana in coltul opus
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| BFS pe matrice n×m | O(n·m) | O(n·m) |
+
+Fiecare celulă intră în coadă cel mult o dată; pentru fiecare verifici 4 vecini → O(n·m).
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Folosești DFS (recursiv) în loc de BFS.** DFS găsește UN drum, nu pe cel minim.
+  Pentru distanță minimă pe grilă, coada (BFS) e obligatorie.
+- **Init greșit al distanțelor.** Lași 0 peste tot și nu mai distingi „neatins” de
+  „distanță 0”. Inițializează cu `-1` (sau infinit) și pune `0` doar în sursă.
+- **Marchezi distanța prea târziu** (la scoaterea din coadă, nu la adăugare) → aceeași
+  celulă intră de mai multe ori, coada explodează.
+- **Uiți verificarea de limite sau de obstacol** înainte de acces → citești în afara
+  matricei sau treci prin ziduri.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește valul de distanțe propagându-se strat cu strat din sursă, ocolind obstacolele:
+
+<Visualizer name="lee-fill" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+## Recapitulare
+
+- Lee = BFS pe grilă: află distanța minimă în pași de la sursă la fiecare celulă liberă.
+- Coada garantează ordinea pe straturi de distanță; prima atingere = drum minim.
+- Inițializează distanțele cu −1, marchează la adăugare în coadă, verifică limite și obstacole.

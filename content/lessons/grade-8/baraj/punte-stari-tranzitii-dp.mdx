@@ -1,0 +1,107 @@
+---
+title: "Lecție-punte: stări și tranziții în programarea dinamică"
+slug: punte-stari-tranzitii-dp
+grade: 8
+chapter: baraj
+difficulty: mediu
+estimatedTime: 12
+free: true
+status: draft
+isBridge: true
+tags: ["programare-dinamica", "stare", "tranzitie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce verifici mai întâi când bănuiești că o problemă se rezolvă cu DP?"
+    options: ["Dacă datele sunt sortate", "Dacă poți defini o stare care, calculată o dată, se refolosește în alte calcule", "Dacă încape în memorie", "Dacă are obstacole"]
+    correctIndex: 1
+    explanation: "DP merită doar dacă există subprobleme care se repetă. Dacă fiecare subproblemă apare o singură dată, o simplă recursivitate sau o buclă e suficientă — nu ai ce memora."
+  - question: "Recurența ta citește `dp[i+1]` ca să calculeze `dp[i]`, dar tu completezi tabelul de la 0 în sus. Care e problema?"
+    options: ["Niciuna", "Citești o valoare încă neinițializată — ordinea de completare nu respectă dependențele", "E prea lent", "Folosești prea multă memorie"]
+    correctIndex: 1
+    explanation: "Ordinea de completare trebuie să garanteze că orice stare de care depinzi e deja calculată. Dacă `dp[i]` depinde de `dp[i+1]`, trebuie să completezi de la mare la mic, nu invers."
+  - question: "Cum alegi între o stare 1D (`dp[i]`) și una 2D (`dp[i][j]`)?"
+    options: ["Mereu 2D, ca să fii sigur", "După câți parametri independenți descriu complet o subproblemă", "După mărimea memoriei", "Alegi aleatoriu"]
+    correctIndex: 1
+    explanation: "Numărul de dimensiuni = numărul de mărimi de care depinde răspunsul. Dacă o subproblemă e determinată doar de poziție, e 1D; dacă depinde și de o a doua mărime (ex. buget rămas), e 2D."
+---
+
+<LessonHook>
+Ai învățat câteva rețete de DP: trepte, Fibonacci, tabele care se umplu. Dar la baraj nu
+primești eticheta „aceasta e o problemă de DP”. Primești un enunț nou. Întrebarea reală nu
+e „cum scriu DP”, ci „care e starea și care e tranziția?”. Această lecție te învață să le
+descoperi singur.
+</LessonHook>
+
+## Ideea-cheie: orice DP e o stare plus o tranziție
+
+Indiferent de problemă, un DP corect se reduce la a răspunde clar la două întrebări:
+
+- **Starea:** ce informație minimă descrie complet o subproblemă? (Ce înseamnă `dp[...]`?)
+- **Tranziția:** cum obții o stare din stările mai mici, deja rezolvate?
+
+Dacă poți enunța starea **într-o propoziție** și recurența **într-o formulă**, restul e
+mecanic: cazuri de bază, ordinea de completare, citirea răspunsului.
+
+<ObservationBox>
+Testul rapid dacă o problemă e DP: există **subprobleme care se repetă**? Dacă recursivitatea
+naivă ar recalcula aceeași subproblemă de multe ori, memorarea o transformă în DP. Dacă
+fiecare subproblemă apare o singură dată, nu ai ce câștiga — e doar recursivitate.
+</ObservationBox>
+
+## Cum alegi starea
+
+Întreabă-te: **de ce mărimi depinde răspunsul unei subprobleme?** Fiecare mărime
+independentă devine o dimensiune.
+
+- Răspunsul depinde doar de o poziție `i` → stare 1D: `dp[i]`. (Trepte, Fibonacci, subsecvențe pe un vector.)
+- Răspunsul depinde de poziție **și** de o resursă rămasă (buget, capacitate) → stare 2D:
+  `dp[i][cap]`. (Problema rucsacului.)
+- Răspunsul depinde de două poziții (două șiruri) → `dp[i][j]`. (Subsecvență comună, distanță de editare.)
+
+Apoi formulează tranziția enumerând **deciziile** posibile din starea curentă. Pentru rucsac,
+la obiectul `i` ai două alegeri: îl iei (`dp[i-1][cap - greutate] + valoare`) sau îl lași
+(`dp[i-1][cap]`) — iei maximul.
+
+## Cum alegi ordinea de completare
+
+Tranziția spune de ce stări depinzi; **ordinea trebuie să le calculeze pe acelea mai întâi**.
+
+- `dp[i]` depinde de `dp[i-1]` → completezi crescător, de la mic la mare.
+- `dp[i]` depinde de `dp[i+1]` → completezi descrescător, de la mare la mic.
+- Stări 2D → de regulă două bucle imbricate, în ordinea care respectă dependențele.
+
+<ObservationBox>
+Un truc practic: scrie recurența pe hârtie și trasează săgeți de la fiecare stare la cele
+de care depinde. Orice ordine în care săgețile arată „înapoi” (spre stări deja calculate)
+este corectă.
+</ObservationBox>
+
+## Cum alegi: rezumat de decizie
+
+| Întrebarea ta | Răspunsul ghidului |
+|---------------|--------------------|
+| E DP sau simplă recursivitate? | DP doar dacă subproblemele se **repetă**. |
+| Câte dimensiuni are starea? | Câte mărimi **independente** descriu subproblema. |
+| Care e tranziția? | Enumeră **deciziile** din starea curentă; combină stările mai mici. |
+| În ce ordine completez? | Astfel încât stările de care **depinzi** să fie deja gata. |
+
+<MistakeBox>
+Greșeli frecvente la trecerea spre DP:
+
+- **Stare incompletă.** Definești `dp[i]` dar răspunsul depinde și de o a doua mărime pe
+  care ai uitat-o → recurența dă valori greșite. Dacă două subprobleme „identice” după
+  starea ta au răspunsuri diferite, starea e prea săracă.
+- **Ordine care încalcă dependențele.** Completezi crescător o recurență care citește
+  înainte → folosești valori neinițializate.
+- **Confunzi DP cu greedy.** Iei mereu „cea mai bună alegere locală” fără să explorezi
+  stările → ratezi optimul global. DP păstrează toate stările relevante, nu doar una.
+- **Cazuri de bază greșite.** Un tabel DP fără puncte de pornire corecte propagă zerouri
+  sau valori absurde prin toată recurența.
+</MistakeBox>
+
+## Recapitulare
+
+- Orice DP = o **stare** (ce înseamnă `dp[...]`) plus o **tranziție** (din ce stări mai mici se obține).
+- Numărul de dimensiuni al stării = numărul de mărimi independente de care depinde răspunsul.
+- Completează în ordinea care garantează că stările de care depinzi sunt deja calculate.

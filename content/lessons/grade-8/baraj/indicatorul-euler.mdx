@@ -1,0 +1,131 @@
+---
+title: "Indicatorul lui Euler"
+slug: indicatorul-euler
+grade: 8
+chapter: baraj
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["euler", "phi", "divizori"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cât este φ(p) pentru un număr prim p?"
+    options: ["1", "p", "p - 1", "p / 2"]
+    correctIndex: 2
+    explanation: "Un prim p nu are divizori comuni cu niciunul dintre 1, 2, …, p−1, deci toate cele p−1 numere sunt prime cu el. Rezultă φ(p) = p − 1."
+  - question: "În formula produsului, de ce înmulțim cu (1 − 1/p) o singură dată per factor prim distinct?"
+    options: ["Ca să fie mai rapid", "Pentru că doar primul distinct contează — exponentul nu schimbă proporția numerelor neprime cu p", "Din greșeală", "Ca să evităm overflow"]
+    correctIndex: 1
+    explanation: "Proporția numerelor care SUNT divizibile cu p este 1/p indiferent de exponentul lui p. Contează doar care primi divid n, nu de câte ori — de aceea folosim fiecare prim o singură dată."
+  - question: "Care e complexitatea calculului lui φ(n) prin factorizare cu împărțiri până la √n?"
+    options: ["O(n)", "O(√n)", "O(log n)", "O(n log n)"]
+    correctIndex: 1
+    explanation: "Testăm divizori doar până la √n; dacă rămâne un factor > 1, e un prim mare. Deci O(√n) împărțiri pentru un singur n."
+---
+
+<LessonHook>
+Ai un ceas cu n ore și vrei să știi câte „salturi” de mărime fixă te plimbă prin toate
+orele înainte să te întorci la start. Răspunsul ține de câte numere mai mici ca n nu
+au niciun divizor comun cu n. Exact asta numără indicatorul lui Euler.
+</LessonHook>
+
+## Ce este indicatorul lui Euler
+
+Indicatorul lui Euler, notat **φ(n)** (phi de n), numără câte numere din `1, 2, …, n`
+sunt **prime cu n** — adică au cel mai mare divizor comun cu n egal cu 1.
+
+Câteva valori concrete:
+
+- φ(1) = 1
+- φ(6) = 2, fiindcă doar 1 și 5 sunt prime cu 6 (2, 3, 4 împart un divizor cu 6)
+- φ(7) = 6, fiindcă 7 e prim: toate 1…6 sunt prime cu el
+
+<ObservationBox>
+Pentru orice prim `p`, **φ(p) = p − 1**: un prim nu are divizori comuni cu niciun
+număr mai mic decât el. Aceasta e piatra de temelie a formulei generale.
+</ObservationBox>
+
+## Formula prin factori primi
+
+Dacă descompui `n = p1^a1 · p2^a2 · … · pk^ak`, atunci:
+
+```
+φ(n) = n · (1 − 1/p1) · (1 − 1/p2) · … · (1 − 1/pk)
+```
+
+Contează doar **primii distincți** care divid n, nu și exponenții lor.
+
+### Pas cu pas pentru n = 12
+
+`12 = 2^2 · 3`. Primii distincți: 2 și 3.
+
+```
+φ(12) = 12 · (1 − 1/2) · (1 − 1/3)
+      = 12 · (1/2) · (2/3)
+      = 12 · 1/3
+      = 4
+```
+
+Verificare: numerele prime cu 12 sunt 1, 5, 7, 11 — exact 4. ✓
+
+## Implementare C++
+
+Ca să evităm fracții, rescriem `n · (1 − 1/p)` ca `n − n/p`. Pentru fiecare prim p
+găsit, scădem contribuția lui:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+long long phi(long long n) {
+    long long rez = n;
+    for (long long p = 2; p * p <= n; p++) {   // testam divizori pana la sqrt(n)
+        if (n % p == 0) {                       // p este factor prim
+            while (n % p == 0) n /= p;          // scoatem tot p-ul din n
+            rez -= rez / p;                     // rez = rez * (1 - 1/p)
+        }
+    }
+    if (n > 1) rez -= rez / n;                  // a ramas un prim mare
+    return rez;
+}
+
+int main() {
+    cout << phi(12) << "\n";   // 4
+    cout << phi(7) << "\n";    // 6
+    cout << phi(36) << "\n";   // 12
+    return 0;
+}
+```
+
+<ObservationBox>
+Bucla folosește `p * p <= n` pe `n`-ul **care se micșorează**. După ce scoatem toți
+factorii mici, ce rămâne (`n > 1`) e un singur prim mare — îl tratăm separat la final.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Un singur φ(n) | O(√n) | O(1) |
+| Toți φ(1..N) cu ciur | O(N log log N) | O(N) |
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Overflow.** `p * p` poate depăși `int` pentru n mare. Folosește `long long`
+  pentru `p` și `n`.
+- **Aplici factorul de mai multe ori.** Bucla `while (n % p == 0)` trebuie să scoată
+  TOT p-ul; altfel intri din nou pe același prim și scazi de două ori.
+- **Uiți primul mare rămas.** După buclă, dacă `n > 1`, mai e un factor prim — fără
+  linia finală rezultatul e greșit (ex. pentru n = 14).
+- **Pornești de la `p = 1`.** Începe de la 2; `p = 1` ar împărți mereu și ar strica totul.
+</MistakeBox>
+
+## Recapitulare
+
+- φ(n) = câte numere din 1…n sunt prime cu n; pentru un prim p, φ(p) = p − 1.
+- Formula `n · ∏(1 − 1/p)` folosește fiecare prim distinct o singură dată.
+- Calculezi în O(√n) cu `rez -= rez / p`, fără fracții, atent la primul mare rămas.

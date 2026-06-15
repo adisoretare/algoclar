@@ -1,0 +1,142 @@
+---
+title: "Operații pe biți"
+slug: operatii-pe-biti
+grade: 8
+chapter: baraj
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["biti", "binar", "xor"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Cum verifici rapid dacă un număr `n` este par, folosind biți?"
+    options: ["(n & 1) == 0", "(n | 1) == 0", "(n ^ 1) == 0", "(n >> 1) == 0"]
+    correctIndex: 0
+    explanation: "Bitul 0 (cel mai din dreapta) valorează 1 doar la numerele impare. Deci `n & 1` dă 0 la numere pare și 1 la impare. Atenție la prioritate: scrii `(n & 1) == 0`, cu paranteze."
+  - question: "Cât face `1 << 5`?"
+    options: ["10", "25", "32", "64"]
+    correctIndex: 2
+    explanation: "`1 << k` mută bitul 1 cu k poziții la stânga, adică înmulțește cu 2 la puterea k. `1 << 5 = 2^5 = 32`."
+  - question: "Ce calculează expresia `x & (x - 1)`?"
+    options: ["Dublează x", "Stinge cel mai din dreapta bit de 1", "Inversează toți biții", "Numără biții de 1"]
+    correctIndex: 1
+    explanation: "Scăzând 1 transformi cel mai din dreapta bit de 1 în 0 și pui 1-uri sub el; un AND cu x stinge exact acel bit. Trucul stă la baza numărării rapide a biților."
+---
+
+<LessonHook>
+Imaginează-ți un panou cu 8 întrerupătoare, fiecare aprins sau stins. Combinația lor
+codifică un număr. Operațiile pe biți sunt exact apăsările pe aceste întrerupătoare:
+aprinde unul, stinge altul, întoarce-le pe toate — instant, fără să atingi restul.
+</LessonHook>
+
+## Ce este reprezentarea pe biți
+
+Orice număr întreg e stocat în memorie în **baza 2**: un șir de biți, fiecare 0 sau 1.
+Bitul de pe poziția `k` (numărând de la dreapta, de la 0) valorează `2^k`.
+
+De exemplu, `13` în binar:
+
+<ArrayDiagram
+  values="1 1 0 1"
+  valueLabel="bit"
+  index="3 2 1 0"
+  indexLabel="poziție"
+  caption="13 = 8 + 4 + 0 + 1 = 1101 în baza 2. Fiecare poziție valorează o putere a lui 2." />
+
+<ObservationBox>
+A gândi un număr ca pe o mulțime de biți aprinși îți dă superputeri: poți testa,
+aprinde sau stinge un singur element în **O(1)**, fără să parcurgi nimic.
+</ObservationBox>
+
+## Operatorii pe biți
+
+| Operator | Nume | Ce face |
+|----------|------|---------|
+| `&` | AND | bit 1 doar unde **ambele** numere au 1 |
+| `\|` | OR | bit 1 unde **cel puțin unul** are 1 |
+| `^` | XOR | bit 1 unde biții **diferă** |
+| `~` | NOT | inversează toți biții |
+| `<<` | shift stânga | `x << k` = `x · 2^k` |
+| `>>` | shift dreapta | `x >> k` = `x / 2^k` (împărțire întreagă) |
+
+## Pas cu pas pe un exemplu
+
+Fie `a = 13` (`1101`) și `b = 6` (`0110`):
+
+```
+a     = 1101   (13)
+b     = 0110   (6)
+-------------
+a & b = 0100   (4)    bit 1 doar unde ambele au 1
+a | b = 1111   (15)   bit 1 unde macar unul are 1
+a ^ b = 1011   (11)   bit 1 unde difera
+```
+
+XOR are o proprietate magică: `x ^ x = 0` și `x ^ 0 = x`. De aceea XOR-ul tuturor
+elementelor unui șir în care fiecare valoare apare de două ori, mai puțin una, lasă
+exact valoarea unică.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 13;            // 1101
+
+    // testeaza bitul k (1 = aprins)
+    int k = 2;
+    bool areBit = (n >> k) & 1;     // bitul 2 este aprins -> 1
+    cout << areBit << "\n";         // 1
+
+    // stinge bitul k
+    n = n & ~(1 << k);              // 1101 -> 1001 (9)
+    cout << n << "\n";              // 9
+
+    // intoarce (toggle) bitul k
+    n = n ^ (1 << k);              // 1001 -> 1101 (13)
+    cout << n << "\n";              // 13
+
+    // numara bitii de 1
+    int cnt = 0, x = n;
+    while (x) {
+        x = x & (x - 1);            // stinge cel mai din dreapta bit de 1
+        cnt++;
+    }
+    cout << cnt << "\n";            // 3 biti aprinsi in 13
+    return 0;
+}
+```
+
+`__builtin_popcount(n)` numără direct biții de 1 (folosește `__builtin_popcountll`
+pentru `long long`). Util la concurs când vrei viteză și cod scurt.
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| AND / OR / XOR / shift pe un întreg | O(1) | O(1) |
+| Parcurgerea tuturor biților | O(log n) | O(1) |
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Prioritatea operatorilor.** `&`, `|`, `^` au prioritate **mai mică** decât `==`.
+  `n & 1 == 0` se citește `n & (1 == 0)` = `n & 0` = 0. Pune paranteze: `(n & 1) == 0`.
+- **Overflow la shift.** `1 << 31` depășește `int`. Pentru biți peste 30 folosește
+  `1LL << k` (long long).
+- **Shift pe numere negative** are comportament neportabil. Lucrează pe `unsigned`
+  sau pe numere nenegative.
+- **`~` inversează TOȚI biții**, inclusiv semnul: `~5` nu e 2, ci `-6` pe int.
+  Ca să stingi un bit folosește `n & ~(1 << k)`, nu `~` singur.
+</MistakeBox>
+
+## Recapitulare
+
+- Un număr e o mulțime de biți; poziția `k` valorează `2^k`.
+- Test / stinge / toggle un bit: `(n>>k)&1`, `n&~(1<<k)`, `n^(1<<k)`.
+- XOR (`x^x=0`) și `x&(x-1)` (stinge ultimul bit de 1) sunt trucurile de aur la baraj.

@@ -1,0 +1,138 @@
+---
+title: "Recursivitate"
+slug: recursivitate
+grade: 8
+chapter: baraj
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["recursivitate", "stiva", "caz-de-baza"]
+visualizers: ["recursion"]
+relatedProblems: []
+quiz:
+  - question: "Ce se întâmplă dacă o funcție recursivă nu are caz de bază?"
+    options: ["Returnează 0", "Se apelează la infinit până la stack overflow", "Rulează o singură dată", "Compilatorul o respinge"]
+    correctIndex: 1
+    explanation: "Fără o condiție de oprire, fiecare apel face un alt apel la nesfârșit. Stiva de apeluri se umple și programul se oprește cu stack overflow."
+  - question: "În ce ordine se întorc rezultatele dintr-un lanț de apeluri recursive?"
+    options: ["În ordinea în care s-au făcut apelurile", "Invers: ultimul apel deschis se închide primul", "Aleatoriu", "Toate deodată"]
+    correctIndex: 1
+    explanation: "Stiva e LIFO: ultimul apel adăugat (cazul de bază) se rezolvă primul, apoi rezultatele urcă în ordine inversă deschiderii."
+  - question: "Care e diferența esențială dintre recursivitate și o simplă buclă?"
+    options: ["Recursivitatea e mereu mai rapidă", "Recursivitatea folosește stiva de apeluri pentru a memora contextul fiecărui nivel", "Bucla nu poate calcula factorial", "Nu există diferență"]
+    correctIndex: 1
+    explanation: "Fiecare apel recursiv își păstrează propriile variabile pe stivă. Asta o face naturală pentru probleme care se descompun în subprobleme (arbori, backtracking), dar consumă memorie de stivă."
+---
+
+<LessonHook>
+Stai la o coadă lungă și vrei să afli al câtelea ești, dar nu vezi capătul. Întrebi
+persoana din fața ta „tu al câtelea ești?”. Ea nu știe, așa că întreabă mai departe.
+Întrebarea se propagă până la primul om, care răspunde „eu sunt primul”, iar răspunsul
+revine înapoi, +1 la fiecare pas. Asta e recursivitatea.
+</LessonHook>
+
+## Ce este recursivitatea
+
+O funcție este **recursivă** când se apelează pe ea însăși pentru o problemă mai mică.
+Orice recursivitate corectă are **două părți obligatorii**:
+
+1. **Cazul de bază** — situația cea mai simplă, rezolvată direct, fără alt apel. E
+   condiția de oprire.
+2. **Pasul recursiv** — problema se reduce la o versiune mai mică a ei înseși.
+
+<ObservationBox>
+Întreabă-te mereu: „dacă aș avea deja răspunsul pentru cazul mai mic, cum îl folosesc
+pentru cazul curent?”. Dacă știi asta și știi unde te oprești, recursivitatea e gata.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Calculăm suma `1 + 2 + … + n`. Definiția recursivă: `suma(n) = n + suma(n−1)`, iar
+`suma(0) = 0` (cazul de bază).
+
+Pentru `n = 4`, lanțul de apeluri se deschide până la bază, apoi se închide înapoi:
+
+```
+suma(4)
+  -> 4 + suma(3)
+        -> 3 + suma(2)
+              -> 2 + suma(1)
+                    -> 1 + suma(0)
+                          -> 0          (caz de baza)
+```
+
+Răspunsurile urcă în ordine inversă: `0 -> 1 -> 3 -> 6 -> 10`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+long long suma(int n) {
+    if (n == 0) return 0;        // caz de baza
+    return n + suma(n - 1);      // pas recursiv
+}
+
+int main() {
+    cout << suma(4) << "\n";     // 10
+    cout << suma(100) << "\n";   // 5050
+    return 0;
+}
+```
+
+Aceeași problemă, iterativ, ca să compari:
+
+```cpp
+long long sumaIterativ(int n) {
+    long long s = 0;
+    for (int i = 1; i <= n; i++) s += i;
+    return s;
+}
+```
+
+<ObservationBox>
+Fiecare apel recursiv își ține propriile variabile pe **stiva de apeluri**. La cazul de
+bază, stiva e plină; apoi se golește de sus în jos, fiecare nivel adăugând contribuția lui.
+</ObservationBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| `suma(n)` recursiv | O(n) | O(n) — adâncimea stivei |
+| `suma(n)` iterativ | O(n) | O(1) |
+
+Recursivitatea liniară plătește memorie de stivă proporțională cu adâncimea — un detaliu
+care contează când adâncimea ajunge la sute de mii.
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Caz de bază lipsă sau greșit.** Dacă oprești la `n == 1` dar apelezi cu `n = 0`,
+  treci de bază și cobori la infinit → stack overflow.
+- **Pasul nu micșorează problema.** `suma(n) = n + suma(n)` nu se apropie niciodată de
+  bază. Argumentul trebuie să scadă strict.
+- **Adâncime prea mare.** Recursivitate de adâncime ~10^6 depășește stiva implicită.
+  Pentru asemenea cazuri preferă varianta iterativă.
+- **Overflow.** Suma depășește repede `int`. Folosește `long long` pentru rezultat.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum fiecare apel se adaugă pe stivă până la cazul de bază, apoi cum rezultatele
+urcă înapoi, de jos în sus:
+
+<Visualizer name="recursion" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+## Recapitulare
+
+- Orice recursivitate are caz de bază (oprirea) și pas recursiv (reducere la mai mic).
+- Stiva de apeluri se deschide până la bază, apoi rezultatele urcă în ordine inversă.
+- Costă memorie de stivă O(adâncime); la adâncimi uriașe, alege iterativul.

@@ -1,0 +1,151 @@
+---
+title: "Difference Arrays 2D"
+slug: difference-arrays-2d
+grade: 8
+chapter: baraj
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["difference-array", "matrice", "sume-partiale"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Vrei să adaugi +5 unui dreptunghi din matrice de Q ori, apoi citești matricea o singură dată. Ce tehnică e cea mai bună?"
+    options: ["Adaugi direct, celulă cu celulă, la fiecare update", "Difference array 2D + sume parțiale la final", "Sortezi matricea", "Căutare binară"]
+    correctIndex: 1
+    explanation: "Update direct costă O(suprafață) per operație. Difference array marchează fiecare dreptunghi în O(1) cu 4 celule, iar reconstrucția se face o singură dată în O(n·m)."
+  - question: "Câte celule modifici pentru a marca un singur update de dreptunghi în difference array 2D?"
+    options: ["1", "2", "4", "n·m"]
+    correctIndex: 2
+    explanation: "Exact 4: +val la colțul stânga-sus, și corecții (scădere/adunare) la cele 3 colțuri vecine din afara dreptunghiului, ca să oprești propagarea."
+  - question: "Cum reconstruiești matricea finală din difference array 2D?"
+    options: ["O sortezi", "Aplici sume parțiale 2D peste tabelul de diferențe", "Faci XOR pe linii", "Nu se poate reconstrui"]
+    correctIndex: 1
+    explanation: "Sumele parțiale 2D `d[i][j] += d[i-1][j] + d[i][j-1] - d[i-1][j-1]` propagă fiecare +val pe tot dreptunghiul, întorcând matricea reală."
+---
+
+<LessonHook>
+Imaginează-ți că vrei să uzi mai multe dreptunghiuri de gazon dintr-un parc, fiecare cu
+o anumită cantitate de apă, și ai sute de astfel de comenzi. În loc să stropești fiecare
+fir de iarbă de fiecare dată, notezi doar colțurile fiecărui dreptunghi și deschizi
+robinetul o singură dată la final. Asta face difference array 2D.
+</LessonHook>
+
+## Ce este un difference array 2D
+
+E o tehnică pentru a aplica **multe update-uri pe dreptunghiuri** într-o matrice și a
+citi rezultatul **o singură dată**, la final. În loc să modifici toate celulele unui
+dreptunghi la fiecare comandă (scump), marchezi doar **4 colțuri** și lași sumele
+parțiale 2D să „picure” valoarea peste tot dreptunghiul.
+
+E inversul sumelor parțiale 2D: acolo, dintr-o matrice obții sumele; aici, din 4 semne
+obții o matrice.
+
+<ObservationBox>
+Ideea-cheie: un `+val` pus în colțul stânga-sus al unui dreptunghi se propagă, prin sume
+parțiale, **spre dreapta și în jos la infinit**. Cele 3 corecții din celelalte colțuri
+opresc propagarea exact la marginile dreptunghiului.
+</ObservationBox>
+
+## Cele 4 marcaje
+
+Pentru a adăuga `val` pe dreptunghiul cu colțul stânga-sus `(r1, c1)` și dreapta-jos
+`(r2, c2)`, în tabelul de diferențe `d` faci:
+
+```
+d[r1][c1]     += val      // porneste propagarea
+d[r1][c2+1]   -= val      // o opreste pe dreapta
+d[r2+1][c1]   -= val      // o opreste jos
+d[r2+1][c2+1] += val      // corecteaza coltul scazut de doua ori
+```
+
+Apoi reconstruiești matricea cu sume parțiale 2D.
+
+## Pas cu pas pe un exemplu
+
+Matrice 3×3 plină cu 0. Aplicăm `+5` pe dreptunghiul `(0,0)–(1,1)`. Tabelul de
+diferențe după cele 4 marcaje (indexăm de la 0, cu o margine în plus):
+
+<ArrayDiagram
+  values="5 0 -5"
+  valueLabel="rând 0"
+  index="off"
+  caption="Rândul 0 al tabelului de diferențe: +5 la (0,0), −5 la (0,2). Simetric, rândul 2 are −5 și +5." />
+
+După sumele parțiale 2D, dreptunghiul `(0,0)–(1,1)` se umple cu 5, restul rămâne 0:
+
+<ArrayDiagram
+  values="5 5 0"
+  valueLabel="rând 0"
+  index="off"
+  caption="Matricea reconstruită, rândul 0: primele două celule devin 5, a treia rămâne 0." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 1005;
+long long d[N][N];   // tabel de diferente, cu o margine in plus
+
+void update(int r1, int c1, int r2, int c2, long long val) {
+    d[r1][c1]     += val;       // porneste
+    d[r1][c2 + 1] -= val;       // opreste dreapta
+    d[r2 + 1][c1] -= val;       // opreste jos
+    d[r2 + 1][c2 + 1] += val;   // corectie colt
+}
+
+int main() {
+    int n = 3, m = 3;
+    update(0, 0, 1, 1, 5);      // +5 pe dreptunghiul (0,0)-(1,1)
+    update(1, 1, 2, 2, 3);      // +3 pe dreptunghiul (1,1)-(2,2)
+
+    // reconstructie prin sume partiale 2D
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (i > 0) d[i][j] += d[i - 1][j];
+            if (j > 0) d[i][j] += d[i][j - 1];
+            if (i > 0 && j > 0) d[i][j] -= d[i - 1][j - 1];
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) cout << d[i][j] << " ";
+        cout << "\n";
+    }
+    // 5 5 0
+    // 5 8 3
+    // 0 3 3
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Difference array 2D | Update direct |
+|----------|---------------------|---------------|
+| Un update de dreptunghi | O(1) | O(suprafață) |
+| Q update-uri + 1 reconstrucție | O(Q + n·m) | O(Q · n·m) |
+| Spațiu | O(n·m) | O(n·m) |
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Index out of bounds la `c2+1` / `r2+1`.** Marcajele ies cu o poziție în afara
+  dreptunghiului. Declară matricea cu **o margine în plus** (N+1 × M+1), altfel scrii
+  în afara tabloului.
+- **Uiți colțul +val de la `(r2+1, c2+1)`.** Fără el, colțul scăzut de două ori rămâne
+  greșit și „gaura” se propagă.
+- **Reconstruiești greșit ordinea.** Sumele parțiale trebuie făcute de sus-stânga spre
+  jos-dreapta; altfel folosești celule încă neactualizate.
+- **Overflow.** Cu multe update-uri mari, suma depășește `int`. Folosește `long long`.
+</MistakeBox>
+
+## Recapitulare
+
+- Difference array 2D = aplici update-uri pe dreptunghiuri în O(1), citești o dată la final.
+- Fiecare update marchează 4 colțuri: `+`, `−`, `−`, `+`; reconstrucția e suma parțială 2D.
+- Declară matricea cu margine în plus și folosește `long long` ca să eviți erorile clasice.

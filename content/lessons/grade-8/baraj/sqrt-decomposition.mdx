@@ -1,0 +1,153 @@
+---
+title: "Square Root Decomposition"
+slug: sqrt-decomposition
+grade: 8
+chapter: baraj
+difficulty: greu
+estimatedTime: 18
+free: true
+status: draft
+isBridge: false
+tags: ["sqrt-decomposition", "blocuri", "interogari"]
+visualizers: ["sqrt-decomposition"]
+relatedProblems: []
+quiz:
+  - question: "De ce alegem dimensiunea blocului ≈ √n?"
+    options: ["E un număr frumos", "Echilibrează cele două costuri: ~√n blocuri întregi + ~√n elemente la capete = O(√n) per interogare", "Ca să încapă în memorie", "Din întâmplare"]
+    correctIndex: 1
+    explanation: "O interogare parcurge cel mult √n blocuri întregi (folosind valorile precalculate) plus cel mult 2·√n elemente la capetele parțiale. Suma e O(√n) — minimul se obține exact când blocul are mărimea √n."
+  - question: "Ce costă o actualizare a unui singur element în sqrt decomposition?"
+    options: ["O(n)", "O(√n)", "O(1) — actualizezi elementul și recalculezi doar blocul lui", "O(log n)"]
+    correctIndex: 2
+    explanation: "Schimbi `a[i]` și ajustezi agregatul blocului din care face parte (ex. scazi vechea valoare, adaugi noua). Un singur bloc afectat → O(1) pentru sume; O(√n) doar dacă trebuie recalculat tot blocul."
+  - question: "Pentru o interogare de sumă pe [2, 7] cu blocuri de mărime 3, cum o procesezi?"
+    options: ["Aduni toate cele n elemente", "Capătul parțial stâng element cu element, blocurile întregi din mijloc prin valori precalculate, capătul parțial drept element cu element", "Cauți binar", "Sortezi intervalul"]
+    correctIndex: 1
+    explanation: "Marginile care nu acoperă un bloc complet se parcurg direct; blocurile complet conținute se iau din suma precalculată. Așa atingi O(√n) în loc de O(n)."
+---
+
+<LessonHook>
+Ai o bibliotecă uriașă și te întreabă cineva „câte cărți sunt pe rafturile 30 până la 95?”.
+Dacă numeri carte cu carte, dureazi o veșnicie. Mai bine ții pe fiecare raft un bilețel cu
+totalul lui: aduni bilețelele rafturilor pline și numeri la mână doar capetele. Asta e
+square root decomposition.
+</LessonHook>
+
+## Ce este square root decomposition
+
+E o tehnică prin care împărți un vector de `n` elemente în **blocuri de mărime ≈ √n** și
+precalculezi un **agregat** pentru fiecare bloc (suma, minimul, maximul…). Apoi o
+interogare pe un interval se rezolvă combinând:
+
+- blocurile **complet conținute** → folosești valoarea precalculată (rapid);
+- capetele **parțiale** → parcurgi element cu element (puține elemente).
+
+<ObservationBox>
+Magia stă în echilibru: sunt cel mult ~√n blocuri întregi și cel mult ~√n elemente la
+capete. Orice interogare costă **O(√n)**, mult mai bine decât O(n) per interogare când ai
+multe interogări.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Vector de `n = 9` elemente, blocuri de mărime 3:
+
+<ArrayDiagram
+  values="2 5 1 3 8 2 7 4 6"
+  valueLabel="a"
+  caption="Vector de 9 elemente, împărțit mental în 3 blocuri de câte 3: [2 5 1] [3 8 2] [7 4 6]." />
+
+Sumele pe blocuri (precalculate o singură dată):
+
+<ArrayDiagram
+  values="8 13 17"
+  valueLabel="bloc"
+  index="0 1 2"
+  indexLabel="bloc"
+  caption="Suma fiecărui bloc: blocul 0 = 8, blocul 1 = 13, blocul 2 = 17." />
+
+Interogare: suma pe `[2, 7]` (indici 0-based):
+
+1. Capăt parțial stâng: indicele 2 (`1`) — în blocul 0, dar blocul nu e complet acoperit → adun direct: `1`.
+2. Blocul 1 (indici 3–5) e complet în interval → iau suma precalculată: `13`.
+3. Capăt parțial drept: indicii 6, 7 (`7`, `4`) — în blocul 2, neacoperit complet → adun direct: `11`.
+4. Total: `1 + 13 + 11 = 25`.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+const int N = 100005;
+long long a[N], bloc[400];   // bloc[k] = suma blocului k
+int n, len;                  // len = marimea blocului ~ sqrt(n)
+
+void build() {
+    len = (int)sqrt(n) + 1;
+    for (int i = 0; i < n; i++)
+        bloc[i / len] += a[i];     // fiecare element contribuie la blocul lui
+}
+
+long long query(int st, int dr) {  // suma pe [st, dr], 0-based
+    long long s = 0;
+    while (st <= dr && st % len != 0) s += a[st++];      // capat partial stang
+    while (st + len - 1 <= dr) { s += bloc[st / len]; st += len; }  // blocuri intregi
+    while (st <= dr) s += a[st++];                        // capat partial drept
+    return s;
+}
+
+void update(int i, long long val) {  // a[i] = val
+    bloc[i / len] += val - a[i];      // ajustezi doar blocul lui
+    a[i] = val;
+}
+
+int main() {
+    n = 9;
+    long long t[9] = {2,5,1,3,8,2,7,4,6};
+    for (int i = 0; i < n; i++) a[i] = t[i];
+    build();
+    cout << query(2, 7) << "\n";   // 25
+    update(4, 0);                  // a[4]: 8 -> 0
+    cout << query(2, 7) << "\n";   // 17
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Construcție | O(n) | O(n + √n) |
+| Interogare pe interval | O(√n) | — |
+| Actualizare element | O(1) | — |
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Off-by-one la capete.** Condițiile `st % len != 0` și `st + len - 1 <= dr` sunt
+  delicate. Testează pe un interval mic, la mână, înainte de submisie.
+- **Overflow.** Sumele pe blocuri cresc repede. Folosește `long long` pentru `a` și `bloc`.
+- **Uiți să ajustezi blocul la update.** Schimbi `a[i]` dar nu și `bloc[i/len]` → toate
+  interogările următoare sunt greșite.
+- **Bloc prea mare sau prea mic.** Cu `len = n` ai O(n) per interogare; cu `len = 1` ai
+  O(n) pe blocuri. Ține-l aproape de √n.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum o interogare folosește blocurile întregi precalculate și parcurge doar
+capetele parțiale element cu element:
+
+<Visualizer name="sqrt-decomposition" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+## Recapitulare
+
+- Împarți vectorul în blocuri de ≈ √n și precalculezi un agregat per bloc.
+- Interogarea combină blocurile întregi (precalculate) cu capetele parțiale (directe) → O(√n).
+- Actualizarea unui element ajustează doar blocul lui; atenție la off-by-one și overflow.

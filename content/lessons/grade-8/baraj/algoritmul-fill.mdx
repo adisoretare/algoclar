@@ -1,0 +1,153 @@
+---
+title: "Algoritmul de fill"
+slug: algoritmul-fill
+grade: 8
+chapter: baraj
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["flood-fill", "matrice", "vecini"]
+visualizers: ["lee-fill"]
+relatedProblems: []
+quiz:
+  - question: "Ce face fundamental algoritmul de fill (umplere) pe o matrice?"
+    options: ["Sortează celulele", "Marchează toate celulele dintr-o zonă conectată, pornind dintr-una", "Găsește drumul cel mai scurt", "Numără doar liniile"]
+    correctIndex: 1
+    explanation: "Fill pornește dintr-o celulă și se extinde la vecinii de același tip, marcând întreaga regiune conectată — exact ca găleata de vopsea care umple o zonă continuă."
+  - question: "De ce marchezi o celulă ca vizitată ÎNAINTE sau imediat când o procesezi?"
+    options: ["Ca să arate mai frumos", "Ca să nu o reprocesezi la infinit prin vecinii care trimit înapoi", "Nu e necesar", "Ca să economisești memorie"]
+    correctIndex: 1
+    explanation: "Vecinii se trimit reciproc; fără marcaj, A intră în B, B se întoarce în A la nesfârșit. Marcajul rupe ciclul și garantează că fiecare celulă e procesată o singură dată."
+  - question: "Câte zone distincte de '1' are o matrice dacă fill-ul pornit din celule nemarcate se declanșează de 3 ori?"
+    options: ["1", "3", "9", "Depinde de dimensiune"]
+    correctIndex: 1
+    explanation: "Fiecare nou fill pornit dintr-o celulă încă nemarcată descoperă exact o componentă conectată. Numărul de porniri = numărul de zone."
+---
+
+<LessonHook>
+Deschizi într-un program de desen unealta „găleată de vopsea”, dai clic pe o regiune albă
+și toată zona continuă se colorează instant — dar se oprește la primul perete. Algoritmul
+de fill e exact acea găleată: pornește dintr-un punct și inundă toată zona conectată.
+</LessonHook>
+
+## Ce este algoritmul de fill
+
+Fill (sau **flood fill**) pornește dintr-o celulă a unei matrice și se extinde la toți
+**vecinii de același tip**, până umple întreaga **regiune conectată**. E folosit pentru:
+
+- a colora / marca o zonă (ca găleata de vopsea);
+- a număra componentele conectate (insule de 1-uri într-o mare de 0-uri);
+- a măsura aria unei regiuni.
+
+Doi vecini sunt de obicei celulele care se ating pe **4 direcții** (sus, jos, stânga,
+dreapta); uneori și pe diagonale (8 direcții).
+
+<ObservationBox>
+Fill răspunde la întrebarea „ce este conectat de aici?”. Spre deosebire de algoritmul lui
+Lee, nu îți pasă de **distanță** — doar de **apartenență** la aceeași zonă.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Fie matricea (1 = teren, 0 = apă). Pornim fill din celula `(0,0)`:
+
+```
+1 1 0          marcam (0,0), apoi vecinul (0,1)
+1 0 0          de la (0,0) coboram la (1,0)
+0 0 1          (2,2) ramane: alta zona, neatinsa de acest fill
+```
+
+Pașii, pornind din `(0,0)`:
+
+1. Marchează `(0,0)`. Vecini de teren: `(0,1)` și `(1,0)`.
+2. Intri în `(0,1)`. Vecinii ei de teren sunt deja marcați → te întorci.
+3. Intri în `(1,0)`. Vecinii de teren: niciunul nou → te întorci.
+4. Zona conectată din colț are 3 celule. Celula `(2,2)` formează o zonă separată.
+
+## Implementare C++ (recursivă, 4 direcții)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+const int N = 1005;
+int a[N][N];          // 1 = teren, 0 = apa
+bool viz[N][N];       // marcaj de vizitare
+int n, m;
+
+// vectori de directie: sus, jos, stanga, dreapta
+int dl[] = {-1, 1, 0, 0};
+int dc[] = {0, 0, -1, 1};
+
+void fill(int l, int c) {
+    viz[l][c] = true;                       // marcam IMEDIAT, ca sa nu revenim
+    for (int d = 0; d < 4; d++) {
+        int nl = l + dl[d], nc = c + dc[d];
+        if (nl < 0 || nl >= n || nc < 0 || nc >= m) continue;  // iesim din matrice
+        if (a[nl][nc] == 1 && !viz[nl][nc]) {
+            fill(nl, nc);                   // vecin de teren, nevizitat
+        }
+    }
+}
+
+int main() {
+    n = 3; m = 3;
+    int t[3][3] = {{1,1,0},{1,0,0},{0,0,1}};
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) a[i][j] = t[i][j];
+
+    int zone = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            if (a[i][j] == 1 && !viz[i][j]) {
+                fill(i, j);                 // o noua zona descoperita
+                zone++;
+            }
+    cout << zone << "\n";                   // 2 zone
+    return 0;
+}
+```
+
+<HintBox>
+Vectorii de direcție `dl/dc` îți scutesc patru `if`-uri și se extind ușor la 8 direcții:
+adaugi diagonalele `{-1,-1,1,1}` și `{-1,1,-1,1}`.
+</HintBox>
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Fill pe matrice n×m | O(n·m) | O(n·m) — marcaj + stivă |
+
+Fiecare celulă e vizitată o singură dată, deci timpul e proporțional cu numărul de celule.
+
+<MistakeBox>
+Capcane reale de concurs:
+
+- **Uiți marcajul `viz`** (sau marchezi prea târziu) → recursivitate infinită, vecinii se
+  trimit reciproc.
+- **Nu verifici limitele înainte de acces** → citești `a[-1][c]` și ai comportament
+  nedefinit. Testează `nl, nc` în interval ÎNAINTE de a accesa celula.
+- **Adâncime de recursivitate prea mare.** Pe o matrice mare, plină cu teren, recursivitatea
+  poate depăși stiva. Folosește varianta cu coadă (BFS) pentru siguranță.
+- **Confunzi 4 cu 8 direcții.** Citește enunțul: „vecini pe linie/coloană” = 4; „și pe
+  diagonală” = 8. Rezultatul (numărul de zone) diferă.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum fill-ul pornește dintr-o celulă și inundă pas cu pas întreaga zonă conectată:
+
+<Visualizer name="lee-fill" />
+
+<HintBox>
+Folosește **←** și **→** pentru a avansa pas cu pas, sau apasă **Redă** pentru animație automată.
+</HintBox>
+
+## Recapitulare
+
+- Fill pornește dintr-o celulă și marchează toată regiunea conectată de același tip.
+- Marchează celula imediat și verifică limitele înainte de acces, ca să eviți cicluri și erori.
+- Numărul de porniri din celule nemarcate = numărul de zone (componente conectate).
