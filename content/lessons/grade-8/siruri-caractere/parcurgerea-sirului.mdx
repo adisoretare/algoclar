@@ -1,0 +1,134 @@
+---
+title: "Parcurgerea unui șir de caractere"
+slug: parcurgerea-sirului
+grade: 8
+chapter: siruri-caractere
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["string", "parcurgere", "numarare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care e condiția corectă a buclei pentru a parcurge tot șirul `s`?"
+    options: ["i <= s.size()", "i < s.size()", "i < s.size() - 1", "i <= s.size() - 1 mereu"]
+    correctIndex: 1
+    explanation: "Indicii valizi sunt 0..size()-1, deci condiția i < s.size() le acoperă pe toate fără a ieși din șir."
+  - question: "Ce numără bucla dacă incrementezi un contor când `s[i] == ' '`?"
+    options: ["Numărul de cuvinte", "Numărul de spații", "Lungimea șirului", "Numărul de litere"]
+    correctIndex: 1
+    explanation: "Contorul crește exact când caracterul curent este spațiu, deci numără spațiile (nu cuvintele — acelea sunt de obicei spații + 1)."
+  - question: "De ce e periculos `for (int i = 0; i <= s.size() - 1; i++)` pe un șir gol?"
+    options: ["Nu e periculos", "size()-1 devine un număr uriaș (unsigned)", "Bucla nu pornește niciodată", "Compilatorul dă eroare"]
+    correctIndex: 1
+    explanation: "size() e unsigned; pe șir gol size()-1 nu e -1, ci un număr foarte mare, deci bucla intră și accesează poziții inexistente."
+---
+
+<LessonHook>
+Imaginează-ți că citești o pancartă literă cu literă, cu degetul, de la stânga la
+dreapta. La fiecare literă poți decide ceva: „e vocală?", „e spațiu?", „o număr?".
+Asta e parcurgerea unui șir — treci o singură dată prin el și prelucrezi fiecare
+caracter.
+</LessonHook>
+
+## Ce înseamnă parcurgerea
+
+A parcurge un șir înseamnă a-i vizita caracterele **pe rând, de la index 0 până la
+`size()-1`**, și a face ceva la fiecare pas: a-l număra, a-l compara, a-l transforma.
+Cele mai multe probleme cu șiruri sunt, în esență, o singură parcurgere bine gândită.
+
+<ObservationBox>
+Decizia importantă la orice parcurgere: *ce reții între pași?* Un contor (câte
+vocale), un maxim, ultimul caracter văzut. Restul e doar o buclă simplă.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Să numărăm **vocalele** din `"informatica"`. Parcurgem și creștem un contor când
+caracterul curent e o vocală:
+
+<ArrayDiagram
+  values="i n f o r m a t i c a"
+  valueLabel="s"
+  indexLabel="index"
+  highlight="0 3 6 8 10"
+  caption="Caracterele evidențiate sunt vocale: i, o, a, i, a → 5 vocale." />
+
+```
+i=0  's[0]=i' vocala -> contor=1
+i=1  's[1]=n' nu
+i=2  's[2]=f' nu
+i=3  's[3]=o' vocala -> contor=2
+...
+i=10 's[10]=a' vocala -> contor=5
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+bool esteVocala(char c) {
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+}
+
+int main() {
+    string s = "informatica";
+    int vocale = 0;
+    for (int i = 0; i < (int)s.size(); i++) {
+        if (esteVocala(s[i])) {
+            vocale++;
+        }
+    }
+    cout << vocale << endl;  // 5
+    return 0;
+}
+```
+
+## Parcurgerea cu `for` pe interval
+
+Când nu ai nevoie de index, varianta „pe interval" e mai curată:
+
+```cpp
+int vocale = 0;
+for (char c : s) {        // c ia pe rand fiecare caracter
+    if (esteVocala(c)) {
+        vocale++;
+    }
+}
+```
+
+<HintBox>
+Folosește `for (char c : s)` când îți pasă doar de **valoarea** caracterului, și
+`for (int i = ...)` când ai nevoie de **poziție** (de exemplu să compari `s[i]` cu `s[i-1]`).
+</HintBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| O parcurgere completă | O(n) | O(1) |
+
+O singură trecere prin cele `n` caractere — nu poți mai repede dacă trebuie să te uiți
+la fiecare.
+
+<MistakeBox>
+Greșeli reale la parcurgere:
+
+- **`i <= s.size()`** accesează `s[size()]`, o poziție inexistentă. Corect: `i < s.size()`.
+- **`s.size()` e `unsigned`.** Compară `int i` cu `unsigned` dă avertismente și, mai grav,
+  `s.size() - 1` pe șir gol devine un număr uriaș. Pune `(int)s.size()`.
+- **Numeri cuvintele numărând spațiile.** Două spații consecutive, sau spații la capete,
+  strică formula „cuvinte = spații + 1". Numără tranzițiile literă-după-spațiu.
+- **Modifici lungimea în timpul buclei** (ștergi caractere) fără să ajustezi indicele → sari peste caractere.
+</MistakeBox>
+
+## Recapitulare
+
+- Parcurgerea = o singură trecere de la index 0 la `size()-1`, prelucrând fiecare caracter.
+- Folosește indexul când compari poziții vecine; `for (char c : s)` când contează doar valoarea.
+- Condiția corectă e `i < s.size()` — `size()` e `unsigned`, deci convertește la `int` la nevoie.

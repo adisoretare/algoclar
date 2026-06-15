@@ -1,0 +1,129 @@
+---
+title: "Aplicații specifice ale cozii"
+slug: aplicatii-coada
+grade: 8
+chapter: coada
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["coada", "aplicatii", "simulare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "De ce e coada structura potrivită pentru a simula un rând la ghișeu?"
+    options: ["E mai rapidă decât orice", "Respectă natural ordinea sosirii (FIFO)", "Ține elementele sortate", "Permite acces la mijloc"]
+    correctIndex: 1
+    explanation: "Un rând servește în ordinea sosirii — exact regula FIFO a cozii. Adaugi la spate cine vine, servești din față cine a așteptat cel mai mult."
+  - question: "În parcurgerea în lățime (BFS), în ce ordine sunt explorate nodurile?"
+    options: ["În ordinea descoperirii lor", "De la cel mai mare la cel mai mic", "Aleatoriu", "De la frunze spre rădăcină"]
+    correctIndex: 0
+    explanation: "BFS pune fiecare nod descoperit la coadă și îl procesează când îi vine rândul, deci explorează în ordinea descoperirii — întâi vecinii apropiați, apoi cei mai depărtați."
+  - question: "Pentru a procesa numere în ordinea citirii, dar abia după ce le-ai citit pe toate, ce folosești?"
+    options: ["O stivă", "O coadă", "Un vector sortat", "Niciuna"]
+    correctIndex: 1
+    explanation: "Coada păstrează ordinea de intrare; le scoți în aceeași ordine în care au intrat. O stivă le-ar inversa."
+---
+
+<LessonHook>
+La un call-center, apelurile se preiau în ordinea în care au sunat. La un joc pe tablă,
+celulele se „inundă” din aproape în aproape. La o imprimantă, documentele se tipăresc
+în ordinea trimiterii. În spatele tuturor stă aceeași structură: **coada**.
+</LessonHook>
+
+## Trei tipare în care coada strălucește
+
+Coada rezolvă elegant orice problemă în care **ordinea sosirii trebuie respectată** sau
+în care **explorezi din aproape în aproape**. Iată tiparele clasice de gimnaziu.
+
+<ObservationBox>
+Întrebarea care îți spune „folosește coadă”: *trebuie să tratez lucrurile în exact
+ordinea în care au apărut?* Dacă da, FIFO e răspunsul.
+</ObservationBox>
+
+## 1. Simularea unui rând
+
+Citești evenimente (sosiri și serviri) și menții rândul. La fiecare „servire”, scoți
+din față:
+
+```cpp
+#include <iostream>
+#include <queue>
+using namespace std;
+
+int main() {
+    queue<int> ghiseu;
+    ghiseu.push(101);            // soseste clientul 101
+    ghiseu.push(102);
+    ghiseu.push(103);
+
+    while (!ghiseu.empty()) {
+        cout << "servesc " << ghiseu.front() << "\n";
+        ghiseu.pop();
+    }
+    // servesc 101, 102, 103 (in ordinea sosirii)
+    return 0;
+}
+```
+
+## 2. Parcurgerea în lățime (BFS) — ideea
+
+Pe o tablă/graf, pornești dintr-un punct și explorezi vecinii **în ordinea descoperirii**:
+pui fiecare vecin nou la coadă și îl procesezi când îi vine rândul. Așa se găsește drumul
+**cel mai scurt** (în număr de pași) — baza algoritmului lui Lee de la lecțiile viitoare.
+
+<ArrayDiagram
+  values="S a b c d"
+  valueLabel="coada"
+  index="off"
+  pointers="0:proces 4:nou:warning"
+  caption="Pornind din S, vecinii descoperiți (a, b, c, d) intră la coadă și se procesează în ordine." />
+
+```
+coada: [S]
+scot S, adaug vecinii lui  -> [a b]
+scot a, adaug vecinii noi  -> [b c d]
+scot b, ...                -> exploram din aproape in aproape
+```
+
+## 3. Procesare amânată în ordine
+
+Citești toate datele, apoi le prelucrezi în ordinea intrării. Coada le ține „la rând”
+până ești gata:
+
+```cpp
+queue<int> q;
+int x;
+while (cin >> x) q.push(x);     // aduna in ordinea citirii
+while (!q.empty()) {
+    proceseaza(q.front());      // in aceeasi ordine
+    q.pop();
+}
+```
+
+## Complexitate
+
+| Aplicație | Timp | Spațiu |
+|-----------|------|--------|
+| Simulare rând (n evenimente) | O(n) | O(n) |
+| BFS pe tablă m × p | O(m · p) | O(m · p) |
+
+Fiecare element intră și iese din coadă **o singură dată** → liniar în numărul lor.
+
+<MistakeBox>
+Capcane reale în aplicații:
+
+- **Alegi stivă în loc de coadă** la o problemă de ordine → inversezi rezultatul.
+- **La BFS, nu marchezi nodurile vizitate.** Le readaugi la coadă la infinit → buclă fără
+  sfârșit. Marchează un nod când îl pui în coadă.
+- **Procesezi `front()` și uiți `pop()`** → bucla nu avansează niciodată (coadă mereu plină).
+- **Vector prea mic la coada manuală.** La BFS pe tablă mare, `dr` poate ajunge la `m·p`;
+  dimensionează corect sau folosește `std::queue`.
+</MistakeBox>
+
+## Recapitulare
+
+- Folosește coada când ordinea sosirii contează sau explorezi din aproape în aproape.
+- Tipare clasice: simulare de rând, BFS (drum minim în pași), procesare amânată în ordine.
+- La BFS marchează nodurile vizitate; fiecare element intră și iese o singură dată → O(n).

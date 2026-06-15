@@ -1,0 +1,89 @@
+---
+title: "Lecție-punte: ordine lexicografică"
+slug: punte-ordine-lexicografica
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["lexicografic", "ordine", "generare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "În ordine lexicografică, ce vine primul: „abc” sau „ab”?"
+    options: ["„abc”", "„ab”", "Sunt egale", "Depinde de lungime mereu"]
+    correctIndex: 1
+    explanation: "Când un cuvânt e prefixul celuilalt, cel mai scurt vine primul. „ab” e prefix al lui „abc”, deci „ab” < „abc”, exact ca în dicționar."
+  - question: "De ce produc toate algoritmele din capitol rezultate în ordine lexicografică?"
+    options: ["Din întâmplare", "Pentru că pe fiecare poziție încercăm valorile de la mic la mare", "Pentru că sortăm la final", "Nu o produc"]
+    correctIndex: 1
+    explanation: "Dacă la fiecare poziție iei valorile în ordine crescătoare, prima soluție completă e cea mai mică, iar următoarele cresc — adică exact ordinea lexicografică."
+  - question: "La ce e utilă ordinea lexicografică, dincolo de a fi „frumoasă”?"
+    options: ["La nimic", "Output determinist, comparare ușoară și găsirea celei de-a k-a soluții", "Doar la string-uri", "La accelerarea generării"]
+    correctIndex: 1
+    explanation: "Multe probleme cer explicit ieșirea „în ordine lexicografică”; în plus, ordinea fixă permite verificarea automată și saltul direct la a k-a configurație."
+---
+
+<LessonHook>
+Cum găsești un cuvânt în dicționar fără să-l citești din scoarță-n scoarță? Te folosești
+de ordine: compari literă cu literă, de la stânga. Exact aceeași regulă — **ordinea
+lexicografică** — stă în spatele tuturor algoritmilor de generare din acest capitol.
+</LessonHook>
+
+## Ce este ordinea lexicografică
+
+Ordinea lexicografică e ordinea din dicționar, aplicată la șiruri (de litere sau de
+numere). Compari poziție cu poziție, de la stânga; la prima diferență decide cine e mai
+mic. Dacă unul e prefixul celuilalt, **cel mai scurt vine primul**.
+
+<ObservationBox>
+`„ab” < „abc”` (prefixul vine primul), `„abd” > „abc”` (la poziția 3, `d > c`). Pentru
+tupluri de numere e la fel: `(1,3,9) < (1,4,0)` pentru că la a doua poziție `3 < 4` —
+și nu mai contează ce urmează.
+</ObservationBox>
+
+## Firul roșu al capitolului
+
+Tot ce ai generat — succesori, submulțimi, permutări, combinări, aranjamente — apare
+în ordine lexicografică **dacă** pe fiecare poziție încerci valorile **de la mic la mare**:
+
+| Algoritm | De ce iese în ordine lexicografică |
+|----------|-----------------------------------|
+| Succesor | construiește direct „următoarea mai mare configurație” |
+| Permutări / aranjamente | bucla `for (val = 1; val <= n)` ia valorile crescător |
+| Combinări | `start = val + 1` ține elementele crescătoare |
+| `next_permutation` | prin definiție produce permutarea lexicografic următoare |
+
+<ObservationBox>
+De aceea prima soluție generată e mereu cea mai mică, iar ultima cea mai mare. Ordinea
+nu e un bonus estetic — e o consecință a felului în care ramifici.
+</ObservationBox>
+
+## De ce contează la concurs
+
+1. **Cerință explicită.** Multe enunțuri cer ieșirea „în ordine lexicografică”. Dacă
+   generezi corect, primești ordinea gratis — fără sortare la final.
+2. **Verificare deterministă.** Aceeași intrare → exact aceeași ieșire, în aceeași ordine.
+3. **A k-a soluție.** Cu ordinea fixă poți număra câte soluții încep cu un anumit prefix
+   și sări direct la a k-a, fără să le enumeri pe toate.
+
+<MistakeBox>
+Confuzii care strică punctaje:
+
+- **Compari numere ca text.** Lexicografic, `„10” < „9”` (compari `'1'` cu `'9'`). Pentru
+  ordine numerică, compară valori, nu caractere.
+- **Crezi că trebuie să sortezi la final.** Dacă ramifici crescător, ieșirea e deja
+  ordonată — sortarea în plus e timp pierdut (și ascunde un bug dacă ordinea era greșită).
+- **Iei valorile descrescător „din obișnuință”.** Atunci generezi în ordine inversă și
+  pici la verificatorul care cere ordine lexicografică.
+- **Uiți regula prefixului.** `„ab”` vine înaintea lui `„abc”`; nu compara doar primele
+  caractere egale și gata.
+</MistakeBox>
+
+## Recapitulare
+
+- Ordinea lexicografică = ordinea de dicționar; la egalitate de prefix, cel scurt e primul.
+- Toți algoritmii de generare o produc dacă încerci valorile crescător pe fiecare poziție.
+- E cerută des explicit și permite ieșire deterministă plus saltul la a k-a soluție.

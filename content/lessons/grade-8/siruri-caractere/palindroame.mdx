@@ -1,0 +1,124 @@
+---
+title: "Palindroame — citit la fel în ambele sensuri"
+slug: palindroame
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["palindrom", "string", "doi-pointeri"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care cuvânt este palindrom?"
+    options: ["carte", "cojoc", "soare", "masa"]
+    correctIndex: 1
+    explanation: "„cojoc\" citit invers rămâne „cojoc\". Celelalte se schimbă la inversare, deci nu sunt palindroame."
+  - question: "În metoda cu doi indici, ce comparăm la fiecare pas?"
+    options: ["s[0] cu s[i]", "s[st] cu s[dr], apoi st++ și dr--", "fiecare caracter cu 'a'", "s[i] cu s[i+1]"]
+    correctIndex: 1
+    explanation: "Pornim din capete (st=0, dr=n-1) și comparăm caracterele simetrice; dacă sunt egale, avansăm spre centru: st++, dr--."
+  - question: "De ce metoda cu doi indici e mai bună decât a construi inversul șirului?"
+    options: ["E mai scurtă de scris", "Nu folosește memorie suplimentară și se oprește la prima nepotrivire", "Dă alt rezultat", "Nu e mai bună"]
+    correctIndex: 1
+    explanation: "Doi indici lucrează în O(1) memorie suplimentară și pot opri imediat ce găsesc o diferență, fără a copia tot șirul."
+---
+
+<LessonHook>
+„ele", „cojoc", „aerisirea" — citește-le invers. Sunt la fel! Un palindrom e un text
+care arată identic citit de la stânga la dreapta și de la dreapta la stânga. Ca o oglindă
+pusă fix la mijlocul cuvântului: cele două jumătăți se reflectă una pe cealaltă.
+</LessonHook>
+
+## Ce este un palindrom
+
+Un șir e **palindrom** dacă, citit de la coadă la cap, rămâne neschimbat. Asta înseamnă
+că primul caracter trebuie să fie egal cu ultimul, al doilea cu penultimul ș.a.m.d. —
+caracterele **simetrice** față de centru coincid.
+
+<ObservationBox>
+Nu trebuie să compari fiecare caracter cu fiecare. E de ajuns să verifici perechile
+simetrice: `s[0]` cu `s[n-1]`, `s[1]` cu `s[n-2]`, ... până te întâlnești la mijloc.
+</ObservationBox>
+
+## Algoritmul cu doi indici
+
+Pornim cu `st = 0` (stânga) și `dr = n-1` (dreapta) și înaintăm unul spre celălalt.
+Pentru `"cojoc"`:
+
+<ArrayDiagram
+  values="c o j o c"
+  valueLabel="s"
+  indexLabel="index"
+  pointers="0:st 4:dr:warning"
+  caption="Pas 1: s[0]='c' == s[4]='c' → potrivire, avansăm st→1, dr→3." />
+
+<ArrayDiagram
+  values="c o j o c"
+  valueLabel="s"
+  indexLabel="index"
+  pointers="1:st 3:dr:warning"
+  dim="0 4"
+  caption="Pas 2: s[1]='o' == s[3]='o' → potrivire. st=2, dr=2 se întâlnesc → palindrom." />
+
+```
+st=0 dr=4 : 'c' == 'c'  ok -> st=1 dr=3
+st=1 dr=3 : 'o' == 'o'  ok -> st=2 dr=2
+st >= dr  : ne-am intalnit -> PALINDROM
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+bool estePalindrom(const string& s) {
+    int st = 0, dr = s.size() - 1;
+    while (st < dr) {
+        if (s[st] != s[dr]) {
+            return false;        // o nepotrivire => nu e palindrom
+        }
+        st++;
+        dr--;
+    }
+    return true;
+}
+
+int main() {
+    cout << estePalindrom("cojoc") << endl;  // 1
+    cout << estePalindrom("carte") << endl;  // 0
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| Cel mai bun (nepotrivire la primul pas) | O(1) | O(1) |
+| Cel mai rău (chiar e palindrom) | O(n/2) = O(n) | O(1) |
+
+Metoda nu folosește memorie suplimentară și se oprește imediat ce găsește o diferență.
+
+<MistakeBox>
+Greșeli des întâlnite:
+
+- **`dr = s.size()` în loc de `s.size() - 1`.** `size()` e poziția de după ultimul caracter;
+  pornind de acolo, compari cu un caracter inexistent.
+- **`s.size() - 1` pe șir gol.** `size()` e unsigned: pe șir gol devine un număr uriaș.
+  Tratează separat șirul vid (de obicei e considerat palindrom).
+- **Construiești inversul degeaba.** A copia tot șirul inversat și a-l compara merge,
+  dar costă O(n) memorie în plus și nu se oprește devreme. Doi indici e mai bun.
+- **Uiți să tratezi diferit literele mari/mici sau spațiile** când problema cere asta
+  (de ex. „A man a plan..."). Citește cu atenție ce caractere contează.
+</MistakeBox>
+
+## Recapitulare
+
+- Un palindrom se citește la fel în ambele sensuri: caracterele simetrice coincid.
+- Verifici cu doi indici, din capete spre centru, în O(n) timp și O(1) memorie.
+- Oprește-te la prima nepotrivire și tratează cu grijă șirul vid (`size()` e unsigned).

@@ -1,0 +1,116 @@
+---
+title: "Combinări — alegi k din n, ordinea nu contează"
+slug: combinari
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["combinari", "backtracking", "generare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La combinări, {1,3} și {3,1} sunt..."
+    options: ["Două combinații diferite", "Aceeași combinație (ordinea nu contează)", "Combinații invalide", "Permutări"]
+    correctIndex: 1
+    explanation: "La combinări contează doar CE elemente alegi, nu ordinea. {1,3} și {3,1} sunt aceeași submulțime de 2 elemente."
+  - question: "Cum eviți să generezi de două ori aceeași combinație în ordini diferite?"
+    options: ["Sortezi la final", "Ceri ca elementele alese să fie mereu în ordine crescătoare", "Folosești folosit[]", "Nu se poate evita"]
+    correctIndex: 1
+    explanation: "Dacă fiecare element nou ales e mai mare decât precedentul (pornești de la poziția următoare), generezi fiecare combinație o singură dată, în ordine crescătoare."
+  - question: "Câte combinări de 2 din 4 elemente există?"
+    options: ["4", "6", "8", "12"]
+    correctIndex: 1
+    explanation: "C(4,2) = 6: {1,2},{1,3},{1,4},{2,3},{2,4},{3,4}. Spre deosebire de aranjamente (unde ordinea ar conta), aici fiecare pereche e numărată o dată."
+---
+
+<LessonHook>
+La loto alegi 6 numere din 49. Contează ordinea în care le bifezi pe bilet? Nu — {7, 13}
+e același bilet cu {13, 7}. Când alegi un grup și ordinea nu contează, vorbim despre
+**combinări**.
+</LessonHook>
+
+## Ce este o combinare
+
+O **combinare** de `k` elemente din `n` este o alegere a `k` elemente în care **ordinea
+nu contează**. Numărul lor se notează `C(n, k)`. Diferența esențială față de permutări:
+`{1, 3}` și `{3, 1}` sunt **aceeași** combinare.
+
+<ObservationBox>
+Trucul ca să nu generezi de două ori aceeași combinare: cere ca elementele să fie mereu
+în **ordine crescătoare**. Așa, fiecare grup apare o singură dată, în forma lui sortată.
+</ObservationBox>
+
+## Algoritmul cu backtracking
+
+Construim combinarea adăugând elemente tot mai mari. Fiecare apel pornește de la
+valoarea **următoare** celei alese anterior, ca să păstrăm ordinea crescătoare.
+
+Combinările de 2 din {1,2,3,4}:
+
+<ArrayDiagram
+  values="{1,2} {1,3} {1,4} {2,3} {2,4} {3,4}"
+  valueLabel="C(4,2)"
+  index="off"
+  caption="6 combinări. Fiecare e crescătoare, deci {3,1} nu apare separat de {1,3}." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n = 4, k = 2;
+int sol[20];
+
+void combinari(int poz, int start) {
+    if (poz == k) {                       // am ales k elemente
+        cout << "{ ";
+        for (int i = 0; i < k; i++) cout << sol[i] << " ";
+        cout << "}\n";
+        return;
+    }
+    for (int val = start; val <= n; val++) {
+        sol[poz] = val;                   // adauga un element mai mare ca precedentul
+        combinari(poz + 1, val + 1);      // urmatorul porneste de la val+1
+    }
+}
+
+int main() {
+    combinari(0, 1);                      // 6 combinari de 2 din 4
+    return 0;
+}
+```
+
+<HintBox>
+Detaliul cheie e `start`. Trecând `val + 1` la apelul următor, garantezi că elementele
+cresc strict, deci nu repeți combinări și nu alegi același element de două ori.
+</HintBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Generarea tuturor combinărilor | O(C(n,k) · k) | O(k) |
+
+Sunt `C(n, k)` combinări, fiecare afișată în O(k).
+
+<MistakeBox>
+Greșeli reale:
+
+- **Pornești apelul recursiv de la `start` în loc de `val + 1`.** Atunci repeți elemente
+  (`{2,2}`) și generezi duplicate.
+- **Confunzi combinări cu aranjamente.** La combinări ordinea NU contează; dacă o numeri,
+  obții A(n,k), nu C(n,k).
+- **Cazul de bază greșit** (`poz == n` în loc de `poz == k`) → generezi mereu k = n.
+- **`start > n` neacoperit:** dacă nu mai sunt suficiente elemente până la `n`, ramura
+  trebuie să se stingă singură (bucla nu pornește) — nu forța afișarea.
+</MistakeBox>
+
+## Recapitulare
+
+- O combinare alege `k` din `n` fără să țină cont de ordine; sunt `C(n, k)`.
+- Backtracking cu `start = val + 1` păstrează ordinea crescătoare și elimină duplicatele.
+- Dacă ai numărat ordinea, ai calculat aranjamente, nu combinări.

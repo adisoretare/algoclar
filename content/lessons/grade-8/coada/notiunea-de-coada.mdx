@@ -1,0 +1,106 @@
+---
+title: "Noțiunea de coadă — primul venit, primul servit"
+slug: notiunea-de-coada
+grade: 8
+chapter: coada
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["coada", "fifo", "structuri"]
+visualizers: ["queue"]
+relatedProblems: []
+quiz:
+  - question: "Ce înseamnă FIFO?"
+    options: ["Ultimul venit, primul servit", "Primul venit, primul servit", "Cel mai mare, primul servit", "Ordine aleatoare"]
+    correctIndex: 1
+    explanation: "FIFO = First In, First Out: elementul intrat primul este și primul care iese, exact ca la o coadă la magazin."
+  - question: "La un rând la casă, unde se adaugă o persoană nouă și de unde pleacă cea servită?"
+    options: ["Ambele la început", "Se adaugă la coadă (spate), pleacă din față", "Ambele la spate", "De oriunde"]
+    correctIndex: 1
+    explanation: "Într-o coadă, adaugi mereu la un capăt (spatele) și scoți de la celălalt (fața) — cele două operații lucrează la capete opuse."
+  - question: "Care situație NU se modelează natural cu o coadă?"
+    options: ["Comenzi procesate în ordinea sosirii", "Persoane la ghișeu", "Ultima acțiune anulată prima (undo)", "Pachete trimise în ordine"]
+    correctIndex: 2
+    explanation: "„Undo” scoate ultima acțiune adăugată — comportament LIFO, specific stivei, nu cozii. Coada servește în ordinea sosirii."
+---
+
+<LessonHook>
+Stai la rând la brutărie. Cine a venit primul e servit primul; cine tocmai a intrat se
+așază la capătul rândului și așteaptă. Nimeni nu sare peste. Această regulă simplă și
+corectă — „primul venit, primul servit” — este, în programare, structura numită **coadă**.
+</LessonHook>
+
+## Ce este o coadă
+
+O **coadă** (engleză *queue*) este o structură în care elementele sunt servite în
+**ordinea în care au sosit**. Regula se numește **FIFO** — *First In, First Out*
+(primul intrat, primul ieșit).
+
+Are două capete cu roluri fixe:
+- **spatele** (back) — singurul loc unde **adaugi** un element;
+- **fața** (front) — singurul loc de unde **scoți** un element.
+
+<ObservationBox>
+Spre deosebire de stivă (LIFO — ultimul intrat iese primul), coada păstrează ordinea
+naturală a sosirii. Stiva e ca un teanc de farfurii; coada e ca rândul la casă.
+</ObservationBox>
+
+## Cum se comportă
+
+Pornim de la o coadă goală și adăugăm 3 clienți (A, B, C), apoi servim unul:
+
+<ArrayDiagram
+  values="A B C"
+  valueLabel="coada"
+  index="off"
+  pointers="0:fata 2:spate:warning"
+  caption="A a venit primul (în față), C ultimul (la spate). Următorul servit va fi A." />
+
+<ArrayDiagram
+  values="B C"
+  valueLabel="coada"
+  index="off"
+  pointers="0:fata 1:spate:warning"
+  caption="După servirea lui A, B avansează în față. Ordinea sosirii rămâne respectată." />
+
+## Operațiile de bază (intuitiv)
+
+| Operație | Ce face | La ce capăt |
+|----------|---------|-------------|
+| `push` (enqueue) | adaugă un element | spate |
+| `pop` (dequeue) | scoate elementul servit | față |
+| `front` | citește cine urmează (fără a scoate) | față |
+| `empty` | spune dacă mai e cineva | — |
+
+## Unde apare în viața reală
+
+- Clienți la ghișeu, mașini la o intersecție cu semafor.
+- Comenzi într-un restaurant, procesate în ordinea primirii.
+- Pachete de date trimise pe rețea, livrate în ordine.
+- **Parcurgerea în lățime (BFS)** a unui graf — explorezi vecinii în ordinea descoperirii.
+
+## Vizualizare
+
+Urmărește cum elementele intră pe la spate și ies pe la față, păstrând mereu ordinea sosirii:
+
+<Visualizer name="queue" />
+
+<MistakeBox>
+Confuzii frecvente la început:
+
+- **Confunzi coada cu stiva.** Coada e FIFO (primul venit iese primul); stiva e LIFO.
+  Întreabă-te: „cine iese primul?” înainte de a alege structura.
+- **Scoți de la capătul greșit.** Adaugi la spate, scoți din față — nu invers; altfel
+  strici ordinea.
+- **Citești `front` dintr-o coadă goală.** Verifică întâi `empty()`, altfel accesezi ceva inexistent.
+- **Crezi că poți accesa mijlocul.** O coadă „pură” lucrează doar la capete; pentru acces
+  liber ai nevoie de un vector.
+</MistakeBox>
+
+## Recapitulare
+
+- Coada respectă regula FIFO: primul venit este primul servit.
+- Adaugi mereu la spate și scoți din față — capete cu roluri fixe.
+- Modelează ordini naturale (rânduri, comenzi, BFS); diferă de stivă, care e LIFO.

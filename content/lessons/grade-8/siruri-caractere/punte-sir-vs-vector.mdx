@@ -1,0 +1,103 @@
+---
+title: "Lecție-punte: șir de caractere vs vector de valori"
+slug: punte-sir-vs-vector
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 10
+free: true
+status: draft
+isBridge: true
+tags: ["string", "vector", "alegere"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ai de citit o propoziție cu spații și de numărat cuvintele. Ce alegi?"
+    options: ["vector<int> și cin >> pe rând", "string cu getline", "char unic", "Nu se poate cu string"]
+    correctIndex: 1
+    explanation: "Propoziția e text cu spații → string + getline. Un vector<int> ar fi pentru numere, iar cin >> ar tăia la primul spațiu."
+  - question: "Ai 1000 de note (numere între 1 și 10) de prelucrat. Ce structură?"
+    options: ["string", "vector<int> sau int[]", "un singur char", "string apoi conversie"]
+    correctIndex: 1
+    explanation: "Sunt valori numerice pe care le compari/aduni → vector de întregi. Un string ar complica inutil aritmetica."
+  - question: "De ce `s[i] - '0'` apare des când lucrezi cu numere date ca string?"
+    options: ["E o greșeală", "Convertește cifra-caracter în valoarea ei numerică", "Mărește șirul", "Sortează cifrele"]
+    correctIndex: 1
+    explanation: "Când un număr vine ca text (de ex. foarte mare), fiecare cifră e un char; s[i]-'0' îi dă valoarea numerică pentru calcule."
+---
+
+<LessonHook>
+Ai în mână două caiete care arată la fel: file numerotate, scris pe rânduri. Unul e un
+jurnal (text — litere, spații, semne), celălalt un catalog de note (numere). Aceeași
+formă, dar le folosești complet diferit. La fel stau lucrurile cu `string` și
+`vector<int>`: ambele sunt secvențe indexate de la 0, dar alegi în funcție de *ce* ții în ele.
+</LessonHook>
+
+## Aceeași formă, scop diferit
+
+Atât `string`, cât și un vector de valori sunt **secvențe indexate de la 0**, parcurse
+cu aceeași buclă `for (i = 0; i < n; i++)`. Diferența nu e în formă, ci în **conținut**
+și în **operațiile naturale** pe el.
+
+<ObservationBox>
+Întrebarea care decide: *prelucrez text (litere, cuvinte, semne) sau valori numerice
+pe care le compar și le adun?* Text → `string`. Numere → `vector<int>` / `int[]`.
+</ObservationBox>
+
+## Tabel de decizie
+
+| Situație | Alegi | De ce |
+|----------|-------|-------|
+| Cuvânt, nume, propoziție | `string` | conținutul e text; ai `find`, `substr`, `size` |
+| Note, vârste, prețuri | `vector<int>` | faci aritmetică: sume, maxime, sortări numerice |
+| Frecvențe de litere | `int frecv[26]` | indexezi cu `c - 'a'` |
+| Număr foarte mare (sute de cifre) | `string` sau `vector<int>` cifre | nu încape în `long long` |
+| Citire cu spații | `string` + `getline` | `cin >>` taie la primul spațiu |
+
+## Două capcane care vin din confuzie
+
+Un număr „mare" citit ca `string` **nu** e un întreg — e text. Ca să-i aduni cifrele,
+le convertești una câte una:
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string nr = "12345";
+    int suma = 0;
+    for (char c : nr) {
+        suma += c - '0';      // cifra-caracter -> valoare numerica
+    }
+    cout << suma << endl;     // 15
+    return 0;
+}
+```
+
+Iar invers: dacă valorile sunt numere pe care le compari și le aduni, un `string` te
+încurcă — `"10" < "9"` e adevărat alfabetic (compari `'1'` cu `'9'`), dar fals numeric.
+
+<ObservationBox>
+Compararea diferă fundamental: `string`-urile se compară **lexicografic** (ca în dicționar),
+nu după valoare. „10" vine înaintea lui „9" în ordine de dicționar.
+</ObservationBox>
+
+<MistakeBox>
+Confuzii care strică soluții:
+
+- **Tratezi un `string` de cifre ca pe un număr.** `"12" + "3"` concatenează („123"),
+  nu adună. Convertește cu `s[i] - '0'` sau `stoi`.
+- **Compari numere ca text.** `"100" < "99"` e `true` lexicografic. Pentru ordine numerică,
+  ține valorile într-un `vector<int>`.
+- **Folosești `cin >>` pentru text cu spații.** Pierzi tot ce e după primul spațiu —
+  folosește `getline`.
+- **Alegi `string` pentru valori mari care încap în `long long`.** Complici degeaba;
+  `string` e pentru numere care chiar *nu* încap (sute de cifre).
+</MistakeBox>
+
+## Recapitulare
+
+- `string` și vectorul de valori au aceeași formă (secvență indexată), dar scop diferit.
+- Alege `string` pentru text și numere uriașe; `vector<int>` pentru valori pe care le calculezi.
+- Cifrele dintr-un `string` se convertesc cu `c - '0'`; șirurile se compară lexicografic, nu numeric.

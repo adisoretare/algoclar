@@ -1,0 +1,97 @@
+---
+title: "Lecție-punte: geometrie cu desen și formule"
+slug: punte-geometrie-desen
+grade: 8
+chapter: geometrie-8
+difficulty: mediu
+estimatedTime: 11
+free: true
+status: draft
+isBridge: true
+tags: ["geometrie", "desen", "strategie"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Înainte de a scrie o formulă geometrică, ce ajută cel mai mult?"
+    options: ["Să cauți pe net", "Să faci un desen rapid cu punctele", "Să folosești double peste tot", "Să sortezi punctele"]
+    correctIndex: 1
+    explanation: "Un desen scoate la iveală cazurile speciale (puncte aliniate, verticale, suprapuse) și te ajută să alegi formula potrivită înainte de a coda."
+  - question: "Când e mai sigur să lucrezi cu numere întregi în loc de double?"
+    options: ["Niciodată", "La coliniaritate și comparații de distanțe/arii (pătrate, determinanți)", "Doar la afișare", "Mereu, fără excepție"]
+    correctIndex: 1
+    explanation: "Determinanții, pătratele distanțelor și dublul ariei sunt întregi; păstrându-i așa eviți erorile de rotunjire ale lui double la comparația cu 0."
+  - question: "De ce e periculos `if (arie == 0.0)` cu double?"
+    options: ["Nu e periculos", "Rotunjirea poate da 0.0000001 în loc de 0, deci testul eșuează", "double nu poate fi 0", "arie e mereu pozitivă"]
+    correctIndex: 1
+    explanation: "Calculele cu double acumulează mici erori; o valoare teoretic 0 poate ieși ușor diferită. Cu determinantul întreg, `== 0` e exact."
+---
+
+<LessonHook>
+Un programator bun la geometrie nu se aruncă direct în formule — întâi mâzgălește un
+desen pe ciornă. Punctele pe hârtie îți arată instant ce ascunde enunțul: o aliniere, o
+verticală, două puncte care coincid. Desenul e harta; formula e doar drumul.
+</LessonHook>
+
+## Desenul întâi, formula după
+
+Geometria de concurs are o capcană: formula pare clară, dar **cazurile speciale** te
+prind. Un desen rapid (chiar și grosier) îți arată ce să verifici înainte de a coda.
+
+<ObservationBox>
+Întreabă-te mereu, uitându-te la desen: *ce se întâmplă dacă punctele coincid? dacă sunt
+coliniare? dacă segmentul e vertical (dx = 0)?* Aceste cazuri sparg formulele scrise „pe
+generalul fericit”.
+</ObservationBox>
+
+## Legătura dintre cele învățate
+
+Toate lecțiile capitolului se sprijină pe **același determinant**:
+
+| Întrebare | Unealtă | Cum decizi |
+|-----------|---------|------------|
+| Sunt 3 puncte aliniate? | determinant `d` | `d == 0` → coliniare |
+| Ce arie are triunghiul? | determinant `d` | `arie = \|d\| / 2` |
+| În ce parte a dreptei e un punct? | semnul lui `d` | `d > 0` o parte, `d < 0` cealaltă |
+| Care punct e mai aproape? | pătratul distanței | compari `distSq`, fără `sqrt` |
+
+<ObservationBox>
+Un singur instrument — determinantul întreg — răspunde la coliniaritate, arie și orientare.
+Nu sunt trei formule de memorat, ci una folosită în trei feluri.
+</ObservationBox>
+
+## Întreg vs. virgulă: când care
+
+Regula practică pentru concurs:
+
+- **Lucrează cu întregi** cât poți: determinant (coliniaritate, arie, orientare), pătratul
+  distanței (comparații). Sunt exacte și fără rotunjiri.
+- **Treci la `double`** doar la final, când rezultatul cerut chiar e zecimal (o distanță
+  afișată, o arie cu `.5`).
+
+```cpp
+// EXACT (intreg): cine e mai aproape de origine?
+long long distSq(long long x, long long y) { return x*x + y*y; }
+// distSq(3,4)=25 < distSq(0,6)=36  -> (3,4) e mai aproape, fara sqrt
+
+// ZECIMAL doar la afisare:
+cout << sqrt((double)distSq(3, 4)) << "\n";   // 5
+```
+
+<MistakeBox>
+Greșeli care apar exact aici:
+
+- **Compari `double` cu 0 pentru coliniaritate.** Rotunjirea strică testul; folosește
+  determinantul întreg și `== 0`.
+- **Sari peste desen** și ratezi cazul vertical (`dx = 0`) sau punctele suprapuse → împărțire
+  la 0 sau arie aberantă.
+- **Folosești `double` de la început.** Acumulezi erori inutil; întregii rezolvă majoritatea
+  întrebărilor exact.
+- **Memorezi trei formule separate** în loc să vezi că sunt același determinant — mai greu
+  de ținut minte și mai ușor de greșit.
+</MistakeBox>
+
+## Recapitulare
+
+- Fă întâi un desen: scoate la iveală cazurile speciale (coliniare, verticale, suprapuse).
+- Determinantul întreg răspunde la coliniaritate, arie și orientare — un instrument, trei folosiri.
+- Rămâi pe întregi (determinant, pătratul distanței); treci la `double` doar la afișarea finală.

@@ -1,0 +1,134 @@
+---
+title: "Căutări în șiruri — găsește un cuvânt în text"
+slug: cautari-in-siruri
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["cautare", "substring", "string"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câte poziții de start verifică metoda directă pentru un text de lungime n și un tipar de lungime m?"
+    options: ["n", "m", "n - m + 1", "n · m"]
+    correctIndex: 2
+    explanation: "Tiparul de lungime m poate începe doar de la pozițiile 0..n-m, adică n-m+1 poziții de start posibile."
+  - question: "De ce comparăm doar până la `n - m` și nu până la `n - 1`?"
+    options: ["Ca să fie mai rapid fără motiv", "Dincolo de n-m, tiparul ar ieși din text", "E o greșeală, trebuie n-1", "Ca să sărim primul caracter"]
+    correctIndex: 1
+    explanation: "Dacă tiparul ar începe după poziția n-m, ultimele lui caractere ar depăși textul, deci acele porniri nu pot fi potriviri."
+  - question: "Ce întoarce `s.find(t)` când `t` apare de mai multe ori?"
+    options: ["Toate pozițiile", "Poziția ultimei apariții", "Poziția primei apariții", "Numărul de apariții"]
+    correctIndex: 2
+    explanation: "find întoarce indexul PRIMEI apariții. Pentru următoarele, reiei căutarea de la poziție + 1."
+---
+
+<LessonHook>
+Cauți cuvântul „algoritm" într-o pagină de carte. Ce faci? Aluneci cu privirea de la
+început și, la fiecare poziție, verifici dacă de acolo începe cuvântul. Exact așa
+caută și calculatorul un tipar într-un text: încearcă fiecare poziție de start.
+</LessonHook>
+
+## Problema căutării
+
+Ai un **text** `s` (lungime `n`) și un **tipar** `t` (lungime `m`). Vrei să afli dacă
+`t` apare în `s` și, dacă da, **de la ce poziție**. E baza oricărui „Ctrl+F".
+
+<ObservationBox>
+Tiparul nu poate începe oriunde: dacă pornește de la o poziție mai mare decât `n - m`,
+ultimele lui caractere ar ieși din text. Deci verifici doar pozițiile de start `0 .. n-m`.
+</ObservationBox>
+
+## Algoritmul direct, pas cu pas
+
+Căutăm `t = "ana"` în `s = "banana"`. Încercăm fiecare poziție de start și comparăm
+caracter cu caracter:
+
+<ArrayDiagram
+  values="b a n a n a"
+  valueLabel="s"
+  indexLabel="index"
+  range="1-3"
+  caption="Start = 1: s[1..3] = „ana” == t → potrivire găsită la poziția 1." />
+
+```
+start=0: s[0]='b' != t[0]='a'  -> esueaza imediat
+start=1: 'a'='a', 'n'='n', 'a'='a' -> POTRIVIRE la pozitia 1
+```
+
+## Implementare C++ (metoda directă)
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int cautaTipar(const string& s, const string& t) {
+    int n = s.size(), m = t.size();
+    for (int start = 0; start + m <= n; start++) {  // doar pozitii valide
+        int j = 0;
+        while (j < m && s[start + j] == t[j]) {
+            j++;
+        }
+        if (j == m) {
+            return start;          // tot tiparul s-a potrivit
+        }
+    }
+    return -1;                     // negasit
+}
+
+int main() {
+    cout << cautaTipar("banana", "ana") << endl;  // 1
+    cout << cautaTipar("banana", "xyz") << endl;  // -1
+    return 0;
+}
+```
+
+## Varianta cu funcția standard
+
+Pentru concursurile de gimnaziu, `find` rezolvă rapid căutarea simplă:
+
+```cpp
+string s = "banana", t = "ana";
+size_t poz = s.find(t);
+if (poz != string::npos) {
+    cout << poz << endl;          // 1
+}
+// toate aparitiile:
+poz = s.find(t);
+while (poz != string::npos) {
+    cout << poz << " ";           // 1 3
+    poz = s.find(t, poz + 1);
+}
+```
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|--------|------|--------|
+| Directă (cel mai rău caz) | O(n · m) | O(1) |
+| Directă (text obișnuit) | aproape O(n) | O(1) |
+
+Pentru `n` mare și multe potriviri parțiale există algoritmi în O(n + m) (KMP), dar
+metoda directă e suficientă și corectă pentru dimensiunile de la gimnaziu.
+
+<MistakeBox>
+Greșeli reale la căutare:
+
+- **Limita buclei greșită.** `start < n` în loc de `start + m <= n` → compari în afara
+  textului pe ultimele poziții.
+- **Compari `find` cu -1.** Rezultatul „negăsit" e `string::npos` (unsigned), nu -1.
+- **Uiți `+ 1` la apariții multiple.** `s.find(t, poz)` fără `+1` găsește la nesfârșit
+  aceeași poziție → buclă infinită.
+- **Numeri suprapunerile greșit.** Pentru `"aaa"` și tiparul `"aa"`, dacă reiei de la
+  `poz + m` ratezi potrivirea suprapusă de la poziția 1; reia de la `poz + 1` dacă vrei toate.
+</MistakeBox>
+
+## Recapitulare
+
+- Căutarea directă încearcă fiecare poziție de start validă (`0 .. n-m`) și compară pe litere.
+- `find` rezolvă rapid; întoarce poziția primei apariții sau `string::npos`.
+- Pentru toate aparițiile, reia de la `poziție + 1`; atenție la potrivirile suprapuse.

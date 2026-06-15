@@ -1,0 +1,125 @@
+---
+title: "Aplicații specifice ale deque-ului"
+slug: aplicatii-deque
+grade: 8
+chapter: deque
+difficulty: greu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["deque", "fereastra-glisanta", "aplicatii"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "În maximul pe fereastră glisantă cu deque, de ce scoatem din SPATE elementele mai mici decât cel nou?"
+    options: ["Ca să economisim memorie", "Pentru că nu vor mai fi niciodată maxim cât timp e prezent cel nou, mai mare", "Ca să sortăm", "E o greșeală"]
+    correctIndex: 1
+    explanation: "Un element mai mic decât cel care tocmai a intrat și e mai în dreapta nu mai poate fi vreodată maximul ferestrei — e „învins”, deci îl scoatem."
+  - question: "De ce scoatem din FAȚĂ în algoritmul ferestrei glisante?"
+    options: ["Pentru că e cel mai mic", "Pentru că a ieșit din fereastră (index prea vechi)", "La întâmplare", "Niciodată nu scoatem din față"]
+    correctIndex: 1
+    explanation: "Fața ține indexul candidatului la maxim; când acel index iese din fereastra curentă, nu mai e valid și îl eliminăm din față."
+  - question: "Ce complexitate are maximul pe fereastră glisantă cu deque, pentru n elemente?"
+    options: ["O(n · k)", "O(n²)", "O(n)", "O(n log n)"]
+    correctIndex: 2
+    explanation: "Fiecare element intră și iese din deque cel mult o dată, deci în total O(n) — mult mai bine decât O(n·k) al variantei naive."
+---
+
+<LessonHook>
+Imaginează-ți că privești un grafic prin o fereastră îngustă care alunecă spre dreapta.
+La fiecare pas vrei să știi instant care e cel mai mare punct vizibil. Să recalculezi de
+fiecare dată e lent. Deque-ul îți ține „campionii” pregătiți la un capăt și îți dă
+răspunsul în O(1).
+</LessonHook>
+
+## Problema ferestrei glisante
+
+Ai un șir de `n` numere și o fereastră de lățime `k` care alunecă de la stânga la dreapta.
+Pentru fiecare poziție vrei **maximul** din fereastra curentă. Varianta naivă recalculează
+fiecare fereastră în O(k) → O(n·k), prea lent. Deque-ul o face în **O(n)**.
+
+<ObservationBox>
+Ideea: în deque ținem **indici**, în ordine descrescătoare a valorilor. Fața e mereu
+indexul maximului ferestrei. Curățăm din spate ce e „învins” și din față ce a „expirat”.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Șirul `[1, 3, 2, 5, 4]`, fereastră `k = 3`. Ținem în deque indicii candidaților la maxim:
+
+<ArrayDiagram
+  values="1 3 2 5 4"
+  valueLabel="v"
+  indexLabel="index"
+  range="0-2"
+  caption="Prima fereastră [1,3,2]: maximul e 3 (indexul 1). Deque-ul ține indicii utili." />
+
+Două reguli la fiecare element nou `v[i]`:
+
+1. **Curăță spatele:** cât timp `v[deque.back()] <= v[i]`, scoate din spate (acele valori
+   nu mai pot fi maxim cât timp `v[i]` e prezent și mai în dreapta).
+2. **Curăță fața:** dacă `deque.front()` a ieșit din fereastră (`<= i - k`), scoate din față.
+
+Fața deque-ului dă mereu indexul maximului ferestrei curente.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <deque>
+using namespace std;
+
+int main() {
+    int v[] = {1, 3, 2, 5, 4};
+    int n = 5, k = 3;
+    deque<int> dq;               // tine INDICI, valori descrescatoare in fata->spate
+
+    for (int i = 0; i < n; i++) {
+        // 1) scoate din spate elementele <= v[i] (sunt invinse)
+        while (!dq.empty() && v[dq.back()] <= v[i]) {
+            dq.pop_back();
+        }
+        dq.push_back(i);
+
+        // 2) scoate din fata indicele iesit din fereastra
+        if (dq.front() <= i - k) {
+            dq.pop_front();
+        }
+
+        // cand fereastra e completa, fata = indexul maximului
+        if (i >= k - 1) {
+            cout << v[dq.front()] << " ";
+        }
+    }
+    // 3 5 5  (maximul ferestrelor [1,3,2],[3,2,5],[2,5,4])
+    return 0;
+}
+```
+
+## Complexitate
+
+| Metodă | Timp | Spațiu |
+|--------|------|--------|
+| Naivă (recalc fiecare fereastră) | O(n · k) | O(1) |
+| Cu deque | O(n) | O(k) |
+
+Fiecare index intră și iese din deque **cel mult o dată** → O(n) total, deși există bucla `while`.
+
+<MistakeBox>
+Capcane reale (problemă grea):
+
+- **Ții valori în loc de indici.** Ai nevoie de indici ca să știi când un element a ieșit
+  din fereastră. Cu valori, nu poți verifica expirarea.
+- **Ordine greșită la curățarea spatelui.** Pentru maxim scoți elementele `<= v[i]`; pentru
+  minim, inversezi comparația (`>= v[i]`).
+- **Afișezi înainte ca fereastra să fie completă.** Începe afișarea doar de la `i >= k - 1`.
+- **Crezi că bucla `while` face algoritmul O(n·k).** Nu — amortizat e O(n), fiindcă fiecare
+  index se scoate o singură dată.
+</MistakeBox>
+
+## Recapitulare
+
+- Deque-ul rezolvă maximul/minimul pe fereastră glisantă în O(n), nu O(n·k).
+- Ține **indici**, valori descrescătoare; curăță spatele (învinși) și fața (expirați).
+- Fața deque-ului e mereu indexul maximului ferestrei curente.

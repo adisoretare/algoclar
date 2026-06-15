@@ -1,0 +1,125 @@
+---
+title: "Permutări — toate ordinile posibile"
+slug: permutari
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["permutari", "backtracking", "generare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Câte permutări are mulțimea {1, 2, 3, 4}?"
+    options: ["12", "16", "24", "64"]
+    correctIndex: 2
+    explanation: "Numărul de permutări ale n elemente este n!. Aici 4! = 4 × 3 × 2 × 1 = 24."
+  - question: "La ce folosește vectorul `folosit[]` în backtracking-ul de permutări?"
+    options: ["Sortează elementele", "Marchează ce elemente sunt deja puse pe pozițiile anterioare", "Numără permutările", "Ține rezultatul final"]
+    correctIndex: 1
+    explanation: "O permutare folosește fiecare element exact o dată; folosit[] ne spune ce am plasat deja, ca să nu repetăm un element pe două poziții."
+  - question: "De ce nu poți genera toate permutările pentru n = 20?"
+    options: ["Codul e greșit", "20! este un număr astronomic — peste 2·10¹⁸", "folosit[] e prea mic", "Permutările nu există pentru n > 10"]
+    correctIndex: 1
+    explanation: "20! ≈ 2,4 · 10¹⁸ permutări; nicio mașină nu le poate genera în timp util. Generarea completă merge doar pentru n mic (≈ n ≤ 10-11)."
+---
+
+<LessonHook>
+Trei prieteni se așază pe o bancă. În câte feluri pot sta? Aurel-Bianca-Cătălin,
+Aurel-Cătălin-Bianca, ... numeri și ajungi la 6 aranjări. Fiecare ordine diferită a
+acelorași persoane este o **permutare**.
+</LessonHook>
+
+## Ce este o permutare
+
+O **permutare** a `n` elemente este o aranjare a lor într-o anumită ordine, folosind
+**fiecare element exact o dată**. Numărul de permutări este `n!` (n factorial):
+`n · (n-1) · ... · 2 · 1`.
+
+<ObservationBox>
+`n!` crește amețitor: 5! = 120, 10! ≈ 3,6 milioane, 13! depășește deja un `int`.
+Generarea tuturor permutărilor e fezabilă doar pentru `n` mic.
+</ObservationBox>
+
+## Algoritmul cu backtracking
+
+Construim permutarea poziție cu poziție. Pe fiecare poziție încercăm fiecare element
+**încă nefolosit**. Un vector `folosit[]` ține minte ce am plasat deja.
+
+Pentru `{1, 2, 3}`, primele permutări generate în ordine:
+
+<ArrayDiagram
+  values="1 2 3"
+  valueLabel="sol"
+  index="0 1 2"
+  caption="Prima permutare. Apoi schimbăm ultima poziție: 1 3 2, apoi pornim de la 2: 2 1 3..." />
+
+```
+poz 0 -> 1 (folosit: 1)
+  poz 1 -> 2 (folosit: 1,2)
+    poz 2 -> 3  => 1 2 3
+  poz 1 -> 3 (folosit: 1,3)
+    poz 2 -> 2  => 1 3 2
+poz 0 -> 2 ...  => 2 1 3, 2 3 1
+poz 0 -> 3 ...  => 3 1 2, 3 2 1
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n = 3;
+int sol[20];
+bool folosit[20];
+
+void permutari(int poz) {
+    if (poz == n) {                    // am completat toate pozitiile
+        for (int i = 0; i < n; i++) cout << sol[i];
+        cout << " ";
+        return;
+    }
+    for (int val = 1; val <= n; val++) {
+        if (!folosit[val]) {           // doar elemente neplasate
+            folosit[val] = true;
+            sol[poz] = val;
+            permutari(poz + 1);
+            folosit[val] = false;      // undo: elementul redevine liber
+        }
+    }
+}
+
+int main() {
+    permutari(0);                      // 1 2 3 ... 3 2 1 (6 permutari)
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Generarea tuturor permutărilor | O(n! · n) | O(n) |
+
+Sunt `n!` permutări, fiecare afișată în O(n). Memorie O(n) pentru `sol` și `folosit`.
+
+<MistakeBox>
+Capcane reale:
+
+- **Uiți pasul de „undo" (`folosit[val] = false`).** Fără el, după prima ramură toate
+  elementele rămân marcate folosite → nu se mai generează nimic.
+- **Confunzi `n!` cu `n²`.** Bucla pare dublă, dar recursivitatea o face factorială.
+- **Index în afara lui `folosit`.** Dacă elementele nu sunt `1..n`, mapează-le întâi la
+  indici, altfel `folosit[val]` iese din vector.
+- **Generezi permutări pentru `n` mare.** La n = 13 ai peste 6 miliarde — depășești timpul.
+  Caută o formulă sau o abordare care nu le enumeră pe toate.
+</MistakeBox>
+
+## Recapitulare
+
+- O permutare e o ordine a tuturor celor `n` elemente; există `n!` permutări.
+- Backtracking: completezi poziție cu poziție, `folosit[]` evită repetarea unui element.
+- Nu uita pasul de „undo" și reține că `n!` limitează generarea la `n` mic.

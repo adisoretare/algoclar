@@ -1,0 +1,117 @@
+---
+title: "Aranjamente — alegi k din n, dar ordinea contează"
+slug: aranjamente
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["aranjamente", "backtracking", "generare"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "La aranjamente, (1,3) și (3,1) sunt..."
+    options: ["Aceeași alegere", "Două aranjamente diferite (ordinea contează)", "Invalide", "Combinări"]
+    correctIndex: 1
+    explanation: "La aranjamente ordinea contează, deci (1,3) și (3,1) sunt distincte — spre deosebire de combinări, unde ar fi una singură."
+  - question: "Cum se leagă aranjamentele de combinări și permutări?"
+    options: ["Nu se leagă", "Un aranjament = o combinare + o ordonare (permutare) a celor k alese", "Aranjamentele sunt mereu mai puține", "Sunt identice cu permutările"]
+    correctIndex: 1
+    explanation: "Alegi k elemente (combinare) și apoi le ordonezi (permutare a celor k). De aceea A(n,k) = C(n,k) · k!."
+  - question: "Față de codul de permutări, ce schimbi ca să generezi aranjamente de k din n?"
+    options: ["Nimic", "Te oprești la poziția k, nu la n", "Elimini folosit[]", "Pornești de la val+1"]
+    correctIndex: 1
+    explanation: "Aranjamentele sunt ca permutările, dar de lungime k: cazul de bază devine poz == k. folosit[] rămâne, fiindcă ordinea contează și nu repeți elemente."
+---
+
+<LessonHook>
+La o cursă cu 5 sportivi, premiem primii 3: aur, argint, bronz. Contează cine pe ce loc?
+Categoric — (Ana-aur, Dan-argint) e altceva decât (Dan-aur, Ana-argint). Când alegi `k`
+din `n` ȘI ordinea contează, ai un **aranjament**.
+</LessonHook>
+
+## Ce este un aranjament
+
+Un **aranjament** de `k` din `n` este o alegere de `k` elemente în care **ordinea
+contează**. Numărul lor: `A(n, k) = n · (n-1) · ... · (n-k+1) = n! / (n-k)!`.
+
+<ObservationBox>
+Aranjamentul stă exact între combinare și permutare: alegi `k` elemente (ca la combinări)
+și le pui într-o anumită ordine (ca la permutări). De aici `A(n,k) = C(n,k) · k!`.
+</ObservationBox>
+
+## Cele trei, una lângă alta
+
+Pentru a alege/ordona din `{1, 2, 3}`:
+
+<ArrayDiagram
+  values="(1,2) (2,1) (1,3) (3,1) (2,3) (3,2)"
+  valueLabel="A(3,2)"
+  index="off"
+  caption="6 aranjamente de 2 din 3. La combinări ar fi doar 3: {1,2},{1,3},{2,3}." />
+
+| Noțiune | Ordinea contează? | Câte | Formula |
+|---------|-------------------|------|---------|
+| Combinări C(n,k) | nu | mai puține | n! / (k!·(n-k)!) |
+| Aranjamente A(n,k) | da | mai multe | n! / (n-k)! |
+| Permutări (k = n) | da | A(n,n) = n! | n! |
+
+## Implementare C++
+
+Aproape identic cu permutările, dar ne oprim la poziția `k`:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n = 3, k = 2;
+int sol[20];
+bool folosit[20];
+
+void aranjamente(int poz) {
+    if (poz == k) {                    // doar k pozitii, nu n
+        for (int i = 0; i < k; i++) cout << sol[i];
+        cout << " ";
+        return;
+    }
+    for (int val = 1; val <= n; val++) {
+        if (!folosit[val]) {
+            folosit[val] = true;
+            sol[poz] = val;
+            aranjamente(poz + 1);
+            folosit[val] = false;      // undo
+        }
+    }
+}
+
+int main() {
+    aranjamente(0);                    // 12 21 13 31 23 32 (6 aranjamente)
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Generarea tuturor aranjamentelor | O(A(n,k) · k) | O(k) |
+
+<MistakeBox>
+Capcane reale:
+
+- **Cazul de bază `poz == n` în loc de `poz == k`.** Atunci generezi permutări complete,
+  nu aranjamente de lungime `k`.
+- **Scoți `folosit[]`** crezând că, fiindcă ordinea contează, nu mai e nevoie — greșit:
+  un element tot nu poate apărea de două ori în același aranjament.
+- **Confunzi A(n,k) cu C(n,k).** Aranjamentele sunt de `k!` ori mai multe decât combinările.
+- **Pui `start` ca la combinări.** Aici NU restricționezi la ordine crescătoare — toate
+  ordinile sunt valide și distincte.
+</MistakeBox>
+
+## Recapitulare
+
+- Un aranjament alege `k` din `n` cu ordinea contând; sunt `A(n,k) = n!/(n-k)!`.
+- Cod = permutări oprite la poziția `k`; păstrezi `folosit[]`, nu folosești `start`.
+- Relația cheie: `A(n,k) = C(n,k) · k!` (alegi, apoi ordonezi).

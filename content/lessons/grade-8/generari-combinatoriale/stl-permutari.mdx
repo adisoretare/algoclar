@@ -1,0 +1,120 @@
+---
+title: "Funcții STL pentru permutări — next_permutation"
+slug: stl-permutari
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["stl", "permutari", "next-permutation"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce întoarce `next_permutation` când nu mai există o permutare următoare?"
+    options: ["true", "false", "0 permutări", "Aruncă eroare"]
+    correctIndex: 1
+    explanation: "next_permutation transformă șirul în permutarea următoare și întoarce true; când a ajuns la ultima (descrescătoare), o readuce la prima și întoarce false."
+  - question: "De ce trebuie să sortezi crescător înainte de a genera TOATE permutările cu next_permutation?"
+    options: ["Ca să fie mai rapid", "Pentru că next_permutation merge doar înainte în ordine lexicografică", "Nu e obligatoriu", "Ca să elimini duplicatele"]
+    correctIndex: 1
+    explanation: "next_permutation produce doar permutarea lexicografic următoare. Dacă nu pornești de la cea mai mică (sortată crescător), ratezi permutările dinaintea celei curente."
+  - question: "Pentru a parcurge toate permutările, ce structură de buclă folosești?"
+    options: ["for cu next_permutation în condiție", "do { ... } while (next_permutation(...))", "while (true) fără ieșire", "recursivitate obligatoriu"]
+    correctIndex: 1
+    explanation: "do-while procesează întâi permutarea curentă (cea sortată), apoi avansează; bucla se oprește când next_permutation întoarce false."
+---
+
+<LessonHook>
+Ai scris singur backtracking-ul pentru permutări — bravo, înțelegi mecanismul. Dar în
+concurs, când ai nevoie rapid de toate permutările, C++ îți dă o unealtă gata făcută:
+`next_permutation`. E ca diferența dintre a face focul cu bețe și a aprinde un chibrit.
+</LessonHook>
+
+## Ce face next_permutation
+
+`next_permutation(început, sfârșit)` rearanjează elementele în **următoarea permutare
+în ordine lexicografică** și întoarce `true`. Dacă șirul era deja ultima permutare (ordine
+descrescătoare), îl readuce la prima (crescătoare) și întoarce `false`.
+
+<ObservationBox>
+Ca să obții **toate** permutările, pornește de la șirul **sortat crescător** — adică
+prima permutare lexicografică. Altfel `next_permutation` doar merge înainte și ratează
+permutările dinaintea celei curente.
+</ObservationBox>
+
+## Cum le parcurgi pe toate
+
+Pentru `{1, 2, 3}`, ordinea lexicografică completă:
+
+<ArrayDiagram
+  values="123 132 213 231 312 321"
+  valueLabel="perm"
+  index="off"
+  caption="next_permutation trece de la fiecare la următoarea; după 321 întoarce false." />
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    int v[] = {1, 2, 3};
+    int n = 3;
+    sort(v, v + n);                   // porneste de la cea mai mica permutare
+    do {
+        for (int i = 0; i < n; i++) cout << v[i];
+        cout << " ";
+    } while (next_permutation(v, v + n));
+    // 123 132 213 231 312 321
+    return 0;
+}
+```
+
+## Și pentru string-uri
+
+Funcționează la fel pe un `string` (ordine alfabetică a caracterelor):
+
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+int main() {
+    string s = "abc";
+    sort(s.begin(), s.end());
+    do {
+        cout << s << " ";
+    } while (next_permutation(s.begin(), s.end()));
+    // abc acb bac bca cab cba
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Un apel `next_permutation` | O(n) amortizat | O(1) |
+| Toate permutările | O(n! · n) | O(1) suplimentar |
+
+<MistakeBox>
+Greșeli reale cu next_permutation:
+
+- **Nu sortezi întâi.** Dacă pornești de la `{2,1,3}`, ratezi `{1,2,3}` și `{1,3,2}` —
+  obții doar permutările de după.
+- **Folosești `while` în loc de `do-while`.** Cu `while`, sari peste prima permutare
+  (cea sortată), pentru că avansezi înainte de a o procesa.
+- **Limite greșite.** `next_permutation(v, v + n)` — al doilea argument e „după ultimul",
+  ca la toate funcțiile STL. `v + n - 1` lasă ultimul element pe loc.
+- **Duplicate la elemente egale.** Cu valori repetate, `next_permutation` sare automat
+  permutările identice — corect, dar nu te aștepta la `n!` rezultate distincte.
+</MistakeBox>
+
+## Recapitulare
+
+- `next_permutation` produce permutarea lexicografic următoare și întoarce `false` la final.
+- Sortează crescător înainte și folosește `do { ... } while (next_permutation(...))`.
+- Funcționează identic pe vectori și pe string-uri; limita e „după ultimul element".

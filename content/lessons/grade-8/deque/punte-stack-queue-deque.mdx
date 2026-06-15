@@ -1,0 +1,105 @@
+---
+title: "Lecție-punte: diferența dintre stack, queue și deque"
+slug: punte-stack-queue-deque
+grade: 8
+chapter: deque
+difficulty: mediu
+estimatedTime: 11
+free: true
+status: draft
+isBridge: true
+tags: ["stack", "queue", "deque"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Vrei „undo” (anulezi ultima acțiune). Ce structură alegi?"
+    options: ["Coadă (FIFO)", "Stivă (LIFO)", "Vector sortat", "Oricare"]
+    correctIndex: 1
+    explanation: "„Undo” scoate ultima acțiune adăugată — comportament LIFO, deci stivă. Coada ar scoate prima acțiune făcută, exact pe dos."
+  - question: "Procesezi clienți strict în ordinea sosirii. Ce alegi?"
+    options: ["Stivă", "Coadă", "Deque cu ambele capete", "Vector"]
+    correctIndex: 1
+    explanation: "Ordinea sosirii = FIFO = coadă. Stiva ar inversa ordinea, servind ultimul sosit primul."
+  - question: "Ai nevoie să scoți elemente și din față, și din spate (ex. fereastră glisantă). Ce alegi?"
+    options: ["Stivă", "Coadă", "Deque", "Niciuna nu poate"]
+    correctIndex: 2
+    explanation: "Doar deque-ul permite adăugare și scoatere la AMBELE capete. Stiva și coada lucrează la un singur capăt pentru fiecare operație."
+---
+
+<LessonHook>
+Trei recipiente, aceeași marfă, reguli diferite de scos. Un teanc de farfurii (iei de
+sus), un rând la casă (iese primul venit), un tunel cu uși la ambele capete. Stivă,
+coadă, deque — par la fel, dar **regula de acces** le face complet diferite. Alegerea
+corectă rezolvă jumătate din problemă.
+</LessonHook>
+
+## Aceeași idee, reguli diferite
+
+Toate trei sunt **colecții liniare** în care adaugi și scoți elemente. Diferența e
+**unde** ai voie să operezi:
+
+| Structură | Regulă | Adaugi | Scoți |
+|-----------|--------|--------|-------|
+| Stivă (stack) | LIFO — ultimul intrat iese primul | un capăt | **același** capăt |
+| Coadă (queue) | FIFO — primul intrat iese primul | un capăt | **celălalt** capăt |
+| Deque | ambele | oricare capăt | oricare capăt |
+
+<ObservationBox>
+Deque-ul le conține pe celelalte două: restrâns la „adaugă și scoate de la același capăt”
+e o stivă; restrâns la „adaugă la spate, scoate din față” e o coadă. De aceea, dacă ai
+dubii, deque-ul „le poate face pe toate” — dar plătești în claritate.
+</ObservationBox>
+
+## Întrebarea care decide
+
+Pune-ți o singură întrebare: **cine trebuie să iasă primul?**
+
+- „Ultimul lucru pe care l-am pus” → **stivă**. Exemple: undo, verificarea parantezelor,
+  apelurile recursive, evaluarea expresiilor.
+- „Primul lucru pe care l-am pus” → **coadă**. Exemple: rânduri, BFS, procesare în ordinea sosirii.
+- „Uneori dintr-un capăt, uneori din celălalt” → **deque**. Exemple: fereastră glisantă
+  cu maxim/minim, istoric înainte/înapoi.
+
+## Aceeași secvență, trei rezultate
+
+Adăugăm `1, 2, 3` și scoatem tot. Ordinea de ieșire diferă:
+
+<ArrayDiagram
+  values="1 2 3"
+  valueLabel="intrare"
+  index="off"
+  caption="Adăugăm în ordinea 1, 2, 3. Ce iese depinde de structură." />
+
+- **Stivă:** scoate `3, 2, 1` (inversează).
+- **Coadă:** scoate `1, 2, 3` (păstrează ordinea).
+- **Deque:** tu decizi — poate scoate `1, 3, 2` dacă alternezi capetele.
+
+## Ce tip STL folosești
+
+```cpp
+#include <stack>
+#include <queue>
+#include <deque>
+
+stack<int> s;       // push, pop, top
+queue<int> q;       // push, pop, front, back
+deque<int> d;       // push_front/back, pop_front/back, d[i]
+```
+
+<MistakeBox>
+Greșeli de alegere care strică soluții:
+
+- **Alegi coadă pentru „undo”** (sau stivă pentru un rând) → ordinea iese pe dos.
+- **Folosești deque „ca să fii sigur” peste tot.** Funcționează, dar ascunde intenția;
+  un cititor nu mai vede dacă voiai FIFO sau LIFO. Alege structura care exprimă regula.
+- **Confunzi `top`/`front`.** Stiva are `top` (vârf), coada are `front` (cap). Nume diferite,
+  capete diferite.
+- **Crezi că vectorul le înlocuiește mereu.** Poate, dar `push_front` pe vector e O(n);
+  pentru capete rapide, structura dedicată e mai bună.
+</MistakeBox>
+
+## Recapitulare
+
+- Stivă = LIFO (un capăt), coadă = FIFO (capete opuse), deque = ambele capete.
+- Întrebarea-cheie: „cine iese primul?” — ultimul pus → stivă, primul pus → coadă.
+- Deque-ul le generalizează, dar alege structura care exprimă clar intenția.

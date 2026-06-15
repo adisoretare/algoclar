@@ -1,0 +1,129 @@
+---
+title: "Produs cartezian — toate combinațiile dintre mulțimi"
+slug: produs-cartezian
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["produs-cartezian", "generare", "bucle"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Un meniu are 3 feluri principale și 2 deserturi. Câte combinații (principal, desert) există?"
+    options: ["5", "6", "8", "3"]
+    correctIndex: 1
+    explanation: "Pentru fiecare dintre cele 3 principale poți alege oricare dintre cele 2 deserturi: 3 × 2 = 6 combinații."
+  - question: "Care e diferența dintre produs cartezian și submulțimi?"
+    options: ["Sunt identice", "La produs cartezian alegi câte un element din FIECARE mulțime", "Produsul cartezian dă mereu mai puține rezultate", "Submulțimile folosesc bucle, produsul nu"]
+    correctIndex: 1
+    explanation: "La produs cartezian compui un rezultat luând exact un element din fiecare mulțime. La submulțimi decizi prezent/absent pentru elementele unei singure mulțimi."
+  - question: "Pentru k mulțimi de mărimi cunoscute la rulare, ce structură folosești în loc de k bucle scrise de mână?"
+    options: ["O singură buclă", "Recursivitate (o poziție per nivel)", "Sortare", "Nimic, e imposibil"]
+    correctIndex: 1
+    explanation: "Numărul de bucle nu se știe la scriere, deci folosești recursivitate: fiecare nivel alege elementul de pe o poziție, exact ca niște bucle imbricate generate dinamic."
+---
+
+<LessonHook>
+La un fast-food alegi un fel principal ȘI un desert. Trei principale, două deserturi —
+câte meniuri diferite poți compune? Le numeri pe toate: fiecare principal merge cu
+fiecare desert. Mulțimea acestor perechi este **produsul cartezian**.
+</LessonHook>
+
+## Ce este produsul cartezian
+
+Produsul cartezian a două mulțimi `A` și `B` este mulțimea tuturor perechilor
+`(a, b)` cu `a` din `A` și `b` din `B`. Dacă `A` are `m` elemente și `B` are `p`,
+produsul are `m · p` perechi. Pentru `k` mulțimi, înmulțești toate mărimile.
+
+<ObservationBox>
+Deosebirea de submulțimi: aici alegi **exact un element din fiecare** mulțime și le
+combini. La submulțimi lucrai cu o singură mulțime și decideai prezent/absent.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Pentru `A = {1, 2, 3}` și `B = {x, y}`, parcurgem toate perechile cu două bucle imbricate:
+
+<ArrayDiagram
+  values="(1,x) (1,y) (2,x) (2,y) (3,x) (3,y)"
+  valueLabel="perechi"
+  index="off"
+  caption="3 × 2 = 6 perechi. Bucla exterioară fixează elementul din A, cea interioară parcurge B." />
+
+## Implementare C++ (două mulțimi)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    int A[] = {1, 2, 3};
+    char B[] = {'x', 'y'};
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 2; j++) {
+            cout << "(" << A[i] << "," << B[j] << ") ";
+        }
+    }
+    // (1,x) (1,y) (2,x) (2,y) (3,x) (3,y)
+    return 0;
+}
+```
+
+## Când numărul de mulțimi nu e fix
+
+Dacă ai `k` mulțimi, dar `k` se află abia la rulare, nu poți scrie `k` bucle. Folosești
+**recursivitate**: fiecare nivel alege elementul de pe o poziție.
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n[] = {3, 2, 2};   // marimile celor k=3 multimi
+int k = 3;
+int sol[20];
+
+void produs(int poz) {
+    if (poz == k) {                 // am ales cate un element din fiecare
+        for (int i = 0; i < k; i++) cout << sol[i];
+        cout << " ";
+        return;
+    }
+    for (int val = 0; val < n[poz]; val++) {
+        sol[poz] = val;             // alege un element din multimea curenta
+        produs(poz + 1);
+    }
+}
+
+int main() {
+    produs(0);                      // 3*2*2 = 12 combinatii
+    return 0;
+}
+```
+
+## Complexitate
+
+| Caz | Timp | Spațiu |
+|-----|------|--------|
+| `k` mulțimi de mărimi `n₁..n_k` | O(n₁ · n₂ · ... · n_k · k) | O(k) |
+
+Numărul de rezultate este produsul mărimilor — crește foarte repede.
+
+<MistakeBox>
+Greșeli reale:
+
+- **Aduni în loc să înmulțești.** Numărul de combinații e `m · p`, nu `m + p`.
+- **Hard-codezi `k` bucle** când `k` e variabil → cod care nu se compilează pentru alt `k`.
+  Folosește recursivitatea.
+- **Uiți cazul de bază** (`poz == k`) în varianta recursivă → recursivitate infinită.
+- **Refolosești `sol` fără să-l rescrii** complet pe fiecare nivel — fiecare apel trebuie
+  să seteze `sol[poz]` înainte de a coborî.
+</MistakeBox>
+
+## Recapitulare
+
+- Produsul cartezian = toate combinațiile cu câte un element din fiecare mulțime.
+- Numărul de combinații e produsul mărimilor (înmulțire, nu adunare).
+- Pentru `k` fix folosești bucle imbricate; pentru `k` variabil, recursivitate (un nivel per mulțime).

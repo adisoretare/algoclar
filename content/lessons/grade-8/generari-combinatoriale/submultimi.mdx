@@ -1,0 +1,133 @@
+---
+title: "Submulțimi — fiecare element intră sau nu"
+slug: submultimi
+grade: 8
+chapter: generari-combinatoriale
+difficulty: mediu
+estimatedTime: 16
+free: true
+status: draft
+isBridge: false
+tags: ["submultimi", "backtracking", "generare"]
+visualizers: ["backtracking"]
+relatedProblems: []
+quiz:
+  - question: "Câte submulțimi are o mulțime cu 4 elemente?"
+    options: ["4", "8", "16", "24"]
+    correctIndex: 2
+    explanation: "Fiecare element are 2 variante (în submulțime sau nu), independent: 2 × 2 × 2 × 2 = 2⁴ = 16, incluzând mulțimea vidă și pe cea totală."
+  - question: "În generarea prin backtracking, ce decizie iei la fiecare element?"
+    options: ["Îl sortezi", "Îl incluzi sau îl excluzi, apoi treci la următorul", "Îl compari cu primul", "Îl ștergi"]
+    correctIndex: 1
+    explanation: "Pentru fiecare element ramifici în două: o ramură îl include, cealaltă îl exclude; apoi continui recursiv cu elementul următor."
+  - question: "Cum corespunde un mask binar 1011 unei submulțimi a lui {a,b,c,d}?"
+    options: ["{a,b,c,d}", "Bitul 1 = element prezent → {a,b,d} (citind de la stânga)", "Doar {a}", "Nicio legătură"]
+    correctIndex: 1
+    explanation: "Fiecare bit spune dacă elementul de pe acea poziție e prezent. 1011 → primul prezent, al doilea absent, al treilea și al patrulea prezenți."
+---
+
+<LessonHook>
+Îți faci bagajul pentru o excursie. Pentru fiecare obiect de pe listă iei o singură
+decizie: îl pun în rucsac sau nu. Toate combinațiile posibile de „da/nu" sunt exact
+**submulțimile** listei tale de obiecte.
+</LessonHook>
+
+## Ce este o submulțime
+
+O **submulțime** a unei mulțimi se obține alegând o parte dintre elemente (eventual
+niciunul sau pe toate). O mulțime cu `n` elemente are exact `2ⁿ` submulțimi: fiecare
+element are două variante independente — prezent sau absent.
+
+<ObservationBox>
+Două elemente → 4 submulțimi, trei → 8, zece → 1024. Numărul crește exponențial, deci
+generarea tuturor submulțimilor are sens doar pentru `n` mic (în practică n ≤ 20-25).
+</ObservationBox>
+
+## Două moduri de a le genera
+
+**Cu mască binară:** fiecare submulțime ↔ un număr de la 0 la 2ⁿ-1. Bitul `i` spune
+dacă elementul `i` e prezent.
+
+<ArrayDiagram
+  values="1 0 1 1"
+  index="a b c d"
+  valueLabel="bit"
+  indexLabel="elem"
+  highlight="0 2 3"
+  caption="Masca 1011 → submulțimea {a, c, d}: bit 1 înseamnă element prezent." />
+
+**Cu backtracking:** pentru fiecare element ramifici recursiv — o cale îl include,
+una îl exclude. Mai natural când vrei să te oprești devreme sub o condiție.
+
+## Implementare C++ (backtracking)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n = 3;
+bool inSubmultime[20];
+
+void genereaza(int i) {
+    if (i == n) {                 // am decis pentru toate elementele
+        cout << "{ ";
+        for (int j = 0; j < n; j++) {
+            if (inSubmultime[j]) cout << j + 1 << " ";
+        }
+        cout << "}\n";
+        return;
+    }
+    inSubmultime[i] = true;       // ramura: includem elementul i
+    genereaza(i + 1);
+    inSubmultime[i] = false;      // ramura: il excludem
+    genereaza(i + 1);
+}
+
+int main() {
+    genereaza(0);                 // 8 submultimi pentru n=3
+    return 0;
+}
+```
+
+## Implementare C++ (mască binară)
+
+```cpp
+for (int mask = 0; mask < (1 << n); mask++) {  // 1<<n inseamna 2^n
+    cout << "{ ";
+    for (int i = 0; i < n; i++) {
+        if (mask & (1 << i)) cout << i + 1 << " ";  // bitul i este 1?
+    }
+    cout << "}\n";
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Generarea tuturor submulțimilor | O(2ⁿ · n) | O(n) |
+
+`2ⁿ` submulțimi, fiecare afișată în O(n). Pentru `n` mare e imposibil — exponențial.
+
+## Vizualizare
+
+Urmărește arborele de decizii: la fiecare nivel, o ramură include elementul, cealaltă îl exclude. Frunzele sunt cele 2ⁿ submulțimi:
+
+<Visualizer name="backtracking" />
+
+<MistakeBox>
+Capcane frecvente:
+
+- **`1 << n` depășește `int` pentru n ≥ 31.** Folosește `1LL << n` (long long) la măști mari.
+- **Uiți să anulezi decizia (`inSubmultime[i] = false`).** Fără pasul de „undo", ramurile
+  se contaminează între ele.
+- **Confunzi numărul de submulțimi cu 2·n.** Sunt `2ⁿ`, nu `2n` — crește exponențial.
+- **Generezi submulțimi pentru n mare.** La n = 40 sunt peste 10¹² submulțimi — depășești
+  timpul. Caută altă abordare (formulă, programare dinamică).
+</MistakeBox>
+
+## Recapitulare
+
+- O mulțime cu `n` elemente are `2ⁿ` submulțimi (fiecare element: prezent sau absent).
+- Backtracking = ramifici include/exclude la fiecare element; masca binară = un bit per element.
+- Generarea e exponențială, deci fezabilă doar pentru `n` mic.

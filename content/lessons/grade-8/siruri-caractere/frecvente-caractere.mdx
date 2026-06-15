@@ -1,0 +1,133 @@
+---
+title: "Frecvențe de caractere — numără o singură dată"
+slug: frecvente-caractere
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["frecventa", "string", "vector-frecventa"]
+visualizers: ["frequency"]
+relatedProblems: []
+quiz:
+  - question: "De ce folosim `frecv[c - 'a']++` în loc de un vector indexat direct cu `c`?"
+    options: ["Ca să economisim memorie aducând literele la 0..25", "E obligatoriu în C++", "Ca să fie mai lent", "Nu are sens"]
+    correctIndex: 0
+    explanation: "c - 'a' transformă literele 'a'..'z' în indici 0..25, deci un vector de 26 de poziții ajunge, în loc de unul de 128."
+  - question: "Care e marele avantaj al vectorului de frecvențe față de numărarea repetată?"
+    options: ["Ocupă mai puțin loc", "O singură parcurgere O(n), nu una pentru fiecare literă", "E mai ușor de scris", "Nu are avantaje"]
+    correctIndex: 1
+    explanation: "Numeri toate caracterele într-o singură trecere O(n); apoi orice întrebare („de câte ori apare x?\") se răspunde instant din vector."
+  - question: "Cum afli litera cea mai frecventă după ce ai vectorul `frecv`?"
+    options: ["Parcurgi șirul din nou", "Parcurgi vectorul frecv și ții maximul", "Sortezi șirul", "Nu se poate"]
+    correctIndex: 1
+    explanation: "Răspunsul e deja în vector: parcurgi cele (de exemplu) 26 de poziții și reții indexul cu valoarea maximă."
+---
+
+<LessonHook>
+La un recensământ nu întrebi de fiecare casă „câți locuitori sunt în tot orașul?".
+Treci o dată prin toate casele și bifezi pe o listă. Vectorul de frecvențe face exact
+asta pentru caractere: o singură trecere prin șir și știi de câte ori apare fiecare literă.
+</LessonHook>
+
+## Ce este un vector de frecvențe
+
+Un **vector de frecvențe** are câte o poziție pentru fiecare caracter posibil și
+reține de câte ori apare. Pentru literele mici `'a'..'z'` ai nevoie de doar 26 de
+poziții, dacă aduci litera la index cu `c - 'a'`.
+
+<ObservationBox>
+Ideea-cheie: în loc să întrebi de `n` ori „de câte ori apare litera x?" (fiecare
+întrebare costând O(n)), numeri totul **o singură dată** și apoi citești răspunsul
+instant din vector.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Pentru `"abracadabra"` parcurgem și creștem poziția corespunzătoare:
+
+```
+a -> frecv[0]++   (acum 1)
+b -> frecv[1]++   (acum 1)
+r -> frecv[17]++  (acum 1)
+a -> frecv[0]++   (acum 2)
+c -> frecv[2]++
+a -> frecv[0]++   (acum 3)
+d -> frecv[3]++
+a -> frecv[0]++   (acum 4)
+b -> frecv[1]++   (acum 2)
+r -> frecv[17]++  (acum 2)
+a -> frecv[0]++   (acum 5)
+```
+
+Frecvențele finale pentru literele care apar:
+
+<ArrayDiagram
+  values="5 2 1 1 2"
+  index="a b c d r"
+  valueLabel="frecv"
+  indexLabel="litera"
+  highlight="0"
+  caption="„abracadabra”: a apare de 5 ori (maxim), b și r de câte 2, c și d o dată." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s = "abracadabra";
+    int frecv[26] = {0};            // init cu 0, esential
+
+    for (char c : s) {
+        frecv[c - 'a']++;           // aduce litera la index 0..25
+    }
+
+    // litera cea mai frecventa
+    int maxPoz = 0;
+    for (int i = 1; i < 26; i++) {
+        if (frecv[i] > frecv[maxPoz]) {
+            maxPoz = i;
+        }
+    }
+    cout << (char)('a' + maxPoz) << " " << frecv[maxPoz] << endl; // a 5
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Construirea vectorului | O(n) | O(alfabet) |
+| Răspuns la o întrebare (apariții, maxim) | O(1) / O(alfabet) | O(1) |
+
+`n` = lungimea șirului; alfabetul e constant (26 sau 128), deci spațiul e O(1) practic.
+
+<MistakeBox>
+Greșeli reale cu vectorii de frecvențe:
+
+- **Uiți să inițializezi cu 0.** `int frecv[26];` fără `= {0}` conține gunoi → numărători aberante.
+- **Index greșit la litere mari sau cifre.** `c - 'a'` e corect doar pentru litere mici;
+  pentru text mixt folosește `frecv[(unsigned char)c]` pe 128/256 de poziții.
+- **Acces în afara vectorului.** Dacă apare un caracter neașteptat (spațiu, virgulă) și
+  faci `c - 'a'`, poți obține index negativ → comportament nedefinit. Filtrează întâi cu `isalpha`.
+- **Numeri de mai multe ori.** Nu reface bucla pentru fiecare literă — vectorul există tocmai
+  ca să răspunzi o singură dată.
+</MistakeBox>
+
+## Vizualizare
+
+Urmărește cum, la fiecare caracter parcurs, exact o coloană de frecvență crește cu 1:
+
+<Visualizer name="frequency" />
+
+## Recapitulare
+
+- Un vector de frecvențe numără toate caracterele într-o singură trecere O(n).
+- `c - 'a'` aduce literele mici la indicii 0..25 (folosește 128 de poziții pentru text mixt).
+- Inițializează mereu cu 0 și filtrează caracterele din afara alfabetului așteptat.

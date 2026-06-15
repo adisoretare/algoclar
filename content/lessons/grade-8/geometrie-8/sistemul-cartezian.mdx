@@ -1,0 +1,122 @@
+---
+title: "Sistemul de coordonate cartezian"
+slug: sistemul-cartezian
+grade: 8
+chapter: geometrie-8
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["geometrie", "coordonate", "cartezian"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Punctul (−3, 2) se află în ce cadran?"
+    options: ["Cadranul I", "Cadranul II", "Cadranul III", "Cadranul IV"]
+    correctIndex: 1
+    explanation: "x negativ și y pozitiv → stânga-sus = cadranul II. Reține: I (+,+), II (−,+), III (−,−), IV (+,−)."
+  - question: "Ce au în comun toate punctele de pe axa Ox?"
+    options: ["x = 0", "y = 0", "x = y", "x + y = 0"]
+    correctIndex: 1
+    explanation: "Axa Ox este linia orizontală; orice punct de pe ea are coordonata y egală cu 0, de exemplu (5, 0) sau (−2, 0)."
+  - question: "Cum reprezinți în C++ un punct cu coordonate întregi?"
+    options: ["Un singur int", "Două variabile (x, y) sau o structură cu două câmpuri", "Un string", "Un vector de 100 de elemente"]
+    correctIndex: 1
+    explanation: "Un punct în plan are două coordonate, deci îl ții în două variabile sau, mai curat, într-o structură cu câmpurile x și y."
+---
+
+<LessonHook>
+Pe o hartă a orașului spui „strada 3, casa 5” și oricine găsește locul exact. Sistemul
+cartezian face același lucru pentru plan: două numere, `x` și `y`, fixează fără echivoc
+orice punct. E adresa unui punct în plan.
+</LessonHook>
+
+## Ce este sistemul cartezian
+
+Sistemul de coordonate cartezian are două axe perpendiculare:
+- **Ox** — axa orizontală (abscisa, coordonata `x`);
+- **Oy** — axa verticală (ordonata, coordonata `y`).
+
+Se intersectează în **origine**, punctul `(0, 0)`. Orice punct e descris de o pereche
+`(x, y)`: cât de la dreapta/stânga și cât sus/jos față de origine.
+
+<ObservationBox>
+Ordinea contează: `(3, 5)` și `(5, 3)` sunt puncte diferite. Primul număr e mereu `x`
+(orizontal), al doilea e `y` (vertical).
+</ObservationBox>
+
+## Cadranele și axele
+
+Axele împart planul în patru **cadrane**, după semnele lui `x` și `y`:
+
+| Cadran | Semnul lui x | Semnul lui y | Exemplu |
+|--------|--------------|--------------|---------|
+| I | + | + | (3, 2) |
+| II | − | + | (−3, 2) |
+| III | − | − | (−3, −2) |
+| IV | + | − | (3, −2) |
+
+Punctele speciale: pe **Ox** au `y = 0`, pe **Oy** au `x = 0`, iar originea are ambele 0.
+
+Câteva puncte și pozițiile lor:
+
+<ArrayDiagram
+  values="(3,2) (-3,2) (-3,-2) (3,-2) (0,0)"
+  valueLabel="punct"
+  index="I II III IV O"
+  indexLabel="zona"
+  caption="Aceleași valori 3 și 2 cu semne diferite cad în cadrane diferite; (0,0) e originea." />
+
+## Reprezentarea în C++
+
+Cel mai curat e o structură:
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct Punct {
+    int x, y;
+};
+
+int main() {
+    Punct p = {3, 5};
+    cout << p.x << " " << p.y << endl;   // 3 5
+
+    // mai multe puncte intr-un vector
+    Punct v[3] = {{0, 0}, {-3, 2}, {4, -1}};
+    for (int i = 0; i < 3; i++) {
+        cout << "(" << v[i].x << "," << v[i].y << ") ";
+    }
+    return 0;
+}
+```
+
+<HintBox>
+Pentru coordonate care pot fi mari (până la 10⁹) folosește `long long`, mai ales când le
+ridici la pătrat (la distanțe) — produsul depășește repede `int`.
+</HintBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Citire / stocare un punct | O(1) | O(1) |
+| Citire `n` puncte | O(n) | O(n) |
+
+<MistakeBox>
+Confuzii frecvente:
+
+- **Inversezi x cu y.** Primul e abscisa (orizontal), al doilea ordonata (vertical).
+  `(3,5)` ≠ `(5,3)`.
+- **Greșești cadranul după semne.** Verifică tabelul: cadranul II e (−,+), nu (+,−).
+- **Uiți punctele de pe axe.** Un punct cu `y = 0` nu e în niciun cadran — e pe axa Ox.
+- **Folosești `int` pentru coordonate mari.** La 10⁹, pătratul depășește `int`; trece pe `long long`.
+</MistakeBox>
+
+## Recapitulare
+
+- Un punct se descrie prin `(x, y)`: x orizontal (Ox), y vertical (Oy), origine la (0,0).
+- Semnele lui x și y dau cadranul; punctele cu o coordonată 0 sunt pe axe.
+- În cod, ține un punct într-o structură cu `x` și `y`; folosește `long long` la coordonate mari.

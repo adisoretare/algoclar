@@ -1,0 +1,125 @@
+---
+title: "Funcții specifice pentru șiruri"
+slug: functii-siruri
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["string", "functii", "substr"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce întoarce `s.find(\"ma\")` pentru `s = \"informatica\"`?"
+    options: ["true", "Poziția 5", "Poziția 6", "string::npos"]
+    correctIndex: 1
+    explanation: "find întoarce indexul primei apariții. „ma\" începe la poziția 5 în „informatica\" (i-n-f-o-r-m...)."
+  - question: "Ce înseamnă că `find` a întors `string::npos`?"
+    options: ["Subșirul e la poziția 0", "Subșirul nu a fost găsit", "Șirul e gol", "A apărut o eroare de compilare"]
+    correctIndex: 1
+    explanation: "npos este o valoare specială (cel mai mare unsigned) pe care find o întoarce când subșirul căutat nu apare deloc."
+  - question: "Ce face `s.substr(2, 3)`?"
+    options: ["Șterge 3 caractere de la poziția 2", "Extrage 3 caractere începând de la poziția 2", "Extrage caracterele de la poziția 2 la 3", "Inserează 3 caractere"]
+    correctIndex: 1
+    explanation: "substr(start, lungime) întoarce o copie de `lungime` caractere începând de la indexul `start`. Nu modifică șirul original."
+---
+
+<LessonHook>
+Când lucrezi cu text într-un editor, ai butoane gata făcute: „Caută", „Înlocuiește",
+„Selectează". Tipul `string` din C++ vine cu aceleași unelte ca metode: nu mai
+rescrii bucle pentru lucruri comune — le ceri direct șirului.
+</LessonHook>
+
+## De ce funcții gata făcute
+
+Ai putea căuta un subșir cu o buclă scrisă de mână, dar e ușor să greșești limitele.
+Funcțiile standard sunt testate, scurte și clare. Le folosești pe cele uzuale și știi
+exact ce întorc.
+
+<ObservationBox>
+Multe funcții (`find`, `substr`) lucrează cu **poziții** (indici de la 0). Reține că
+`find` întoarce poziția de start a primei potriviri, sau valoarea specială `string::npos`
+dacă nu găsește nimic.
+</ObservationBox>
+
+## Funcțiile uzuale
+
+Pentru `string s = "informatica";`:
+
+| Funcție | Ce face | Exemplu | Rezultat |
+|---------|---------|---------|----------|
+| `s.size()` / `s.length()` | lungimea | `s.size()` | 11 |
+| `s.substr(p, l)` | subșir de lungime `l` de la poziția `p` | `s.substr(0, 4)` | `"info"` |
+| `s.find(t)` | poziția primei apariții a lui `t` | `s.find("ma")` | 5 |
+| `s.find(c, p)` | caută de la poziția `p` | `s.find('i', 1)` | 8 |
+| `s.insert(p, t)` | inserează `t` la poziția `p` | `s.insert(4, "-")` | `"info-rmatica"` |
+| `s.erase(p, l)` | șterge `l` caractere de la `p` | `s.erase(0, 4)` | `"rmatica"` |
+
+Poziția lui `"ma"`:
+
+<ArrayDiagram
+  values="i n f o r m a t i c a"
+  valueLabel="s"
+  indexLabel="index"
+  range="5-6"
+  caption="s.find(„ma”) întoarce 5 — indexul de unde începe potrivirea." />
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s = "informatica";
+
+    cout << s.substr(0, 4) << endl;   // info
+    cout << s.find("ma") << endl;     // 5
+
+    if (s.find("xyz") == string::npos) {
+        cout << "nu exista" << endl;  // se afiseaza
+    }
+
+    // numara cate aparitii are 'i'
+    int cnt = 0;
+    size_t p = s.find('i');
+    while (p != string::npos) {
+        cnt++;
+        p = s.find('i', p + 1);       // cauta urmatoarea, dupa cea gasita
+    }
+    cout << cnt << endl;              // 2
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `size()` | O(1) | O(1) |
+| `substr(p, l)` | O(l) | O(l) |
+| `find(t)` | O(n · m) în cel mai rău caz | O(1) |
+| `insert` / `erase` | O(n) | — |
+
+Aici `n` e lungimea șirului, `m` lungimea subșirului căutat.
+
+<MistakeBox>
+Capcane frecvente cu funcțiile pe string:
+
+- **Compari `find` cu -1.** `find` întoarce `size_t` (unsigned); rezultatul „negăsit" e
+  `string::npos`, NU `-1`. Scrie `if (s.find(t) == string::npos)`.
+- **Uiți `+ 1` la căutarea repetată.** `find('i', p)` fără `+1` găsește mereu aceeași
+  poziție → buclă infinită.
+- **`substr` cu poziție în afara șirului** aruncă excepție. Verifică `p <= s.size()`.
+- **Crezi că `find`/`substr` modifică șirul.** Ele întorc rezultate; șirul original
+  rămâne neschimbat (doar `insert`/`erase` îl modifică).
+</MistakeBox>
+
+## Recapitulare
+
+- `substr`, `find`, `insert`, `erase` rezolvă operațiile uzuale fără bucle scrise manual.
+- `find` întoarce poziția de start sau `string::npos` (compară cu npos, nu cu -1).
+- La căutarea repetată, reia de la `poziție + 1`, altfel rămâi blocat pe aceeași apariție.

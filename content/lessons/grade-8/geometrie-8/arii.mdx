@@ -1,0 +1,130 @@
+---
+title: "Arii — formula determinantului"
+slug: arii
+grade: 8
+chapter: geometrie-8
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["geometrie", "arie", "determinant"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Aria triunghiului cu vârfurile (0,0), (4,0), (0,3) este..."
+    options: ["7", "12", "6", "3.5"]
+    correctIndex: 2
+    explanation: "E un triunghi dreptunghic cu catetele 4 și 3: aria = (4·3)/2 = 6. Formula determinantului dă același rezultat."
+  - question: "Ce înseamnă dacă determinantul (dublul ariei) iese 0?"
+    options: ["Triunghi foarte mic", "Cele trei puncte sunt coliniare", "Eroare de calcul", "Aria e negativă"]
+    correctIndex: 1
+    explanation: "Aria 0 înseamnă că „triunghiul” e degenerat — cele trei puncte stau pe o dreaptă (coliniare)."
+  - question: "De ce calculăm întâi 2·arie ca întreg și abia la final împărțim la 2?"
+    options: ["E mai elegant", "Ca să rămânem pe întregi (exact) și să evităm rotunjirile", "E obligatoriu în C++", "Ca să fie mai lent"]
+    correctIndex: 1
+    explanation: "Determinantul e întreg; păstrându-l așa eviți numerele cu virgulă până la final, deci calculul rămâne exact (util și la coliniaritate)."
+---
+
+<LessonHook>
+Cum afli suprafața unui teren triunghiular când știi doar coordonatele colțurilor, fără
+riglă și fără înălțimi? Există o formulă care îți dă aria direct din cele trei perechi de
+numere — formula determinantului. O singură expresie, fără să măsori nimic.
+</LessonHook>
+
+## Aria unui triunghi din coordonate
+
+Pentru triunghiul cu vârfurile `A(xA,yA)`, `B(xB,yB)`, `C(xC,yC)`, aria este:
+
+`arie = | (xB − xA)·(yC − yA) − (yB − yA)·(xC − xA) | / 2`
+
+Expresia din interiorul modulului e un **determinant** — același pe care l-ai folosit la
+coliniaritate. Îl notăm `d`; atunci `arie = |d| / 2`.
+
+<ObservationBox>
+`d` reprezintă **dublul ariei cu semn**. Semnul îți spune orientarea (sensul A→B→C: trigonometric
+sau orar); modulul îți dă aria propriu-zisă. Dacă `d == 0`, punctele sunt coliniare (arie 0).
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Triunghiul `A(0,0)`, `B(4,0)`, `C(0,3)`:
+
+<ArrayDiagram
+  values="(0,0) (4,0) (0,3)"
+  valueLabel="varf"
+  index="A B C"
+  indexLabel="rol"
+  caption="Catetele 4 și 3; aria așteptată = (4·3)/2 = 6." />
+
+```
+d = (xB - xA)*(yC - yA) - (yB - yA)*(xC - xA)
+  = (4 - 0)*(3 - 0)     - (0 - 0)*(0 - 0)
+  = 12 - 0 = 12
+arie = |12| / 2 = 6
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+struct Punct { long long x, y; };
+
+long long dublulAriei(Punct A, Punct B, Punct C) {
+    // determinantul cu semn = 2 * arie cu semn
+    return (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+}
+
+int main() {
+    Punct A = {0, 0}, B = {4, 0}, C = {0, 3};
+    long long d = dublulAriei(A, B, C);
+    cout << llabs(d) / 2.0 << endl;   // 6 (/2.0 pastreaza si .5 cand e cazul)
+    return 0;
+}
+```
+
+<HintBox>
+Aria poate avea parte zecimală `.5` (de exemplu un triunghi cu `2·arie` impar). Ține
+`2·arie` ca întreg și împarte la `2.0` doar la afișare, ca să nu pierzi jumătatea.
+</HintBox>
+
+## Poligoane (formula ariei lui Gauss)
+
+Pentru un poligon cu vârfurile `P0, P1, ..., Pn-1` (în ordine), aria e suma determinanților:
+
+```cpp
+long long doubleArea = 0;
+for (int i = 0; i < n; i++) {
+    int j = (i + 1) % n;                       // urmatorul varf, ciclic
+    doubleArea += p[i].x * p[j].y - p[j].x * p[i].y;
+}
+double arie = llabs(doubleArea) / 2.0;
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Aria unui triunghi | O(1) | O(1) |
+| Aria unui poligon cu `n` vârfuri | O(n) | O(1) |
+
+<MistakeBox>
+Greșeli reale:
+
+- **Uiți modulul.** Determinantul poate fi negativ (orientare orară); aria e `|d|/2`, mereu
+  pozitivă.
+- **Împarți la 2 pe întregi prea devreme.** `d / 2` trunchiază; păstrează `d` întreg și
+  împarte la `2.0` la final, altfel pierzi `.5`.
+- **Overflow.** Produsele de coordonate mari depășesc `int` → `long long` peste tot.
+- **Vârfuri în dezordine la poligon.** Formula lui Gauss cere vârfurile **în ordine** pe
+  contur; amestecate, dau o arie greșită.
+</MistakeBox>
+
+## Recapitulare
+
+- Aria triunghiului = `|d| / 2`, unde `d` e determinantul (dublul ariei cu semn).
+- `d == 0` înseamnă coliniaritate; semnul lui `d` dă orientarea.
+- Ține `2·arie` ca `long long` și împarte la `2.0` la final; pentru poligoane, formula lui Gauss.

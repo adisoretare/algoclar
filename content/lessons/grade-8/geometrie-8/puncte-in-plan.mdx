@@ -1,0 +1,130 @@
+---
+title: "Puncte în plan — poziții relative"
+slug: puncte-in-plan
+grade: 8
+chapter: geometrie-8
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["geometrie", "puncte", "coliniaritate"]
+visualizers: ["geometry-basics"]
+relatedProblems: []
+quiz:
+  - question: "Două puncte au același x. Cum sunt unul față de celălalt?"
+    options: ["Pe aceeași linie orizontală", "Pe aceeași linie verticală", "În același cadran mereu", "Identice"]
+    correctIndex: 1
+    explanation: "Același x înseamnă aceeași poziție orizontală; punctele stau unul deasupra altuia, pe o linie verticală."
+  - question: "Mijlocul segmentului dintre (2, 4) și (6, 8) este..."
+    options: ["(4, 6)", "(8, 12)", "(2, 2)", "(4, 4)"]
+    correctIndex: 0
+    explanation: "Mijlocul are coordonatele medii: ((2+6)/2, (4+8)/2) = (4, 6)."
+  - question: "Trei puncte sunt coliniare dacă..."
+    options: ["Au același x", "Sunt în același cadran", "Stau pe aceeași dreaptă", "Sunt egal depărtate"]
+    correctIndex: 2
+    explanation: "Coliniare înseamnă, prin definiție, că toate trei se află pe o singură dreaptă."
+---
+
+<LessonHook>
+Privești trei stâlpi de pe marginea drumului. Sunt aliniați perfect sau unul e ieșit din
+rând? Ochiul ghicește, dar calculatorul trebuie să decidă exact, din coordonate. Lecția
+asta e despre relațiile dintre puncte: aliniere, mijloc, poziție relativă.
+</LessonHook>
+
+## Poziții relative simple
+
+Date două puncte `A(xA, yA)` și `B(xB, yB)`:
+- **același `x`** → sunt pe aceeași **verticală** (unul peste altul);
+- **același `y`** → sunt pe aceeași **orizontală**;
+- altfel, definesc un segment „oblic”.
+
+<ObservationBox>
+Multe verificări geometrice se reduc la comparații simple de coordonate. Înainte de
+formule complicate, întreabă-te dacă punctele nu cumva împart un `x` sau un `y`.
+</ObservationBox>
+
+## Mijlocul unui segment
+
+Mijlocul segmentului `AB` are coordonatele **medii**:
+
+`M = ( (xA + xB) / 2 , (yA + yB) / 2 )`
+
+<ArrayDiagram
+  values="(2,4) (4,6) (6,8)"
+  valueLabel="A M B"
+  index="A M B"
+  indexLabel="rol"
+  highlight="1"
+  caption="Mijlocul lui A(2,4) și B(6,8) este M(4,6) — media coordonatelor." />
+
+## Coliniaritate (trei puncte pe o dreaptă)
+
+Trei puncte `A`, `B`, `C` sunt **coliniare** dacă „aria triunghiului” pe care l-ar forma
+este 0. Calculăm o expresie întreagă (un determinant):
+
+`d = (xB − xA)·(yC − yA) − (yB − yA)·(xC − xA)`
+
+- `d == 0` → puncte **coliniare**;
+- `d != 0` → formează un triunghi.
+
+<ObservationBox>
+Folosind `d` (întreg) eviți complet numerele cu virgulă și erorile de rotunjire. Compari
+direct cu 0 — exact, nu aproximativ.
+</ObservationBox>
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct Punct { long long x, y; };
+
+long long orientare(Punct A, Punct B, Punct C) {
+    // determinantul: >0, <0 sau =0
+    return (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+}
+
+int main() {
+    Punct A = {0, 0}, B = {2, 2}, C = {4, 4};
+    if (orientare(A, B, C) == 0) {
+        cout << "coliniare" << endl;   // se afiseaza
+    } else {
+        cout << "triunghi" << endl;
+    }
+    return 0;
+}
+```
+
+## Vizualizare
+
+Mută punctele în plan și observă cum se schimbă poziția relativă, mijlocul și alinierea:
+
+<Visualizer name="geometry-basics" />
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Mijloc, coliniaritate (3 puncte) | O(1) | O(1) |
+| Verificarea a `n` puncte coliniare | O(n) | O(1) |
+
+<MistakeBox>
+Greșeli reale:
+
+- **Mijloc cu coordonate impare.** `(xA+xB)/2` pe întregi trunchiază; dacă vrei valoarea
+  exactă, lucrează cu dublul coordonatelor sau cu `double`.
+- **Overflow la determinant.** `(B.x - A.x)*(C.y - A.y)` cu coordonate de 10⁹ depășește
+  `int` → folosește `long long`.
+- **Compari arii cu virgulă cu 0.** Pentru coliniaritate, folosește determinantul întreg
+  și `== 0`, nu `abs(arie) < 0.0001`.
+- **Confunzi „același x” cu „coliniare”.** Verticala e un caz particular; coliniaritatea
+  generală cere determinantul.
+</MistakeBox>
+
+## Recapitulare
+
+- Același `x` → verticală; același `y` → orizontală; mijlocul = media coordonatelor.
+- Coliniaritatea se verifică exact cu determinantul întreg `d`: `d == 0` înseamnă aliniere.
+- Folosește `long long` la determinant — produsul de coordonate mari depășește `int`.

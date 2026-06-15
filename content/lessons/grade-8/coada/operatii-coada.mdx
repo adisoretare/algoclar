@@ -1,0 +1,140 @@
+---
+title: "Operații cu coada — push, pop, front"
+slug: operatii-coada
+grade: 8
+chapter: coada
+difficulty: mediu
+estimatedTime: 15
+free: true
+status: draft
+isBridge: false
+tags: ["coada", "stl-queue", "operatii"]
+visualizers: ["queue"]
+relatedProblems: []
+quiz:
+  - question: "Ce afișează codul: `q.push(5); q.push(8); cout << q.front();`?"
+    options: ["8", "5", "13", "Eroare"]
+    correctIndex: 1
+    explanation: "5 a fost adăugat primul, deci e în față. front() întoarce 5, fără a-l scoate din coadă."
+  - question: "După `q.pop()`, ce element este returnat?"
+    options: ["pop() întoarce elementul scos", "Niciunul — pop() doar elimină, nu întoarce nimic", "Ultimul adăugat", "Mărimea cozii"]
+    correctIndex: 1
+    explanation: "În std::queue, pop() are tip void: doar elimină elementul din față. Ca să-l folosești, îl citești cu front() ÎNAINTE de pop()."
+  - question: "De ce verificăm `!q.empty()` înainte de `q.front()` sau `q.pop()`?"
+    options: ["Ca să fie mai rapid", "Apelul pe o coadă goală duce la comportament nedefinit", "E opțional", "Ca să resetăm coada"]
+    correctIndex: 1
+    explanation: "front() și pop() pe o coadă goală au comportament nedefinit (pot da valori aiurea sau crăpa). Verifici întâi că mai există elemente."
+---
+
+<LessonHook>
+Știi deja regula cozii: primul venit, primul servit. Acum înveți butoanele concrete cu
+care o comanzi în C++ — cum adaugi un client la rând, cum vezi cine urmează și cum îl
+servești. Patru-cinci operații, atât îți trebuie.
+</LessonHook>
+
+## Coada din STL
+
+C++ îți oferă `std::queue` din antetul `<queue>` — nu trebuie să-ți construiești singur
+structura. Operațiile esențiale:
+
+| Operație | Ce face |
+|----------|---------|
+| `q.push(x)` | adaugă `x` la spate |
+| `q.pop()` | scoate elementul din față (NU întoarce nimic) |
+| `q.front()` | citește elementul din față |
+| `q.back()` | citește ultimul adăugat |
+| `q.empty()` | `true` dacă e goală |
+| `q.size()` | câte elemente are |
+
+<ObservationBox>
+Atenție la `pop()`: are tip `void`, doar elimină. Dacă vrei valoarea servită, o citești
+cu `front()` **înainte** de a face `pop()`. Sunt două operații separate.
+</ObservationBox>
+
+## Algoritmul pas cu pas
+
+Adăugăm 10, 20, 30 și servim toată coada în ordine:
+
+<ArrayDiagram
+  values="10 20 30"
+  valueLabel="q"
+  index="off"
+  pointers="0:front 2:back:warning"
+  caption="După push(10), push(20), push(30): front=10, back=30. Servirea va da 10, 20, 30." />
+
+```
+push(10) -> [10]
+push(20) -> [10 20]
+push(30) -> [10 20 30]
+front()  -> 10
+pop()    -> [20 30]
+front()  -> 20
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <queue>
+using namespace std;
+
+int main() {
+    queue<int> q;
+    q.push(10);
+    q.push(20);
+    q.push(30);
+
+    cout << q.front() << endl;   // 10 (cine urmeaza)
+    cout << q.size() << endl;    // 3
+
+    while (!q.empty()) {         // serveste toata coada
+        cout << q.front() << " ";// citeste inainte de pop
+        q.pop();                 // scoate din fata
+    }
+    // 10 20 30
+    return 0;
+}
+```
+
+## Coada implementată cu vector (cum funcționează pe dedesubt)
+
+Ca să înțelegi structura, o poți simula cu un vector și doi indici, `st` (față) și `dr` (spate):
+
+```cpp
+int coada[1000];
+int st = 0, dr = 0;          // coada goala cand st == dr
+
+void push(int x) { coada[dr++] = x; }   // adauga la spate
+int front()      { return coada[st]; }  // citeste fata
+void pop()       { st++; }               // avanseaza fata
+bool empty()     { return st == dr; }
+```
+
+<HintBox>
+Varianta cu vector explică de ce `pop()` e O(1): nu mutăm elementele, doar avansăm
+indicele `st`. Coada „înaintează” prin vector.
+</HintBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `push`, `pop`, `front`, `empty`, `size` | O(1) | O(1) |
+| Procesarea întregii cozi | O(n) | O(n) |
+
+<MistakeBox>
+Greșeli reale:
+
+- **Crezi că `pop()` întoarce valoarea.** Nu — e `void`. Citește cu `front()` întâi,
+  apoi `pop()`.
+- **Apelezi `front()`/`pop()` pe coadă goală.** Comportament nedefinit. Verifică `!q.empty()`.
+- **La varianta cu vector, dimensiune prea mică.** `dr` crește la fiecare `push`; dacă
+  faci multe push-uri, vectorul fix se umple. Folosește coadă circulară sau `std::queue`.
+- **Confunzi `front()` cu `back()`.** `front` = cine urmează (cel mai vechi), `back` = ultimul intrat.
+</MistakeBox>
+
+## Recapitulare
+
+- `std::queue`: `push` (spate), `pop` (față, void), `front`/`back`, `empty`, `size` — toate O(1).
+- `pop()` nu întoarce nimic: citește cu `front()` înainte de a scoate.
+- Pe dedesubt, o coadă pe vector avansează cu doi indici; verifică mereu `empty` înainte de acces.

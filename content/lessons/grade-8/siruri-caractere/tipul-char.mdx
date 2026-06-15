@@ -1,0 +1,131 @@
+---
+title: "Tipul char — o literă este de fapt un număr"
+slug: tipul-char-8
+grade: 8
+chapter: siruri-caractere
+difficulty: baza
+estimatedTime: 12
+free: true
+status: draft
+isBridge: false
+tags: ["char", "ascii", "tipuri"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce afișează `cout << (int)'A';`?"
+    options: ["A", "65", "0", "1"]
+    correctIndex: 1
+    explanation: "Un char este stocat ca un cod numeric (ASCII). Codul literei 'A' este 65, iar conversia la int dezvăluie exact acel cod."
+  - question: "Cum obții cifra numerică din caracterul '7'?"
+    options: ["'7'", "'7' - '0'", "'7' + '0'", "(int)'7'"]
+    correctIndex: 1
+    explanation: "Cifrele '0'..'9' au coduri consecutive. Scăzând '0' (codul 48) din '7' (codul 55) obții exact valoarea 7."
+  - question: "De ce `'a' - 'A'` dă mereu 32?"
+    options: ["E o coincidență", "Literele mici și mari sunt la distanță fixă în ASCII", "Pentru că 'a' e prima literă", "Nu dă 32"]
+    correctIndex: 1
+    explanation: "În ASCII fiecare literă mică este cu exact 32 mai mare decât perechea ei mare, deci diferența e constantă pentru orice literă."
+---
+
+<LessonHook>
+Gândește-te la tastatura ta: fiecare tastă trimite calculatorului un număr, nu un
+desen. Litera „A" pe care o vezi pe ecran este, în memorie, doar numărul 65. Tipul
+`char` este exact asta — un număr mic care, la afișare, se transformă într-un simbol.
+</LessonHook>
+
+## Ce este tipul char?
+
+`char` este tipul care reține **un singur caracter**: o literă, o cifră, un spațiu,
+un semn de punctuație. Trucul pe care trebuie să-l înțelegi: în interior, `char`
+**este un număr întreg mic** (1 octet). Fiecărui caracter îi corespunde un cod
+numeric stabilit prin tabela **ASCII**.
+
+<ObservationBox>
+Pentru că un `char` este un număr, poți face aritmetică cu el. `'A' + 1` dă codul
+lui `'B'`, iar `'5' - '0'` dă valoarea 5. Asta e cheia majorității problemelor cu
+caractere.
+</ObservationBox>
+
+Câteva coduri ASCII pe care merită să le ții minte:
+
+<ArrayDiagram
+  values="'0' '9' 'A' 'Z' 'a' 'z' ' '"
+  valueLabel="char"
+  index="48 57 65 90 97 122 32"
+  indexLabel="cod"
+  caption="Cifrele, literele mari, literele mici și spațiul — fiecare cu codul lui ASCII." />
+
+## De ce contează aceste coduri
+
+Trei relații rezolvă aproape orice:
+
+1. **Cifra dintr-un caracter:** `c - '0'` transformă `'7'` în numărul 7
+   (pentru că `'0'..'9'` au coduri consecutive).
+2. **Poziția în alfabet:** `c - 'a'` dă 0 pentru `'a'`, 1 pentru `'b'`, ... 25 pentru `'z'`.
+3. **Mic ↔ mare:** litera mică e cu 32 mai mare decât cea mare, deci
+   `c - 32` transformă o literă mică în mare, iar `c + 32` invers.
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    char c = 'A';
+    cout << c << endl;          // A
+    cout << (int)c << endl;     // 65, codul ASCII
+
+    char cifra = '7';
+    int valoare = cifra - '0';  // transforma caracterul in numar
+    cout << valoare << endl;    // 7
+
+    char mic = 'g';
+    char mare = mic - 32;       // litera mica devine mare
+    cout << mare << endl;       // G
+    return 0;
+}
+```
+
+## Verificări utile pe un char
+
+Le poți scrie singur, din coduri, sau folosi funcțiile din `<cctype>`:
+
+```cpp
+#include <iostream>
+#include <cctype>
+using namespace std;
+
+int main() {
+    char c = 'k';
+    cout << (c >= 'a' && c <= 'z') << endl;  // 1 = e litera mica
+    cout << isdigit('5') << endl;            // nenul = e cifra
+    cout << (char)toupper('k') << endl;      // K
+    return 0;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Citire / afișare un char | O(1) | O(1) |
+| Aritmetică pe char (`c - '0'` etc.) | O(1) | O(1) |
+
+<MistakeBox>
+Patru capcane des întâlnite:
+
+- **`'0'` ≠ `0`.** Caracterul `'0'` are codul 48; dacă uiți să scazi `'0'`,
+  obții 48 în loc de 0.
+- **`cin >> c` sare peste spații și newline.** Dacă vrei să citești inclusiv
+  spațiile (de exemplu dintr-o propoziție), folosește `cin.get(c)` sau `getline`.
+- **`signed char` se sucește la 127.** Pe majoritatea sistemelor `char` e cu semn:
+  adunând prea mult, codul trece în negativ. Pentru coduri > 127 folosește `unsigned char` sau `int`.
+- **Gaura dintre `'Z'` (90) și `'a'` (97).** Literele mari și mici NU sunt lipite;
+  între ele sunt 6 simboluri. Nu presupune că `'Z' + 1 == 'a'`.
+</MistakeBox>
+
+## Recapitulare
+
+- `char` reține un singur caracter și, în memorie, este un cod numeric (ASCII).
+- Aritmetica pe coduri rezolvă conversiile: `c - '0'` (cifră), `c - 'a'` (poziție), `± 32` (caz).
+- Atenție la diferența `'0'` vs `0` și la faptul că `cin >>` ignoră spațiile.

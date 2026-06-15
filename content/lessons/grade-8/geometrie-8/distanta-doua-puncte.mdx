@@ -1,0 +1,125 @@
+---
+title: "Distanța dintre două puncte"
+slug: distanta-doua-puncte
+grade: 8
+chapter: geometrie-8
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["geometrie", "distanta", "pitagora"]
+visualizers: ["geometry-basics"]
+relatedProblems: []
+quiz:
+  - question: "Distanța dintre (0,0) și (3,4) este..."
+    options: ["7", "5", "12", "25"]
+    correctIndex: 1
+    explanation: "√(3² + 4²) = √(9 + 16) = √25 = 5. E celebrul triunghi 3-4-5."
+  - question: "Pentru a compara care dintre două perechi de puncte e mai apropiată, ce e mai sigur?"
+    options: ["Să compari distanțele cu sqrt", "Să compari distanțele LA PĂTRAT (fără sqrt)", "Să rotunjești", "Nu se poate compara"]
+    correctIndex: 1
+    explanation: "Dacă d1 < d2, atunci și d1² < d2². Comparând pătratele eviți sqrt (lent și cu erori de rotunjire) și rămâi pe întregi."
+  - question: "De ce folosim long long la `(x2-x1)*(x2-x1)`?"
+    options: ["E mai elegant", "Pătratul unei diferențe mari depășește int", "sqrt cere long long", "Nu e nevoie"]
+    correctIndex: 1
+    explanation: "La coordonate de ordinul 10⁹, diferența la pătrat ajunge la 10¹⁸ — depășește int și chiar și un int·int intermediar. long long e obligatoriu."
+---
+
+<LessonHook>
+Doi pomi în curte: cât de departe sunt unul de altul? Întinzi o sfoară dreaptă între ei.
+Lungimea sforii e distanța în linie dreaptă — și se calculează cu o formulă pe care o
+știi deja din clasă: teorema lui Pitagora.
+</LessonHook>
+
+## Formula distanței
+
+Distanța dintre `A(xA, yA)` și `B(xB, yB)` e ipotenuza unui triunghi dreptunghic cu
+catetele `|xB − xA|` și `|yB − yA|`:
+
+`d = √( (xB − xA)² + (yB − yA)² )`
+
+<ObservationBox>
+Diferența pe orizontală și cea pe verticală sunt catetele; distanța în linie dreaptă e
+ipotenuza. Pitagora aplicată direct în plan.
+</ObservationBox>
+
+## Exemplu concret
+
+Pentru `A(0, 0)` și `B(3, 4)`:
+
+<ArrayDiagram
+  values="3 4 5"
+  valueLabel="latura"
+  index="dx dy d"
+  indexLabel="rol"
+  highlight="2"
+  caption="dx = 3, dy = 4 (catetele); d = √(9+16) = √25 = 5 (ipotenuza)." />
+
+```
+dx = 3 - 0 = 3
+dy = 4 - 0 = 4
+d  = sqrt(3*3 + 4*4) = sqrt(25) = 5
+```
+
+## Implementare C++
+
+```cpp
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    long long x1 = 0, y1 = 0, x2 = 3, y2 = 4;
+    long long dx = x2 - x1;
+    long long dy = y2 - y1;
+    long long distLaPatrat = dx * dx + dy * dy;  // long long: evita overflow
+
+    double d = sqrt((double)distLaPatrat);
+    cout << d << endl;                            // 5
+    return 0;
+}
+```
+
+## Trucul: compară pătratele, nu rădăcinile
+
+Când doar **compari** distanțe (care e mai aproape?), nu calcula `sqrt` deloc. Dacă
+`d1 < d2`, atunci și `d1² < d2²`. Pătratele sunt întregi → comparație exactă și rapidă:
+
+```cpp
+long long distSq(long long x1, long long y1, long long x2, long long y2) {
+    long long dx = x2 - x1, dy = y2 - y1;
+    return dx * dx + dy * dy;          // fara sqrt
+}
+// cel mai apropiat punct de origine = cel cu distSq minim
+```
+
+<HintBox>
+`sqrt` întoarce un `double` — lent și cu mici erori de rotunjire. Pentru „cine e mai
+aproape” sau „distanța e exact k”, lucrează cu pătratul întreg și compară `distSq == k*k`.
+</HintBox>
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| O distanță (sau pătratul ei) | O(1) | O(1) |
+| Cel mai apropiat dintre `n` puncte | O(n) | O(1) |
+
+<MistakeBox>
+Capcane reale:
+
+- **Overflow la pătrat.** `dx*dx` cu `dx` de 10⁹ dă 10¹⁸ → folosește `long long`; chiar și
+  `int*int` intermediar se sucește.
+- **Folosești `sqrt` când nu trebuie.** La comparații, pătratul întreg e exact și rapid;
+  `sqrt` introduce erori de rotunjire.
+- **Compari `double` cu `==`.** `d == 5.0` poate eșua din rotunjire. Compară pătratul: `distSq == 25`.
+- **Uiți modulul la catete.** Nu contează — le ridici la pătrat oricum, deci semnul dispare;
+  dar nu confunda `dx` cu `|dx|` în alte formule.
+</MistakeBox>
+
+## Recapitulare
+
+- Distanța = √(dx² + dy²), Pitagora aplicată cu catetele dx și dy.
+- Pentru comparații folosește pătratul întreg (`distSq`) — exact, rapid, fără `sqrt`.
+- Ridicarea la pătrat a coordonatelor mari cere `long long`, altfel overflow.

@@ -1,0 +1,134 @@
+---
+title: "Tipul string — un șir de caractere, gestionat pentru tine"
+slug: tipul-string
+grade: 8
+chapter: siruri-caractere
+difficulty: baza
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["string", "siruri", "citire"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Ce reține `s.size()` pentru `string s = \"abc\";`?"
+    options: ["2", "3", "4", "Codul lui 'a'"]
+    correctIndex: 1
+    explanation: "size() (sau length()) întoarce numărul de caractere. „abc\" are 3 caractere, deci rezultatul este 3."
+  - question: "De ce folosim `getline(cin, s)` în loc de `cin >> s` pentru o propoziție?"
+    options: ["E mai rapid", "cin >> s se oprește la primul spațiu", "getline e singura variantă corectă mereu", "Nu există diferență"]
+    correctIndex: 1
+    explanation: "cin >> s citește un singur cuvânt (se oprește la spațiu/newline). getline citește toată linia, inclusiv spațiile dintre cuvinte."
+  - question: "Cum accesezi al treilea caracter dintr-un string `s`?"
+    options: ["s(3)", "s[3]", "s[2]", "s.at(3)"]
+    correctIndex: 2
+    explanation: "Indexarea pornește de la 0, deci al treilea caracter este la poziția 2: s[2]."
+---
+
+<LessonHook>
+Tipul `char` reține o singură literă, dar un cuvânt are multe litere. Ai putea ține
+fiecare literă într-o variabilă separată — coșmar. `string` este cutia care le ține
+pe toate la un loc, în ordine, și își ajustează singură mărimea când adaugi sau scoți
+caractere.
+</LessonHook>
+
+## Ce este un string?
+
+Un `string` este o **secvență de caractere** păstrate în ordine, indexate de la 0.
+Spre deosebire de tablourile clasice, nu trebuie să-i fixezi dimensiunea: crește și
+scade automat. Pentru a-l folosi, incluzi antetul `<string>`.
+
+<ObservationBox>
+Poziția fiecărui caracter contează. `s[0]` este primul caracter, `s[1]` al doilea,
+iar ultimul caracter este `s[s.size() - 1]`. Toată lucrul cu șiruri se bazează pe
+această indexare.
+</ObservationBox>
+
+Pentru `string s = "ALGORITM";` celulele arată așa:
+
+<ArrayDiagram
+  values="A L G O R I T M"
+  valueLabel="s"
+  indexLabel="index"
+  highlight="0 7"
+  caption="Primul caracter este s[0], ultimul este s[7] = s[size()-1]." />
+
+## Operații de bază
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s = "ALGORITM";
+    cout << s.size() << endl;         // 8 caractere
+    cout << s[0] << " " << s[7] << endl; // A M
+    s[0] = 'a';                       // modifici un caracter pe loc
+    cout << s << endl;                // aLGORITM
+    s += "!";                         // concatenare
+    cout << s << endl;                // aLGORITM!
+    return 0;
+}
+```
+
+## Citirea unui string
+
+Aici se nasc cele mai multe bug-uri, deci fii atent la diferență:
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string cuvant, linie;
+    cin >> cuvant;        // citeste un singur cuvant (se opreste la spatiu)
+    getline(cin, linie);  // citeste restul liniei
+    cout << cuvant << endl;
+    cout << linie << endl;
+    return 0;
+}
+```
+
+- `cin >> s` citește **un cuvânt** — se oprește la primul spațiu sau enter.
+- `getline(cin, s)` citește **toată linia**, inclusiv spațiile.
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| `s[i]` (acces caracter) | O(1) | O(1) |
+| `s.size()` | O(1) | O(1) |
+| Citire / parcurgere | O(n) | O(n) |
+| `s += t` (concatenare) | O(lungime adăugată) | — |
+
+## Vizualizare
+
+Un string este, vizual, un vector de caractere indexat de la 0:
+
+<ArrayDiagram
+  values="c o n c u r s"
+  valueLabel="s"
+  indexLabel="index"
+  pointers="0:primul 6:ultimul:warning"
+  caption="„concurs” are 7 caractere; s.size() == 7, ultimul index este 6." />
+
+<MistakeBox>
+Capcane clasice cu string:
+
+- **Amesteci `cin >>` și `getline`.** După `cin >> n`, în buffer rămâne un `\n`;
+  primul `getline` îl prinde și pare gol. Curăță cu `cin.ignore()` înainte de `getline`.
+- **Indexare de la 1.** `s[s.size()]` este în afara șirului (caracterul valid e `s[size()-1]`).
+- **Compari cu `==` greșit gândit.** La `string`, `s == t` compară conținutul corect,
+  dar NU confunda cu compararea de pointeri din C (`char*`).
+- **`size()` întoarce `unsigned`.** `s.size() - 1` pe un string gol devine un număr uriaș,
+  nu -1. Verifică întâi că șirul nu e gol.
+</MistakeBox>
+
+## Recapitulare
+
+- `string` ține o secvență de caractere indexată de la 0, cu dimensiune automată.
+- `cin >>` citește un cuvânt; `getline` citește toată linia (inclusiv spațiile).
+- Ultimul caracter este `s[s.size() - 1]` — atenție că `size()` e `unsigned`.

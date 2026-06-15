@@ -1,0 +1,124 @@
+---
+title: "Prefixe și sufixe"
+slug: prefixe-sufixe-siruri
+grade: 8
+chapter: siruri-caractere
+difficulty: mediu
+estimatedTime: 14
+free: true
+status: draft
+isBridge: false
+tags: ["prefix", "sufix", "string"]
+visualizers: []
+relatedProblems: []
+quiz:
+  - question: "Care dintre acestea este un prefix al cuvântului „concurs\"?"
+    options: ["curs", "conc", "ncurs", "ours"]
+    correctIndex: 1
+    explanation: "Un prefix începe obligatoriu de la primul caracter. „conc\" este s.substr(0, 4); „curs\" sare peste început, deci nu e prefix."
+  - question: "Cum extragi sufixul de lungime 3 al lui `s`?"
+    options: ["s.substr(0, 3)", "s.substr(3)", "s.substr(s.size() - 3)", "s.substr(s.size() - 3, 3) sau s.substr(s.size()-3)"]
+    correctIndex: 3
+    explanation: "Sufixul de lungime k începe la poziția size()-k și merge până la final, deci s.substr(s.size()-3)."
+  - question: "Pentru a verifica dacă `s` începe cu `t`, ce compari?"
+    options: ["s cu t", "s.substr(0, t.size()) cu t", "s.find(t) cu 0 — și e suficient", "ultimul caracter al fiecăruia"]
+    correctIndex: 1
+    explanation: "„Începe cu\" înseamnă că prefixul lui s de lungimea lui t este chiar t: s.substr(0, t.size()) == t."
+---
+
+<LessonHook>
+Când scrii într-o bară de căutare „bucu", aplicația îți propune „București",
+„Bucureșteni"... Toate au în comun începutul „bucu" — adică un **prefix**. Iar
+terminațiile gramaticale („...escu", „...eanu") sunt **sufixe**. A lucra cu începuturi
+și terminații de cuvinte e o operație de zi cu zi.
+</LessonHook>
+
+## Ce sunt prefixele și sufixele
+
+- Un **prefix** este o secvență care începe de la **primul** caracter al șirului.
+- Un **sufix** este o secvență care se termină cu **ultimul** caracter al șirului.
+
+Pentru `"concurs"`, `"con"` e prefix, `"urs"` e sufix. Întregul șir și șirul vid sunt,
+formal, și prefixe și sufixe.
+
+<ObservationBox>
+Un șir de lungime `n` are exact `n + 1` prefixe (de lungime 0, 1, ..., n) și tot atâtea
+sufixe. Definiția contează: un prefix nu „plutește" la mijloc — e legat de început.
+</ObservationBox>
+
+Prefixul de lungime 3 al lui `"concurs"`:
+
+<ArrayDiagram
+  values="c o n c u r s"
+  valueLabel="s"
+  indexLabel="index"
+  range="0-2"
+  caption="Prefixul de lungime 3 este s.substr(0, 3) = „con” — pornește de la index 0." />
+
+Iar sufixul de lungime 3:
+
+<ArrayDiagram
+  values="c o n c u r s"
+  valueLabel="s"
+  indexLabel="index"
+  range="4-6"
+  caption="Sufixul de lungime 3 este s.substr(s.size() - 3) = „urs” — se termină la index 6." />
+
+## Cum le extragi
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s = "concurs";
+    int n = s.size();
+
+    cout << s.substr(0, 3) << endl;        // con (prefix de lungime 3)
+    cout << s.substr(n - 3) << endl;       // urs (sufix de lungime 3)
+    cout << s.substr(n - 3, 3) << endl;    // urs (echivalent)
+    return 0;
+}
+```
+
+## „Începe cu" / „Se termină cu"
+
+O verificare foarte des cerută la concursuri:
+
+```cpp
+bool incepeCu(const string& s, const string& t) {
+    if (t.size() > s.size()) return false;
+    return s.substr(0, t.size()) == t;
+}
+
+bool seTerminaCu(const string& s, const string& t) {
+    if (t.size() > s.size()) return false;
+    return s.substr(s.size() - t.size()) == t;
+}
+```
+
+## Complexitate
+
+| Operație | Timp | Spațiu |
+|----------|------|--------|
+| Extragere prefix/sufix de lungime k | O(k) | O(k) |
+| „începe cu" / „se termină cu" t | O(\|t\|) | O(\|t\|) |
+
+<MistakeBox>
+Capcane reale:
+
+- **Sufix greșit calculat.** `s.substr(s.size() - k)` cere `k <= s.size()`; altfel
+  `size() - k` (unsigned) devine uriaș → excepție. Verifică lungimea înainte.
+- **Confunzi sufixul cu un subșir oarecare.** „urs" e sufix doar pentru că se termină
+  exact la finalul șirului; un subșir de la mijloc nu e nici prefix, nici sufix.
+- **Compari lungimi cu semn diferit.** `t.size() > s.size()` e ok, dar `s.size() - t.size()`
+  fără verificarea de mai sus se sucește pe unsigned.
+- **Uiți cazul `t` mai lung decât `s`.** Fără `if`-ul de la început, „începe cu" pică pe `substr`.
+</MistakeBox>
+
+## Recapitulare
+
+- Prefixul pornește de la primul caracter, sufixul se termină la ultimul.
+- Prefix de lungime k: `s.substr(0, k)`; sufix de lungime k: `s.substr(s.size() - k)`.
+- Verifică mereu `k <= s.size()` — `size()` e unsigned și scăderea se poate suci.

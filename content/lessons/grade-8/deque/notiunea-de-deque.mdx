@@ -1,0 +1,110 @@
+---
+title: "Noțiunea de deque — coadă cu două capete"
+slug: notiunea-de-deque
+grade: 8
+chapter: deque
+difficulty: baza
+estimatedTime: 13
+free: true
+status: draft
+isBridge: false
+tags: ["deque", "structuri", "fifo"]
+visualizers: ["deque"]
+relatedProblems: []
+quiz:
+  - question: "Ce poate face un deque, dar o coadă obișnuită nu?"
+    options: ["Să adauge la spate", "Să adauge ȘI să scoată de la AMBELE capete", "Să țină elemente", "Să fie goală"]
+    correctIndex: 1
+    explanation: "Coada lucrează doar la câte un capăt pentru fiecare operație (adaugi la spate, scoți din față). Deque-ul permite adăugare și scoatere la ambele capete."
+  - question: "De la ce vine numele „deque”?"
+    options: ["Decimal queue", "Double-Ended QUEue (coadă cu două capete)", "Delete queue", "Direct queue"]
+    correctIndex: 1
+    explanation: "Deque = Double-Ended Queue: o coadă la care ambele capete (față și spate) sunt deschise pentru inserare și extragere."
+  - question: "Dacă folosești un deque DOAR cu push_back și pop_front, cum se comportă?"
+    options: ["Ca o stivă", "Ca o coadă obișnuită (FIFO)", "Aleatoriu", "Nu funcționează"]
+    correctIndex: 1
+    explanation: "Restrângând operațiile la un capăt pentru adăugare și celălalt pentru scoatere, deque-ul devine exact o coadă FIFO. El generalizează atât coada, cât și stiva."
+---
+
+<LessonHook>
+Imaginează-ți un tunel de metrou cu uși la **ambele** capete. Pasagerii pot urca și
+coborî și prin față, și prin spate. O coadă obișnuită are o singură ușă de intrare și
+una de ieșire; deque-ul le are pe toate patru. De aici și flexibilitatea lui.
+</LessonHook>
+
+## Ce este un deque
+
+Un **deque** (citit „dec”, de la *Double-Ended Queue* — coadă cu două capete) este o
+structură în care poți **adăuga și scoate la ambele capete**: și în față, și la spate.
+E o coadă mai generală.
+
+Cele patru operații de capăt:
+- `push_front` / `pop_front` — la **față**;
+- `push_back` / `pop_back` — la **spate**.
+
+<ObservationBox>
+Deque-ul le cuprinde pe celelalte: folosit doar cu `push_back` + `pop_front` e o **coadă**
+(FIFO); folosit doar cu `push_back` + `pop_back` e o **stivă** (LIFO). De aceea îl numim
+o structură „universală” pentru capete.
+</ObservationBox>
+
+## Cum se comportă
+
+Pornim de la `[20 30]` și adăugăm la ambele capete:
+
+<ArrayDiagram
+  values="20 30"
+  valueLabel="deque"
+  index="off"
+  pointers="0:fata 1:spate:warning"
+  caption="Deque cu două elemente. Ambele capete sunt deschise." />
+
+<ArrayDiagram
+  values="10 20 30 40"
+  valueLabel="deque"
+  index="off"
+  highlight="0 3"
+  pointers="0:push_front 3:push_back:warning"
+  caption="push_front(10) adaugă în stânga, push_back(40) în dreapta — simultan posibil." />
+
+## Tabel de operații
+
+| Operație | Ce face |
+|----------|---------|
+| `push_front(x)` | adaugă `x` în față |
+| `push_back(x)` | adaugă `x` la spate |
+| `pop_front()` | scoate din față |
+| `pop_back()` | scoate din spate |
+| `front()` / `back()` | citește capătul respectiv |
+| `empty()` / `size()` | starea structurii |
+
+## Unde ajută cele două capete
+
+- **Istoric navigabil** (înainte/înapoi), unde adaugi și scoți de la ambele capete.
+- **Fereastră glisantă cu maxim/minim** — scoți din față elementele expirate și din spate
+  pe cele „învinse” (vei vedea la aplicații).
+- Oriunde ai nevoie când de FIFO, când de LIFO, fără a schimba structura.
+
+## Vizualizare
+
+Urmărește cum elementele intră și ies pe la ambele capete, spre deosebire de coada cu un singur sens:
+
+<Visualizer name="deque" />
+
+<MistakeBox>
+Confuzii la început:
+
+- **Folosești deque ca să accesezi mijlocul.** Operațiile rapide sunt la **capete**;
+  pentru acces la mijloc, un vector e mai potrivit.
+- **Confunzi `pop_front` cu `pop_back`.** Capete diferite, rezultate diferite — verifică
+  exact ce capăt cere problema.
+- **Uiți că `pop_*` nu întoarce valoarea** (ca la `std::queue`): citește cu `front()`/`back()` întâi.
+- **Crezi că deque e mereu mai bun ca o coadă.** Dacă ai nevoie doar de FIFO, `queue` e mai
+  simplu și mai clar.
+</MistakeBox>
+
+## Recapitulare
+
+- Deque = coadă cu două capete: adaugi și scoți și în față, și la spate.
+- Generalizează coada (FIFO) și stiva (LIFO), după ce operații folosești.
+- Operațiile rapide sunt la capete; pentru acces la mijloc folosește un vector.
